@@ -301,7 +301,7 @@ const rootNav = [
         icon:           'icon icon-key',
         route:          'custom-extension.image-repo.config',
         condition() {
-          return true;
+          return !!get(this, 'access.admin');
         }
       },
       {
@@ -311,7 +311,7 @@ const rootNav = [
         icon:           'icon icon-key',
         route:          'custom-extension.image-repo.registries',
         condition() {
-          return true;
+          return !!get(this, 'access.admin');
         }
       },
       {
@@ -320,9 +320,6 @@ const rootNav = [
         localizedLabel: 'nav.admin.imageRepo.project',
         icon:           'icon icon-key',
         route:          'custom-extension.image-repo.project',
-        condition() {
-          return true;
-        }
       },
       {
         scope:          'global',
@@ -330,9 +327,6 @@ const rootNav = [
         localizedLabel: 'nav.admin.imageRepo.log',
         icon:           'icon icon-key',
         route:          'custom-extension.image-repo.log',
-        condition() {
-          return true;
-        }
       },
     ],
   },
