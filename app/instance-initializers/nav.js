@@ -300,7 +300,7 @@ const rootNav = [
         id:             'global-image-repo-admin-config',
         localizedLabel: 'nav.admin.imageRepo.config',
         icon:           'icon icon-key',
-        route:          'custom-extension.image-repo.adminConfig',
+        route:          'custom-extension.image-repo.admin-config',
         resource:       [],
         condition() {
           return !!get(this, 'access.admin');
@@ -322,7 +322,7 @@ const rootNav = [
         id:             'global-image-repo-user-config',
         localizedLabel: 'nav.admin.imageRepo.config',
         icon:           'icon icon-key',
-        route:          'custom-extension.image-repo.userConfig',
+        route:          'custom-extension.image-repo.user-config',
         resource:       [],
         condition() {
           return !get(this, 'access.admin');
