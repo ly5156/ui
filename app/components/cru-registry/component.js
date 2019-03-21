@@ -69,7 +69,9 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
         val.password = password;
         key = get(this, 'harborServer');
         key = key.indexOf('://') > -1 ? key.substr(key.indexOf('://') + 3) : key;
+        set(this, 'model.labels', { 'rancher.cn/registry-harbor-auth': 'true' });
       } else {
+        set(this, 'model.labels', null);
         ['username', 'password', 'auth'].forEach((k) => {
           let v = get(obj, k);
 
