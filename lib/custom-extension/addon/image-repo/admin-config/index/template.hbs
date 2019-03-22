@@ -9,12 +9,16 @@
       <span class="m-0">Harbor 配置</span>
       <p class="help-block">Harbor访问设置</p>
     </div>
-    {{#if (not harborConfigEditable)}}
+    {{#if (and (not changePwd) (not harborConfigEditable))}}
       <button class="btn bg-transparent pull-right" {{action "editHarborConfig"}}>编辑</button>
+    {{/if}}
+    {{#if (and harborAccountValid (not changePwd) (not harborConfigEditable))}}
+      <button class="btn bg-transparent pull-right" {{action "showChangePwdView"}}>修改密码</button>
     {{/if}}
   </div>
   <div class="accordion-content">
     {{top-errors errors=harborAccountErrors}}
+    {{#if (not changePwd)}}
     <div class="row">
       <div class="col span-12">
         <label class="acc-label">访问地址{{field-required}}</label>
@@ -35,6 +39,32 @@
         {{/input-or-display}}
       </div>
     </div>
+    {{/if}}
+    {{#if (and changePwd (not harborConfigEditable))}}
+    <div class="row">
+      <div class="col span-12">
+        <label class="acc-label">访问地址:</label>
+        <span>{{harborConfig.url}}</span>
+      </div>
+      <div class="col span-6">
+        <label class="acc-label">用户名:</label>
+        <span>{{harborConfig.username}}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col span-12">
+        <label class="acc-label">新的Harbor密码{{field-required}}</label>
+        {{input type="password" class="form-control" value=changePwdForm.newPwd placeholder="新的Harbor密码"}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col span-12">
+        <label class="acc-label">确认Harbor密码{{field-required}}</label>
+        {{input type="password" class="form-control" value=changePwdForm.confirmPwd placeholder="确认Harbor密码"}}
+      </div>
+    </div>
+    {{save-cancel save="confirmChangePwd" cancel="cancelChangePwd" createLabel="imageRepoSection.adminConfigPage.saveHarborConfig" }}
+    {{/if}}
     {{#if harborConfigEditable}}
     {{save-cancel save="saveHarboConfig" cancel="cancelHarborConfig" createLabel="imageRepoSection.adminConfigPage.saveHarborConfig" }}
     {{/if}}
