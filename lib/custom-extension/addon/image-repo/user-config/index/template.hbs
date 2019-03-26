@@ -1,35 +1,94 @@
 <section class="header clearfix">
   <h1>Harbor 账号配置</h1>
 </section>
-{{#if (not hasHarborRegistry)}}
-<section>
-  <p>请等待管理员配置镜像库</p>
-</section>
-{{/if}}
-{{#if (and hasHarborRegistry accountSynced)}}
-<section>
-  <p>镜像库账号已经同步完成</p>
-  {{top-errors errors=harborAccountErrors}}
-</section>
-{{/if}}
-{{#if (and hasHarborRegistry (not accountSynced))}}
-<section>
-{{top-errors errors=errors}}
-<div class="row">
-  <div class="col span-6">
-    <label class="acc-label">邮箱地址{{field-required}}</label>
-    {{#input-or-display editable=accountEditable value=account.email}}
-      {{input type="text" class="form-control" value=account.email placeholder="邮箱地址"}}
-    {{/input-or-display}}
+
+<div class="accordion">
+  <div class="accordion-header">
+    <div class="expand"></div>
+    <div class="title">
+      <span class="m-0">Harbor 配置</span>
+      <p class="help-block">Harbor访问设置</p>
+    </div>
+    {{#if (and hasHarborRegistry accountSynced harborAccountValid (not changeHarborAccount))}}
+      <button class="btn bg-transparent pull-right" {{action "showChangeHarborAccountView"}}>修改账号</button>
+    {{/if}}
   </div>
-  <div class="col span-6">
-    <label class="acc-label">密码{{field-required}}</label>
-    {{#input-or-display editable=accountEditable value=""}}
-      {{input type="password" class="form-control" value=account.password placeholder="访问Harbor的密码"}}
-    {{/input-or-display}}
+  <div class="accordion-content">
+    {{#if (not hasHarborRegistry)}}
+      <section>
+        <p>请等待管理员配置镜像库</p>
+      </section>
+      {{/if}}
+      {{#if (and hasHarborRegistry accountSynced (not changeHarborAccount))}}
+      <section>
+        <p>镜像库账号已经同步完成</p>
+        <div class="row">
+          <div class="col span-12">
+            <label class="acc-label">访问地址:</label>
+            <span>{{model.harborServer}}</span>
+          </div>
+          <div class="col span-12">
+            <label class="acc-label">用户名:</label>
+            <span>{{currentAccount.username}}</span>
+          </div>
+        </div>
+        {{top-errors errors=harborAccountErrors}}
+      </section>
+      {{/if}}
+      {{#if (and hasHarborRegistry (not accountSynced))}}
+      <section>
+      {{top-errors errors=errors}}
+      <div class="row">
+        <div class="col span-6">
+          <label class="acc-label">邮箱地址{{field-required}}</label>
+          {{#input-or-display editable=accountEditable value=account.email}}
+            {{input type="text" class="form-control" value=account.email placeholder="邮箱地址"}}
+          {{/input-or-display}}
+        </div>
+        <div class="col span-6">
+          <label class="acc-label">密码{{field-required}}</label>
+          {{#input-or-display editable=accountEditable value=""}}
+            {{input type="password" class="form-control" value=account.password placeholder="访问Harbor的密码"}}
+          {{/input-or-display}}
+        </div>
+      </div>
+
+      {{save-cancel save="syncAccount" cancelDisabled=true createLabel="imageRepoSection.userConfigPage.syncAccount" }}
+      </section>
+      {{/if}}
+      {{#if changeHarborAccount}}
+      {{top-errors errors=changeAccountErrors}}
+        <div class="row">
+          <div class="col span-12">
+            <label class="acc-label">访问地址:</label>
+            <span>{{model.harborServer}}</span>
+          </div>
+          <div class="col span-12">
+            <label class="acc-label">用户名:</label>
+            <span>{{currentAccount.username}}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col span-12">
+            <label class="acc-label">邮箱地址{{field-required}}</label>
+            {{input type="text" class="form-control" value=changeHarborAccountForm.email placeholder="邮箱地址"}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col span-12">
+            <label class="acc-label">新的Harbor密码{{field-required}}</label>
+            {{input type="password" class="form-control" value=changeHarborAccountForm.newPwd placeholder="新的Harbor密码"}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col span-12">
+            <label class="acc-label">确认Harbor密码{{field-required}}</label>
+            {{input type="password" class="form-control" value=changeHarborAccountForm.confirmPwd placeholder="确认Harbor密码"}}
+          </div>
+        </div>
+        {{save-cancel save="confirmChangeHarborAccount" cancel="cancelChangeHarborAccount" createLabel="imageRepoSection.adminConfigPage.saveHarborConfig" }}
+      {{/if}}
   </div>
 </div>
 
-{{save-cancel save="syncAccount" cancelDisabled=true createLabel="imageRepoSection.userConfigPage.syncAccount" }}
-</section>
-{{/if}}
+
