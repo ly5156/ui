@@ -17,13 +17,14 @@
     selectData=selectData
     hasSelect=hasSelect
     availableActions=availableActions
-    totalCount=model.totalCount
+    totalCount=model.projects.totalCount
     primaryKeyName="project_id"
     remove=(action "promptDelete")
     search=(action "search")
     pageChange=(action "pageChange")
     sortChanged=(action "sortChanged")
     selectChange=(action "selectChange")
+    model=model
     as |sortable kind row dt|
   }}
   {{#if (eq kind "row")}}
