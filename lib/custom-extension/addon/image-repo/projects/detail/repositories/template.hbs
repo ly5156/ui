@@ -1,23 +1,23 @@
 <section class="header has-tabs clearfix pb-0">
   <ul class="tab-nav">
     <li>
-      {{#link-to "image-repo.projects.detail.repositories" model.imageList.projectId}}镜像仓库{{/link-to}}
+      {{#link-to "image-repo.projects.detail.repositories" model.imageList.projectId model.currentUserRoleId}}镜像仓库{{/link-to}}
     </li>
     {{#if isAdmin}}
     <li>
-      {{#link-to "image-repo.projects.detail.members" model.imageList.projectId}}成员{{/link-to}}
+      {{#link-to "image-repo.projects.detail.members" model.imageList.projectId model.currentUserRoleId}}成员{{/link-to}}
     </li>
     {{!-- <li>
       {{#link-to "image-repo.projects.detail.replications" model.imageList.projectId}}复制{{/link-to}}
     </li> --}}
     <li>
-      {{#link-to "image-repo.projects.detail.labels" model.imageList.projectId}}标签{{/link-to}}
+      {{#link-to "image-repo.projects.detail.labels" model.imageList.projectId model.currentUserRoleId}}标签{{/link-to}}
     </li>
     <li>
-      {{#link-to "image-repo.projects.detail.logs" model.imageList.projectId}}日志{{/link-to}}
+      {{#link-to "image-repo.projects.detail.logs" model.imageList.projectId model.currentUserRoleId}}日志{{/link-to}}
     </li>
     <li>
-      {{#link-to "image-repo.projects.detail.configs" model.imageList.projectId}}配置管理{{/link-to}}
+      {{#link-to "image-repo.projects.detail.configs" model.imageList.projectId model.currentUserRoleId}}配置管理{{/link-to}}
     </li>
     {{/if}}
   </ul>
@@ -70,10 +70,11 @@
     totalCount=model.imageList.totalCount
     remove=(action "promptDelete")
     pageChange=(action "pageChange")
+    model=model
     as |sortable kind row dt|
   }}
   {{#if (eq kind "row")}}
-      {{image-row model=row}}
+      {{image-row model=row currentUserRoleId=model.currentUserRoleId}}
     {{else if (eq kind "nomatch")}}
       <tr>
         <td

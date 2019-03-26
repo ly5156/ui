@@ -1,5 +1,5 @@
 <section class="header">
-  <h1>{{#link-to "image-repo.projects.detail.repositories" model.projectId}}镜像仓库{{/link-to}}>{{model.repository}}</h1>
+  <h1>{{#link-to "image-repo.projects.detail.repositories" model.projectId model.currentUserRoleId}}镜像仓库{{/link-to}}>{{model.repository}}</h1>
 </section>
 <section>
 {{#custom-table
@@ -16,6 +16,7 @@
     retag=(action "retag")
     addLabel=(action "addLabel")
     copyDigest=(action "copyDigest")
+    model=model
     as |sortable kind row dt|
   }}
   {{#if (eq kind "row")}}
