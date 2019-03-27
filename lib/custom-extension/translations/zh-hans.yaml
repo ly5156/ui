@@ -12,8 +12,8 @@ imageRepoSection:
       developer: Developer
       guest: Guest
     table:
-      noData: There are no projects yet
-      noMatch: No projects match the current search
+      noData: 暂无数据 
+      noMatch: 暂无数据
   adminConfigPage:
     saveHarborConfig: 保存
     removeHarborConfig: 删除
