@@ -1,6 +1,10 @@
 imageRepoSection:
   common:
     reset: 重置
+  action:
+    changePwd: 修改密码
+    edit: 编辑
+    editAccount: 修改账号
   projectsPage:
     addProject: 新建项目
     removeProject: 删除项目

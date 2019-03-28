@@ -1,5 +1,5 @@
 <section class="header clearfix">
-  <h1>Harbor 配置</h1>
+  <h1>系统配置</h1>
 </section>
 <section>
 <div class="accordion">
@@ -9,11 +9,8 @@
       <span class="m-0">Harbor 配置</span>
       <p class="help-block">Harbor访问设置</p>
     </div>
-    {{#if (and (not changePwd) (not harborConfigEditable))}}
-      <button class="btn bg-transparent pull-right" {{action "editHarborConfig"}}>编辑</button>
-    {{/if}}
-    {{#if (and harborAccountValid (not changePwd) (not harborConfigEditable))}}
-      <button class="btn bg-transparent pull-right" {{action "showChangePwdView"}}>修改密码</button>
+    {{#if showActionMenu}}
+    {{#custom-action-menu class="btn bg-transparent pull-right" resourceActions=configActions menuClick=(action 'handleMenuClick')}} {{/custom-action-menu}}
     {{/if}}
   </div>
   <div class="accordion-content">

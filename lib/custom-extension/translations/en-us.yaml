@@ -1,6 +1,10 @@
 imageRepoSection:
   common:
     reset: Reset
+  action:
+    changePwd: Change Password
+    edit: Edit
+    editAccount: Edit Account
   projectsPage:
     addProject: New Project
     removeProject: Delete Project

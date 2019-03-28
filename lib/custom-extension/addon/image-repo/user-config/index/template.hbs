@@ -1,16 +1,16 @@
 <section class="header clearfix">
-  <h1>Harbor 账号配置</h1>
+  <h1>系统配置</h1>
 </section>
 
 <div class="accordion">
   <div class="accordion-header">
     <div class="expand"></div>
     <div class="title">
-      <span class="m-0">Harbor 配置</span>
+      <span class="m-0">Harbor 账号配置</span>
       <p class="help-block">Harbor访问设置</p>
     </div>
-    {{#if (and hasHarborRegistry accountSynced harborAccountValid (not changeHarborAccount))}}
-      <button class="btn bg-transparent pull-right" {{action "showChangeHarborAccountView"}}>修改账号</button>
+    {{#if showActionMenu}}
+    {{#custom-action-menu class="btn bg-transparent pull-right" resourceActions=configActions menuClick=(action 'handleMenuClick')}} {{/custom-action-menu}}
     {{/if}}
   </div>
   <div class="accordion-content">
