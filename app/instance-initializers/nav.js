@@ -299,7 +299,6 @@ const rootNav = [
         scope:          'global',
         id:             'global-image-repo-admin-config',
         localizedLabel: 'nav.admin.imageRepo.config',
-        icon:           'icon icon-key',
         route:          'custom-extension.image-repo.admin-config',
         resource:       [],
         condition() {
@@ -321,7 +320,6 @@ const rootNav = [
         scope:          'global',
         id:             'global-image-repo-user-config',
         localizedLabel: 'nav.admin.imageRepo.config',
-        icon:           'icon icon-key',
         route:          'custom-extension.image-repo.user-config',
         resource:       [],
         condition() {
@@ -332,7 +330,6 @@ const rootNav = [
         scope:          'global',
         id:             'global-image-repo-projects',
         localizedLabel: 'nav.admin.imageRepo.projects',
-        icon:           'icon icon-key',
         route:          'custom-extension.image-repo.projects',
         resource:       [],
         condition() {
@@ -349,7 +346,6 @@ const rootNav = [
         scope:          'global',
         id:             'global-image-repo-logs',
         localizedLabel: 'nav.admin.imageRepo.logs',
-        icon:           'icon icon-key',
         route:          'custom-extension.image-repo.logs',
         resource:       [],
         condition() {
