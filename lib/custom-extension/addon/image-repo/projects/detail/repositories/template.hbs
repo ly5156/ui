@@ -71,10 +71,11 @@
     remove=(action "promptDelete")
     pageChange=(action "pageChange")
     model=model
+    hasRowActions=true
     as |sortable kind row dt|
   }}
   {{#if (eq kind "row")}}
-      {{image-row model=row currentUserRoleId=model.currentUserRoleId}}
+      {{image-row model=row currentUserRoleId=model.currentUserRoleId command=(action "handleCommand")}}
     {{else if (eq kind "nomatch")}}
       <tr>
         <td

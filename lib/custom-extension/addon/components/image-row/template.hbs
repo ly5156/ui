@@ -12,3 +12,6 @@
 <td data-title="{{dt.pull_count}}">
   {{model.pull_count}}
 </td>
+<td data-title="{{dt.actions}}" class="actions">
+  {{custom-action-menu model=model resourceActions=resourceActions menuClick=(action 'handleMenuClick')}}
+</td>
