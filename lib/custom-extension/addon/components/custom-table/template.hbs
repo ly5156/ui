@@ -91,6 +91,9 @@
           header=header
         }}
       {{/each}}
+      {{#if hasRowActions}}
+        <th width="{{actionsWidth}}"></th>
+      {{/if}}
     </tr>
   </thead>
     <tbody>

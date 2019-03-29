@@ -16,10 +16,11 @@
     pageChange=(action "pageChange")
     edit=(action "editLabel")
     sortChanged=(action "sortChanged")
+    hasRowActions=true
     as |sortable kind row dt|
   }}
   {{#if (eq kind "row")}}
-      {{custom-label-row model=row labelColors=labelColors}}
+      {{custom-label-row model=row labelColors=labelColors command=(action "handleCommand")}}
     {{else if (eq kind "nomatch")}}
       <tr>
         <td

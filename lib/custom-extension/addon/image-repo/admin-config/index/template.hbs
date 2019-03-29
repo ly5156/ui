@@ -87,7 +87,7 @@
 {{#if harborAccountValid}}
 <p>其他高级选项在<a class="clip project-link" target="_blank" href="{{model.harborServer}}">Harbor</a>中进行配置</p>
   <section>
-    {{#accordion-list as | al expandFn | }}
+    {{#accordion-list showExpandAll=false as | al expandFn |}}
       {{#accordion-list-item
         title="标签"
         detail="标签管理"
