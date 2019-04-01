@@ -2,7 +2,7 @@
   {{check-box nodeId=model.project_id}}
 </td>
 
-<td data-title="{{dt.name}}">
+<td data-title="{{dt.name}}" class="clip">
   {{!-- <a href="{{href-to 'custom-extension.image-repo.projects.detail.repositories' model.project_id}}">
     {{model.name}}
   </a> --}}
@@ -19,7 +19,7 @@
 </td>
 <td data-title="{{dt.UserRole}}">
   {{#if (eq model.current_user_role_id 0)}}
-  系统管理员
+  
   {{else if (eq model.current_user_role_id 1)}}
     项目管理员
   {{else if (eq model.current_user_role_id 2)}}
