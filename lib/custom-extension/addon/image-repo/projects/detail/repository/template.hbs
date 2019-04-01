@@ -1,5 +1,5 @@
 <section class="header">
-  <h1>{{#link-to "image-repo.projects.detail.repositories" model.projectId model.currentUserRoleId}}镜像仓库{{/link-to}}>{{model.repository}}</h1>
+  <h3>{{#link-to "image-repo.projects.detail.repositories" model.projectId model.currentUserRoleId}}镜像仓库{{/link-to}}>{{model.repository}}</h3>
 </section>
 <section>
 {{#custom-table
@@ -8,6 +8,7 @@
     data=data
     availableActions=availableActions
     totalCount=data.length
+    searchText=searchText
     primaryKeyName="id"
     remove=(action "promptDelete")
     search=(action "search")
