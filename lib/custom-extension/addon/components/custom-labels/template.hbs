@@ -1,8 +1,12 @@
+{{#if isProjectLabel}}
+<button style="position: absolute; right: 0px; top: 32px;" class="btn btn-sm bg-primary right-divider-btn" {{action 'addNewLabel'}}>新建标签</button>
+{{else}}
 <section class="header clearfix">
   <div class="right-buttons">
     <button class="btn btn-sm bg-primary right-divider-btn" {{action 'addNewLabel'}}>新建标签</button>
   </div>
 </section>
+{{/if}}
 <section class="instances pt-5 pb-5">
   {{#custom-table
     classNames="grid sortable-table"
