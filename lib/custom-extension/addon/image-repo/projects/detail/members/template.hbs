@@ -42,14 +42,14 @@
               <div style="margin-left:10px;font-weight:700;margin-top:10px">设置角色</div>
               <div>
                 {{#each roleArr as |role|}}
-                  {{#if canChange}}
+                  {{#if (not disableActions)}}
                     <div style="curser:pointer;padding-left:15px;line-height: 32px;cursor:pointer;" onclick={{action 'changeRole' role.id}} onmouseover="this.style.background='#eee'" onmouseout="this.style.background='#fff'">{{role.name}}</div>
                     {{else}}
                     <div style="curser:pointer;padding-left:15px;line-height: 32px;color:rgb(216, 216, 216)" onclick={{action 'changeRole' role.id}} onmouseover="this.style.background='#eee'" onmouseout="this.style.background='#fff'">{{role.name}}</div>
                   {{/if}}
                 {{/each}}
               </div>
-              {{#if canChange}}
+              {{#if (not disableActions)}}
               <div style="curser:pointer;padding-left:15px;line-height: 39px; border-top:1px solid rgb(216, 216, 216);cursor:pointer;" onclick={{action 'deleteMembersRole'}} onmouseover="this.style.background='#eee'" onmouseout="this.style.background='#fff'">移除成员</div>
               {{else}}
               <div style="curser:pointer;padding-left:15px;line-height: 39px; border-top:1px solid rgb(216, 216, 216);color:rgb(216, 216, 216)" onclick={{action 'deleteMembersRole'}} onmouseover="this.style.background='#eee'" onmouseout="this.style.background='#fff'">移除成员</div>
@@ -74,18 +74,18 @@
     headers=headers
     primaryKeyName="id"
     availableActions=availableActions
-    selectChange=( action "selectChange")
-    data=model.data
+    selectionChanged=( action "selectChange")
+    data=model.memberList.data
     hasBulkActions=true
     showHeader=false
     page=page
-    totalCount=model.totalCount
+    totalCount=model.memberList.totalCount
     sortChanged=(action "sortChanged")
     pageChange=(action "pageChange")
     as |sortable kind row dt|
   }}
   {{#if (eq kind "row")}}
-      {{members-row model=row}}
+      {{custom-members-row model=row}}
     {{else if (eq kind "nomatch")}}
       <tr>
         <td

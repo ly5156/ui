@@ -83,7 +83,7 @@
     as |sortable kind row dt|
   }}
   {{#if (eq kind "row")}}
-      {{image-row model=row currentUserRoleId=model.currentUserRoleId command=(action "handleCommand")}}
+      {{custom-repo-row model=row currentUserRoleId=model.currentUserRoleId hasAdminRole=model.currentUser.has_admin_role command=(action "handleCommand")}}
     {{else if (eq kind "nomatch")}}
       <tr>
         <td
