@@ -1,3 +1,6 @@
+<section style="width: 100%;">
+  <div style="font-size: 1.5em;" class="clip">{{model.repo.name}}</div>
+</section>
 <section class="header has-tabs clearfix pb-0">
   <ul class="tab-nav">
     <li>
@@ -29,11 +32,8 @@
   </ul>
 </section>
 <section>
-  <div class="fixed-header-actions" style="display: flex;align-items: center; justify-content: space-between;">
-    <div style="width: calc(100% - 350px);">
-      <div class="clip">{{model.repo.name}}</div>
-    </div>
-    <div style="display: flex;">
+  <div style="position: relative;">
+    <div style="display: flex; position: absolute;top: 5px; right: 0px; z-index: 1;">
       <div style="width: 115px;margin-right:10px;">
         {{#basic-dropdown
           horizontalPosition="right"
@@ -56,17 +56,13 @@
           {{/dd.content}}
         {{/basic-dropdown}}
       </div>
-      <div>
-        {{#ember-wormhole to=searchToWormhole renderInPlace=(not searchToWormhole)}}
-          <div class="pull-right search-group input-group">
-            {{input value=searchText aria-title=(t 'generic.search') type="search" class="input-sm pull-right" placeholder=(t 'generic.search') enter=(action "search")}}
-            {{#if searchText}}
-              <span class="input-group-btn">
-                <button class="btn bg-transparent text-info pl-10 pr-10" {{action 'clearSearch'}}><i class="icon icon-close"/></button>
-              </span>
-            {{/if}}
-          </div>
-        {{/ember-wormhole}}
+      <div class="pull-right search-group input-group">
+        {{input value=searchText aria-title=(t 'generic.search') type="search" class="input-sm pull-right" placeholder=(t 'generic.search') enter=(action "search")}}
+        {{#if searchText}}
+          <span class="input-group-btn">
+            <button class="btn bg-transparent text-info pl-10 pr-10" {{action 'clearSearch'}}><i class="icon icon-close"/></button>
+          </span>
+        {{/if}}
       </div>
     </div>
   </div>

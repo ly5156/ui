@@ -1,3 +1,6 @@
+<section style="width: 100%;">
+  <div style="font-size: 1.5em;" class="clip">{{model.repo.name}}</div>
+</section>
 <section class="header has-tabs clearfix pb-0">
   <ul class="tab-nav">
     <li>
@@ -30,12 +33,13 @@
 </section>
 <section>
   <div class="fixed-header-actions row clearfix">
-    <div class="pull-right" style="display: flex;">
-      <div class="vertical-middle" style="height: 38px;display:flex;align-items:center">
-        <div class="{{unless searchToWormhole 'pull-right'}} search-group input-group">
-          {{input value=searchText type="search" class="input-sm pull-right" enter="search" }}
-        </div>
-      </div>
+    <div class="pull-right search-group input-group">
+      {{input value=searchText aria-title=(t 'generic.search') type="search" class="input-sm pull-right" placeholder=(t 'generic.search') enter=(action "search")}}
+      {{#if searchText}}
+        <span class="input-group-btn">
+          <button class="btn bg-transparent text-info pl-10 pr-10" {{action 'clearSearch'}}><i class="icon icon-close"/></button>
+        </span>
+      {{/if}}
     </div>
   </div>
 </section>
