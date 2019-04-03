@@ -15,10 +15,13 @@
           value=selectValue
         }}
       </div>
-      <div class="vertical-middle" style="height: 38px;display:flex;align-items:center">
-        <div class="{{unless searchToWormhole 'pull-right'}} search-group input-group">
-          {{input value=searchText type="search" class="input-sm pull-right" enter="search" }}
-        </div>
+      <div class="search-group input-group">
+        {{input value=searchText aria-title=(t 'generic.search') type="search" class="input-sm pull-right" placeholder=(t 'generic.search') enter=(action "search")}}
+        {{#if searchText}}
+          <span class="input-group-btn">
+            <button class="btn bg-transparent text-info pl-10 pr-10" {{action 'clearSearch'}}><i class="icon icon-close"/></button>
+          </span>
+        {{/if}}
       </div>
     </div>
   </div>

@@ -5,7 +5,7 @@
   <hr/>
   <div style="display: flex;">
     {{#each labels as |item|}}
-      <label style={{item.style}}>
+      <label style={{item.style}} class="clip">
       {{input type="checkbox" class="form-control" checked=item.checked}} {{item.name}}
       </label>
     {{/each}}

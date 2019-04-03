@@ -1,5 +1,5 @@
 <section style="width: 100%;">
-  <div style="font-size: 1.5em;" class="clip">{{model.repo.name}}</div>
+  <div style="font-size: 1.5em;height: 30px;" class="clip">{{model.repo.name}}</div>
 </section>
 <section class="header has-tabs clearfix pb-0">
   <ul class="tab-nav">
@@ -122,5 +122,5 @@
 </section>
 {{#custom-modal-add-user modalVisible=showAddUserModal projectId=model.projectId saved=(action "refresh")}}
 {{/custom-modal-add-user }}
-{{#custom-modal-confirm-delete confirm=(action 'confirmDelete') resources=selectedRows modalVisible=showConfirmDeleteModal}}
+{{#custom-modal-confirm-delete confirm=(action 'confirmDelete') resources=selectedMembersWithoutSelf modalVisible=showConfirmDeleteModal}}
 {{/custom-modal-confirm-delete}}
