@@ -34,7 +34,7 @@
 <section>
   <div class="fixed-header-actions row clearfix">
     <div style="position: absolute;right: 0px;top: 52px;">
-      <button class="btn btn-sm bg-primary right-divider-btn" {{action 'addUser'}}>添加用户</button>
+      <button class="btn btn-sm bg-primary right-divider-btn" {{action 'addUser'}} disabled={{not isProjectAdmin}}>添加用户</button>
     </div>
     <div class="pull-left" style="width: 115px;margin-left:10px;">
       {{#if model.refreshFlag}}
