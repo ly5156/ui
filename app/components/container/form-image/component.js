@@ -22,8 +22,13 @@ export default Component.extend({
   tagName:      '',
   value:        null,
   allPods:      null,
-  harborImages: [],
-  harborServer: null,
+  harborImages: {
+    raw:  [],
+    urls: [],
+  },
+  harborServer:        null,
+  harborImageTags: [],
+  imageTag:        null,
 
   init() {
     this._super(...arguments);
@@ -63,6 +68,20 @@ export default Component.extend({
     this.sendAction('changed', out);
     this.validate();
   }),
+  imageTagDidChanged: observer('imageTag', function() {
+    const tag = get(this, 'imageTag');
+
+    if (tag) {
+      const input = get(this, 'userInput');
+      const index = input.indexOf(':');
+
+      if ( index > -1) {
+        set(this, 'userInput', `${ input.substr(0, index) }:${ tag }`)
+      } else {
+        set(this, 'userInput', `${ input }:${ tag }`)
+      }
+    }
+  }),
   searchImages: debouncedObserver('userInput', function() {
     var input = (get(this, 'userInput') || '').trim();
 
@@ -82,10 +101,24 @@ export default Component.extend({
 
     return {
       'Used by other containers':             inUse,
-      'Images in harbor image repositories': get(this, 'harborImages'),
+      'Images in harbor image repositories': get(this, 'harborImages').urls,
     };
   }),
 
+  harborRepo: computed('harborServer', function() {
+    const serverUrl = get(this, 'harborServer');
+
+    if (!serverUrl) {
+      return null;
+    }
+    const repo = serverUrl.indexOf('://') > -1 ? serverUrl.substr(serverUrl.indexOf('://') + 3) : serverUrl;
+
+    if (repo.endsWith('/')) {
+      return repo.substr(0, repo.length - 2);
+    }
+
+    return repo;
+  }),
   validate() {
     var errors = [];
 
@@ -95,33 +128,75 @@ export default Component.extend({
 
     set(this, 'errors', errors);
   },
-
   loadImagesInHarbor(query) {
     if (!get(this, 'harborServer')) {
       return;
     }
-    if (!query) {
-      set(this, 'harborImages', []);
+    let input = query;
+
+    if (!input) {
+      set(this, 'harborImages', {
+        raw:  [],
+        urls: [],
+      });
+      set(this, 'harborImageTags', []);
+      set(this, 'imageTag', null);
 
       return;
     }
+    const harborRepo = get(this, 'harborRepo');
 
-    return get(this, 'harbor').fetchProjectsAndImages(query).then((resp) => {
-      const images = resp.body.repository.map((r) => {
-        let url = get(this, 'harborServer');
+    if (input.startsWith(`${ harborRepo }/`)) {
+      input = input.replace(`${ harborRepo }/`, '')
+    }
+    input = input.indexOf(':') > -1 ? input.substr(0, input.indexOf(':')) : input;
 
-        let endpoint = url.indexOf('://') > -1 ? url.substr(url.indexOf('://') + 3) : url;
-
-        return `${ endpoint }/${ r.repository_name }`
+    return get(this, 'harbor').fetchProjectsAndImages(input).then((resp) => {
+      const repos = resp.body.repository;
+      const repo = get(this, 'harborRepo');
+      const urls = repos.map((r) => {
+        return `${ repo }/${ r.repository_name }`;
       });
 
-      set(this, 'harborImages', images);
+      set(this, 'harborImages', {
+        raw:  repos,
+        urls,
+      });
+      this.loadHarborImageVersions();
     });
   },
   loadHarborServerUrl() {
     get(this, 'harbor').loadHarborServerUrl().then((resp) => {
       set(this, 'harborServer', resp);
     });
-  }
+  },
+  loadHarborImageVersions() {
+    const input = get(this, 'userInput');
+    const harborRepo = get(this, 'harborRepo');
 
+    if (!input.startsWith(harborRepo)) {
+      set(this, 'harborImageTags', []);
+
+      return;
+    }
+    const image = input.indexOf(':') > -1 ? input.substr(0, input.indexOf(':')) : input;
+    const repo = get(this, 'harborImages').raw.find((item) => {
+      return image === `${ harborRepo }/${ item.repository_name }`;
+    });
+
+    if (!repo) {
+      set(this, 'harborImageTags', []);
+
+      return;
+    }
+    get(this, 'harbor').fetchTags(repo.project_id, repo.repository_name).then((resp) => {
+      const tags = resp.body;
+      const input = get(this, 'userInput');
+      const imageTag = input.indexOf(':') > -1 ? input.substr(input.indexOf(':') + 1) : null;
+      const tag = tags.find((t) => t.name === imageTag);
+
+      set(this, 'imageTag', tag && tag.name);
+      set(this, 'harborImageTags', resp.body);
+    });
+  },
 });
