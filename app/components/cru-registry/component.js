@@ -90,6 +90,15 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
   hasHarborAccount: computed('harborAccount', function() {
     return !!get(this, 'harborAccount');
   }),
+  harborUsername: computed('harborAccount', function() {
+    const account = get(this, 'harborAccount');
+
+    if (!account) {
+      return null;
+    }
+
+    return account.split(':')[0];
+  }),
   willSave() {
     let pr = get(this, 'primaryResource');
 
