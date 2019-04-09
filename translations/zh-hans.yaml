@@ -7066,7 +7066,7 @@ nav:
       advanced: 高级
     imageRepo:
       tab: 镜像仓库
-      config: 系统配置 
+      config: Harbor 配置 
       registries: 仓库管理
       projects: 镜像管理
       logs: 日志

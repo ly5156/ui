@@ -1,13 +1,19 @@
 <section class="header clearfix">
-  <h1>系统配置</h1>
+  <h1>Harbor 配置</h1>
 </section>
 
 <div class="accordion">
   <div class="accordion-header">
     <div class="expand"></div>
     <div class="title">
-      <span class="m-0">Harbor 账号配置</span>
-      <p class="help-block">Harbor访问设置</p>
+      {{#if (and hasHarborRegistry (not accountSynced))}}
+      <span class="m-0">Harbor 账号同步</span>
+      <p class="help-block">将当前的用户信息同步到 Harbor 中</p>
+      {{else}}
+      <span class="m-0">Harbor 账号设置</span>
+      <p class="help-block">对邮箱和访问密码进行设置</p>
+      {{/if}}
+      
     </div>
     {{#if showActionMenu}}
     {{#custom-action-menu class="btn bg-transparent pull-right" resourceActions=configActions menuClick=(action 'handleMenuClick')}} {{/custom-action-menu}}
