@@ -38,7 +38,9 @@
             <span>{{currentAccount.username}}</span>
           </div>
         </div>
-        
+        {{#if hasHarborAccountError}}
+          {{save-cancel save="reSyncAccount" cancelDisabled=true createLabel="imageRepoSection.userConfigPage.reSyncAccount" }}
+        {{/if}}
       </section>
       {{/if}}
       {{#if (and hasHarborRegistry (not accountSynced))}}

@@ -25,6 +25,7 @@ imageRepoSection:
     gcSchedule: 立即清理垃圾
   userConfigPage:
     syncAccount: 同步账号
+    reSyncAccount: 重新同步账号
   labelPage:
     table:
       noMatch: 没有Label匹配当前搜索
