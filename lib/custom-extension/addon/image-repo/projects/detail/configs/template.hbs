@@ -26,14 +26,35 @@
     {{/if}}
     {{#if (or isSystemAdmin isMember)}}
     <li>
-      {{#link-to "image-repo.projects.detail.configs" model.projectId model.currentUserRoleId}}配置管理{{/link-to}}
+      {{#link-to "image-repo.projects.detail.configs" model.projectId model.currentUserRoleId}}访问级别{{/link-to}}
     </li>
     {{/if}}
   </ul>
 </section>
 <section>
-  <div class="fixed-header-actions row clearfix" style="display: flex;align-items:center;margin-top:40px;">
-    <div class="pull-left" style="margin-left:10px;padding-left:20px;font-size:17px">
+  <div class="fixed-header-actions clearfix">
+    <div style="position: absolute; right: 0px; top: 62px;">
+    {{#if config.public}}
+      <div class="btn-group no-inline-space">
+        <button disabled={{not isProjectAdmin}} class="btn btn-link btn-sm bg-default" {{action "changePublic" false}}>私有</button>
+        <button class="btn btn-link btn-sm bg-success">公开</button>
+      </div>
+    {{else}}
+      <div class="btn-group no-inline-space">
+        <button class="btn btn-link btn-sm bg-primary">私有</button>
+        <button disabled={{not isProjectAdmin}} class="btn btn-link btn-sm bg-defualt" {{action "changePublic" true}}>公开</button>
+      </div>
+    {{/if}}
+    </div>
+  {{#banner-message color="bg-info"}}
+    <p>
+      当项目设为公开后，任何人都有此项目下镜像的读权限。命令行用户不需要“docker login”就可以拉取此项目下的镜像。
+    </p>
+  {{/banner-message}}
+
+  {{save-cancel save="savePublicConfig" save="savePublicConfig" saveDisabled=saveDisabled cancelDisabled=true createLabel="imageRepoSection.adminConfigPage.saveHarborConfig" }}
+  </div>
+    {{!-- <div class="pull-left" style="margin-left:10px;padding-left:20px;font-size:17px">
       项目仓库
     </div>
     <div class="pull-left" style="flex:1;padding-left:180px;">
@@ -46,5 +67,5 @@
       </div> 
     </div>
   </div>
-  {{save-cancel save="savePublicConfig" saving=saving saveDisabled=saveDisabled cancelDisabled=cancelDisabled cancel="cancelPublicConfig" createLabel="imageRepoSection.adminConfigPage.saveHarborConfig" }}
+  {{save-cancel save="savePublicConfig" saving=saving saveDisabled=saveDisabled cancelDisabled=cancelDisabled cancel="cancelPublicConfig" createLabel="imageRepoSection.adminConfigPage.saveHarborConfig" }} --}}
 </section>
