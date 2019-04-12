@@ -302,7 +302,7 @@ const rootNav = [
         route:          'custom-extension.image-repo.admin-config',
         resource:       [],
         condition() {
-          return !!get(this, 'access.admin');
+          return !!get(this, 'access.currentUser.hasAdmin');
         }
       },
       // {
@@ -313,7 +313,7 @@ const rootNav = [
       //   route:          'custom-extension.image-repo.registries',
       //   resource:       [],
       //   condition() {
-      //     return !!get(this, 'access.admin');
+      //     return !!get(this, 'access.currentUser.hasAdmin');
       //   }
       // },
       {
@@ -323,7 +323,7 @@ const rootNav = [
         route:          'custom-extension.image-repo.user-config',
         resource:       [],
         condition() {
-          return !get(this, 'access.admin');
+          return !get(this, 'access.currentUser.hasAdmin');
         }
       },
       {
@@ -333,10 +333,10 @@ const rootNav = [
         route:          'custom-extension.image-repo.projects',
         resource:       [],
         condition() {
-          if (get(this, 'access.admin')) {
+          if (get(this, 'access.currentUser')) {
             return true
           } else {
-            const a = get(this, 'access.me.annotations');
+            const a = get(this, 'access.currentUser.annotations');
 
             return !!(a && a['authz.management.cattle.io.cn/harborauth']);
           }
@@ -349,10 +349,10 @@ const rootNav = [
         route:          'custom-extension.image-repo.logs',
         resource:       [],
         condition() {
-          if (get(this, 'access.admin')) {
+          if (get(this, 'access.currentUser')) {
             return true
           } else {
-            const a = get(this, 'access.me.annotations');
+            const a = get(this, 'access.currentUser.annotations');
 
             return !!(a && a['authz.management.cattle.io.cn/harborauth']);
           }

@@ -38,12 +38,12 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
       if (!resp) {
         return;
       }
-      if (!!get(this, 'access.admin')) {
+      if (!!get(this, 'access.currentUser.hasAdmin')) {
         get(this, 'harbor').fetchHarborUserInfo().then((resp) => {
           set(this, 'harborAccount', atob(resp.body.value));
         });
       } else {
-        const account = get(this, 'access.me.annotations')['authz.management.cattle.io.cn/harborauth'];
+        const account = get(this, 'access.currentUser.annotations')['authz.management.cattle.io.cn/harborauth'];
 
         set(this, 'harborAccount', atob(account));
       }
