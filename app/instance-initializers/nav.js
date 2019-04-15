@@ -333,7 +333,7 @@ const rootNav = [
         route:          'custom-extension.image-repo.projects',
         resource:       [],
         condition() {
-          if (get(this, 'access.currentUser')) {
+          if (get(this, 'access.currentUser.hasAdmin')) {
             return true
           } else {
             const a = get(this, 'access.currentUser.annotations');
@@ -349,7 +349,7 @@ const rootNav = [
         route:          'custom-extension.image-repo.logs',
         resource:       [],
         condition() {
-          if (get(this, 'access.currentUser')) {
+          if (get(this, 'access.currentUser.hasAdmin')) {
             return true
           } else {
             const a = get(this, 'access.currentUser.annotations');
