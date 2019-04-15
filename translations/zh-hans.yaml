@@ -4467,6 +4467,8 @@ formImage:
   label: Docker镜像
   container:
     placeholder: "例如: ubuntu:xenial"
+  tag:
+    placeholder: 选择镜像标签
 
 formNameDescription:
   name:

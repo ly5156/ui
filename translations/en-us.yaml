@@ -4466,6 +4466,8 @@ formImage:
   label: Docker Image
   container:
     placeholder: "e.g. ubuntu:xenial"
+  tag:
+    placeholder: Choose Image tag
 
 formNameDescription:
   name:
