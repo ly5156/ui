@@ -1,0 +1,56 @@
+<section class="header clearfix">
+  <h1 class="pull-left">VLANSubnet</h1>
+  <div class="vertical-middle"></div>
+  <div class="right-buttons">
+    <a href="#" {{action "newVlansubent"}} class="btn bg-primary btn-sm ml-10" >创建VLANSubnet</a>
+  </div>
+</section>
+<section class="mt-30">
+  {{#custom-table
+       tableClassNames="bordered"
+       paging=false
+       primaryKeyName="id"
+       search=(action "search")
+       sortChanged=(action "sortChanged")
+       headers=headers
+       bulkActions=true
+       availableActions=availableActions
+       selectChange=(action "selectChange")
+       data=data
+       hasRowActions=true
+       remove=(action "promptDelete")
+       as |sortable kind obj dt|
+  }}
+    {{#if (eq kind "row")}}
+      <tr class="main-row">
+        <td valign="middle" class="row-check" style="padding-top: 2px;">
+          {{check-box nodeId=obj.id}}
+        </td>
+        <td data-title="{{dt.name}}">
+          {{#link-to 'authenticated.cluster.static-pods' (query-params vlan=obj.name) class="clip project-link"}}
+            {{obj.name}}
+          {{/link-to}}
+        </td>
+        <td data-title="{{dt.namespace}}">
+          {{obj.namespace}}
+        </td>
+        <td data-title="{{dt.cidr}}">
+          {{obj.cidr}}
+        </td>
+        <td data-title="{{dt.master}}">
+          {{obj.master}}
+        </td>
+        <td class="text-right pr-20">
+          {{date-calendar obj.creationTimestamp}}
+        </td> 
+        <td data-title="{{dt.actions}}" class="actions">
+        {{custom-action-menu model=obj resourceActions=availableActions menuClick=(action 'handleMenuClick')}}
+        </td>
+      </tr>
+    {{else if (eq kind "nomatch")}}
+      <tr><td colspan="{{sortable.fullColspan}}" class="text-center text-muted lacsso pt-20 pb-20">暂无匹配的数据</td></tr>
+    {{else if (eq kind "norows")}}
+      <tr><td colspan="{{sortable.fullColspan}}" class="text-center text-muted lacsso pt-20 pb-20">暂无数据</td></tr>
+    {{/if}}
+  {{/custom-table}}
+</section>

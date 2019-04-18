@@ -7003,6 +7003,8 @@ nav:
       classes: Storage Classes
       volumes: Persistent Volumes
     projects: Projects/Namespaces
+    staticPods: Static Pods
+    vlansubnet: Flat Network
   containers:
     tab: Workloads
     systemTab: System

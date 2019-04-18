@@ -97,4 +97,68 @@
         addActionLabel="formNetwork.dnsConfig.options.addActionLabel"
     }}
   </div>
+  <div class="row box mt-20">
+    <div class="col span-6">
+      <label class="acc-label">扁平网络</label>
+        {{#input-or-display editable=editing value=enableStaticPodLabel}}
+          <div class="radio">
+            <label>{{radio-button selection=staticPod value=false}} 禁用</label>
+          </div>
+          <div class="radio">
+            <label style={{vlansubnetdisabledStyle}}>{{radio-button selection=staticPod disabled=unsupportVlansubnet value=true}} 启用</label>
+          </div>
+        {{/input-or-display}}
+    </div>
+    <div class="col span-6">
+      {{#if enableStaticPod}}
+        <div class="row">
+          <div class="col span-6">
+            <label class="acc-label">k8s.v1.cni.cncf.io/networks</label>
+            <div>{{staticPodForm.network}}</div>
+          </div>
+          <div class="col span-6">
+            <label class="acc-label">CIDR</label>
+            {{#input-or-display editable=editing value=staticPodAnnotation.ip}}
+            {{input
+                class="form-control"
+                value=staticPodForm.ip
+                placeholder="例如: 192.168.1.100/24"
+                change=(action 'updateStaticPod')
+            }}
+            {{/input-or-display}}
+          </div>
+        </div>
+        <div class="row">
+         <div class="col span-6">
+            <label class="acc-label">Static MAC</label>
+            {{#input-or-display editable=editing value=staticPodAnnotation.mac}}
+            {{input
+                class="form-control"
+                value=staticPodForm.mac
+                placeholder="例如: 0a:00:27:00:00:00"
+                change=(action 'updateStaticPod')
+            }}
+            {{/input-or-display}}
+          </div>
+          <div class="col span-6">
+            <label class="acc-label">VLAN{{field-required}}</label>
+            {{#input-or-display editable=editing value=staticPodAnnotation.vlan}}
+            {{!-- {{input
+                class="form-control"
+                value=staticPodForm.vlan
+                change=(action 'updateStaticPod')
+            }} --}}
+            {{new-select
+                classNames="form-control"
+                content=vlansubnets
+                value=staticPodForm.vlan
+                prompt="请选择一个VLANSubnet"
+                change=(action 'updateStaticPod')
+              }}
+            {{/input-or-display}}
+          </div>
+        </div>
+      {{/if}}
+    </div>
+  </div>
 {{/accordion-list-item}}

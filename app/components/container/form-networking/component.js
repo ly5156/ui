@@ -1,16 +1,30 @@
-import { get, set } from '@ember/object';
+import { get, set, computed, observer } from '@ember/object';
 import Component from '@ember/component';
 import layout from './template';
+import { inject as service } from '@ember/service';
 
 export default Component.extend({
+  scope:      service(),
+  vlansubnet: service(),
   layout,
-
   // Inputs
-  instance: null,
-  service:  null,
-  errors:   null,
-  editing:  null,
+  instance:   null,
+  service:    null,
+  errors:     null,
+  editing:    null,
 
+  // static pod
+  staticPod:    false,
+
+  staticPodForm: {
+    network: 'static-macvlan-cni',
+    ip:      '',
+    mac:     '',
+    vlan:    '',
+  },
+  vlansubnets:          [],
+  // unsupport vlansubnet
+  unsupportVlansubnet:  true,
   initHostAliasesArray: [],
   initOptionsArray:     [],
 
@@ -20,9 +34,51 @@ export default Component.extend({
     this._super(...arguments);
     this.initHostAliases();
     this.initOptions();
+    this.initStaticPod()
   },
-
   actions: {
+    updateStaticPod() {
+      const annotationsForm = get(this, 'staticPodForm');
+      const annotations = get(this, 'service.annotations');
+      const props = ['k8s.v1.cni.cncf.io/networks', 'static-ip', 'static-mac', 'vlan'];
+      const propMap = {
+        network:    'k8s.v1.cni.cncf.io/networks',
+        ip:         'static-ip',
+        mac:        'static-mac',
+        vlan:       'vlan',
+      };
+
+      if (!get(this, 'enableStaticPod')) {
+        if (annotations) {
+          const form = {};
+
+          Object.keys(annotations).forEach((a) => {
+            if (props.indexOf(a) < 0) {
+              form[a] = annotations[a];
+            }
+          });
+          set(this, 'service.annotations', Object.assign({}, form));
+        }
+
+        return;
+      }
+      const { network, vlan } = annotationsForm;
+
+      if (network && vlan) {
+        const form = {};
+
+        Object.keys(annotationsForm).forEach((a) => {
+          form[propMap[a]] = annotationsForm[a];
+          if (a === 'ip' && annotationsForm[a] === '') {
+            form[propMap[a]] = 'auto';
+          }
+        });
+
+        set(this, 'service.annotations', Object.assign({}, annotations || {}, form));
+
+        return;
+      }
+    },
     hostAliasesChanged(hostAliases) {
       const out = [];
 
@@ -75,6 +131,77 @@ export default Component.extend({
     }
   },
 
+  namespaceDidChanged: observer('service.namespaceId', function() {
+    const clusterId = get(this, 'scope.currentCluster.id');
+
+    if (clusterId) {
+      get(this, 'vlansubnet').fetchVlansubnets(clusterId).then((resp) => {
+        const items = resp.body.items.map((item) => ({
+          label: item.metadata.name,
+          value: item.metadata.name
+        }));
+
+        set(this, 'vlansubnets', items);
+        set(this, 'unsupportVlansubnet', false);
+      });
+    }
+  }),
+  staticPodDidChanged: observer('staticPod', function() {
+    if (get(!this, 'staticPod')) {
+      const annotations = get(this, 'service.annotations') || {};
+      const props = ['k8s.v1.cni.cncf.io/networks', 'static-ip', 'static-mac', 'vlan'];
+      const form = {}
+
+      Object.keys(annotations).forEach((a) => {
+        if (props.indexOf(a) < 0) {
+          form[a] = annotations[a];
+        }
+      });
+
+      set(this, 'service.annotations', form);
+
+      return;
+    }
+    this.send('updateStaticPod');
+  }),
+  staticPodAnnotation: computed('service.annotations.{k8s.v1.cni.cncf.io/networks,static-ip,static-mac,vlan}', function() {
+    const annotations = get(this, 'service.annotations') || {};
+
+    return {
+      network: annotations['k8s.v1.cni.cncf.io/networks'],
+      ip:      annotations['static-ip'],
+      mac:     annotations['static-mac'],
+      vlan:    annotations.vlan,
+    }
+  }),
+  enableStaticPod: computed('service.annotations.{k8s.v1.cni.cncf.io/networks,static-ip,static-mac,vlan}', 'staticPod', 'editing', function() {
+    const {
+      'k8s.v1.cni.cncf.io/networks': network, 'static-ip': staticIp, vlan
+    } = get(this, 'service.annotations') || {};
+
+    if (get(this, 'editing')) {
+      return get(this, 'staticPod')
+    }
+    if (network && staticIp && vlan) {
+      return true;
+    }
+
+    return false;
+  }),
+  enableStaticPodLabel: computed('enableStaticPod', function() {
+    if (get(this, 'enableStaticPod')) {
+      return '启用';
+    }
+
+    return '禁用';
+  }),
+  vlansubnetdisabledStyle: computed('unsupportVlansubnet', function() {
+    if (get(this, 'unsupportVlansubnet')) {
+      return 'color: #8b969d;cursor: not-allowed;';
+    }
+
+    return '';
+  }),
   initHostAliases() {
     const aliases = get(this, 'service.hostAliases');
 
@@ -100,4 +227,28 @@ export default Component.extend({
       });
     });
   },
+  initStaticPod() {
+    const annotations = get(this, 'service.annotations') || {};
+    const {
+      'k8s.v1.cni.cncf.io/networks': network, 'static-ip': ip, 'static-mac': mac, vlan
+    } = annotations || {};
+
+    if (network && vlan) {
+      set(this, 'staticPod', true);
+      set(this, 'staticPodForm', {
+        network,
+        ip: ip === 'auto' ? '' : ip,
+        mac,
+        vlan,
+      })
+    } else {
+      set(this, 'staticPodForm', {
+        network: 'static-macvlan-cni',
+        ip:      '',
+        mac:     '',
+        vlan:    '',
+      })
+    }
+    this.namespaceDidChanged();
+  }
 });

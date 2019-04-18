@@ -161,6 +161,23 @@ const rootNav = [
   },
   {
     scope:          'cluster',
+    id:             'cluster-vlansubnet',
+    localizedLabel: 'nav.cluster.vlansubnet',
+    route:          'authenticated.cluster.vlansubnet.index',
+    ctx:            [getClusterId],
+    resourceScope:  'global',
+  },
+  // {
+  //   scope:          'cluster',
+  //   id:             'cluster-static-pods',
+  //   localizedLabel: 'nav.cluster.staticPods',
+  //   route:          'authenticated.cluster.static-pods',
+  //   ctx:            [getClusterId],
+  //   resource:       ['node'],
+  //   resourceScope:  'global',
+  // },
+  {
+    scope:          'cluster',
     id:             'cluster-storage',
     localizedLabel: 'nav.cluster.storage.tab',
     ctx:            [getClusterId],
@@ -287,79 +304,79 @@ const rootNav = [
     resource:       ['multiclusterapp'],
     resourceScope:  'global',
   },
-  {
-    scope:          'global',
-    id:             'global-image-repo',
-    localizedLabel: 'nav.admin.imageRepo.tab',
-    route:          'custom-extension.image-repo.index',
-    resource:       [],
-    resourceScope:  'global',
-    submenu:        [
-      {
-        scope:          'global',
-        id:             'global-image-repo-admin-config',
-        localizedLabel: 'nav.admin.imageRepo.config',
-        route:          'custom-extension.image-repo.admin-config',
-        resource:       [],
-        condition() {
-          return !!get(this, 'access.currentUser.hasAdmin');
-        }
-      },
-      // {
-      //   scope:          'global',
-      //   id:             'global-image-repo-registries',
-      //   localizedLabel: 'nav.admin.imageRepo.registries',
-      //   icon:           'icon icon-key',
-      //   route:          'custom-extension.image-repo.registries',
-      //   resource:       [],
-      //   condition() {
-      //     return !!get(this, 'access.currentUser.hasAdmin');
-      //   }
-      // },
-      {
-        scope:          'global',
-        id:             'global-image-repo-user-config',
-        localizedLabel: 'nav.admin.imageRepo.config',
-        route:          'custom-extension.image-repo.user-config',
-        resource:       [],
-        condition() {
-          return !get(this, 'access.currentUser.hasAdmin');
-        }
-      },
-      {
-        scope:          'global',
-        id:             'global-image-repo-projects',
-        localizedLabel: 'nav.admin.imageRepo.projects',
-        route:          'custom-extension.image-repo.projects',
-        resource:       [],
-        condition() {
-          if (get(this, 'access.currentUser.hasAdmin')) {
-            return true
-          } else {
-            const a = get(this, 'access.currentUser.annotations');
+  // {
+  //   scope:          'global',
+  //   id:             'global-image-repo',
+  //   localizedLabel: 'nav.admin.imageRepo.tab',
+  //   route:          'custom-extension.image-repo.index',
+  //   resource:       [],
+  //   resourceScope:  'global',
+  //   submenu:        [
+  //     {
+  //       scope:          'global',
+  //       id:             'global-image-repo-admin-config',
+  //       localizedLabel: 'nav.admin.imageRepo.config',
+  //       route:          'custom-extension.image-repo.admin-config',
+  //       resource:       [],
+  //       condition() {
+  //         return !!get(this, 'access.currentUser.hasAdmin');
+  //       }
+  //     },
+  //     // {
+  //     //   scope:          'global',
+  //     //   id:             'global-image-repo-registries',
+  //     //   localizedLabel: 'nav.admin.imageRepo.registries',
+  //     //   icon:           'icon icon-key',
+  //     //   route:          'custom-extension.image-repo.registries',
+  //     //   resource:       [],
+  //     //   condition() {
+  //     //     return !!get(this, 'access.currentUser.hasAdmin');
+  //     //   }
+  //     // },
+  //     {
+  //       scope:          'global',
+  //       id:             'global-image-repo-user-config',
+  //       localizedLabel: 'nav.admin.imageRepo.config',
+  //       route:          'custom-extension.image-repo.user-config',
+  //       resource:       [],
+  //       condition() {
+  //         return !get(this, 'access.currentUser.hasAdmin');
+  //       }
+  //     },
+  //     {
+  //       scope:          'global',
+  //       id:             'global-image-repo-projects',
+  //       localizedLabel: 'nav.admin.imageRepo.projects',
+  //       route:          'custom-extension.image-repo.projects',
+  //       resource:       [],
+  //       condition() {
+  //         if (get(this, 'access.currentUser.hasAdmin')) {
+  //           return true
+  //         } else {
+  //           const a = get(this, 'access.currentUser.annotations');
 
-            return !!(a && a['authz.management.cattle.io.cn/harborauth']);
-          }
-        }
-      },
-      {
-        scope:          'global',
-        id:             'global-image-repo-logs',
-        localizedLabel: 'nav.admin.imageRepo.logs',
-        route:          'custom-extension.image-repo.logs',
-        resource:       [],
-        condition() {
-          if (get(this, 'access.currentUser.hasAdmin')) {
-            return true
-          } else {
-            const a = get(this, 'access.currentUser.annotations');
+  //           return !!(a && a['authz.management.cattle.io.cn/harborauth']);
+  //         }
+  //       }
+  //     },
+  //     {
+  //       scope:          'global',
+  //       id:             'global-image-repo-logs',
+  //       localizedLabel: 'nav.admin.imageRepo.logs',
+  //       route:          'custom-extension.image-repo.logs',
+  //       resource:       [],
+  //       condition() {
+  //         if (get(this, 'access.currentUser.hasAdmin')) {
+  //           return true
+  //         } else {
+  //           const a = get(this, 'access.currentUser.annotations');
 
-            return !!(a && a['authz.management.cattle.io.cn/harborauth']);
-          }
-        }
-      },
-    ],
-  },
+  //           return !!(a && a['authz.management.cattle.io.cn/harborauth']);
+  //         }
+  //       }
+  //     },
+  //   ],
+  // },
   {
     scope:          'global',
     id:             'global-accounts',

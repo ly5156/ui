@@ -64,6 +64,15 @@ Router.map(function() {
       this.route('nodes', function() {
         this.route('index', { path: '/' });
       });
+      // vlansubnet
+      this.route('vlansubnet', { path: '/vlansubnet' }, function() {
+        this.route('index', { path: '/' });
+        this.route('new', { path: '/add' });
+        this.route('unsupport', { path: '/unsupport' });
+      });
+      this.route('static-pods', function() {
+        this.route('index', { path: '/' });
+      });
 
       this.mount('monitoring');
 
@@ -118,7 +127,6 @@ Router.map(function() {
       this.route('ns', { path: '/ns' }, function() {
         this.route('index', { path: '/' });
       });
-
       // alert/logging
       this.mount('logging', { path: '/logging' });
       this.mount('alert', { path: '/alerts' });
