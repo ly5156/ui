@@ -98,7 +98,7 @@
     }}
   </div>
   <div class="row box mt-20">
-    <div class="col span-6">
+    <div class="col span-4">
       <label class="acc-label">扁平网络</label>
         {{#input-or-display editable=editing value=enableStaticPodLabel}}
           <div class="radio">
@@ -109,7 +109,7 @@
           </div>
         {{/input-or-display}}
     </div>
-    <div class="col span-6">
+    <div class="col span-8">
       {{#if enableStaticPod}}
         <div class="row">
           <div class="col span-6">
@@ -118,10 +118,10 @@
           </div>
           <div class="col span-6">
             <label class="acc-label">CIDR</label>
-            {{#input-or-display editable=editing value=staticPodAnnotation.ip}}
+            {{#input-or-display editable=editing value=staticPodAnnotation.cidr}}
             {{input
                 class="form-control"
-                value=staticPodForm.ip
+                value=staticPodForm.cidr
                 placeholder="例如: 192.168.1.100/24"
                 change=(action 'updateStaticPod')
             }}
@@ -130,7 +130,7 @@
         </div>
         <div class="row">
          <div class="col span-6">
-            <label class="acc-label">Static MAC</label>
+            <label class="acc-label">MAC</label>
             {{#input-or-display editable=editing value=staticPodAnnotation.mac}}
             {{input
                 class="form-control"
@@ -141,8 +141,8 @@
             {{/input-or-display}}
           </div>
           <div class="col span-6">
-            <label class="acc-label">VLAN{{field-required}}</label>
-            {{#input-or-display editable=editing value=staticPodAnnotation.vlan}}
+            <label class="acc-label">Subnet{{field-required}}</label>
+            {{#input-or-display editable=editing value=staticPodAnnotation.subnet}}
             {{!-- {{input
                 class="form-control"
                 value=staticPodForm.vlan
@@ -151,13 +151,21 @@
             {{new-select
                 classNames="form-control"
                 content=vlansubnets
-                value=staticPodForm.vlan
-                prompt="请选择一个VLANSubnet"
+                value=staticPodForm.subnet
+                prompt="请选择一个MacvlanSubnet"
                 change=(action 'updateStaticPod')
               }}
             {{/input-or-display}}
           </div>
         </div>
+        {{#if editing}}
+        <div class="row">
+          <div class="col span-6">
+            <label class="acc-label">Pod ID</label>
+            <div>{{staticPodForm.podId}}</div>
+          </div>
+        </div>
+        {{/if}}
       {{/if}}
     </div>
   </div>

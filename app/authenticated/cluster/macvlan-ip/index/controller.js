@@ -36,10 +36,10 @@ const headers = [
     searchField:    'podId',
   },
   {
-    name:           'vlan',
-    label:          'VLAN',
-    sort:           ['vlan'],
-    searchField:    'vlan',
+    name:           'subnet',
+    label:          'Subnet',
+    sort:           ['subnet'],
+    searchField:    'subnet',
   },
   {
     classNames:     'text-right pr-20',
@@ -102,7 +102,7 @@ export default Controller.extend({
   staticPodsDidChanged: observer('rows', function() {
     set(this, 'data', get(this, 'rows'));
   }),
-  rows: computed('model.staticPods', function() {
-    return get(this, 'model.staticPods');
+  rows: computed('model.macvlanIps', function() {
+    return get(this, 'model.macvlanIps');
   }),
 });

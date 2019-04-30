@@ -16,8 +16,11 @@ export default Route.extend({
           name:              item.metadata.name,
           displayName:        item.metadata.name,
           namespace:         item.metadata.namespace,
-          cidr:              item.spec.cidr,
           master:            item.spec.master,
+          vlan:              item.spec.vlan,
+          cidr:              item.spec.cidr,
+          mode:              item.spec.mode,
+          gateway:           item.spec.gateway,
           creationTimestamp: item.metadata.creationTimestamp,
           rawData:           item,
         };

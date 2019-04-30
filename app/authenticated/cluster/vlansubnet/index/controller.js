@@ -12,8 +12,19 @@ export const headers = [
   },
   {
     name:           'namespace',
-    sort:           ['namespace'],
     translationKey: 'generic.namespace',
+  },
+  {
+    name:           'master',
+    label:          'Master',
+    sort:           ['master'],
+    searchField:    'master',
+  },
+  {
+    name:           'vlan',
+    label:          'VLAN',
+    sort:           ['vlan'],
+    searchField:    'vlan',
   },
   {
     name:           'cidr',
@@ -23,15 +34,22 @@ export const headers = [
     width:          150,
   },
   {
-    name:           'master',
-    label:          'Master',
-    sort:           ['master'],
-    searchField:    'master',
+    name:           'mode',
+    label:          'Mode',
+    sort:           ['mode'],
+    searchField:    'mode',
+  },
+  {
+    name:           'gateway',
+    label:          'Gateway',
+    sort:           ['gateway'],
+    searchField:    'gateway',
   },
   {
     classNames:     'text-right pr-20',
     name:           'creationTimestamp',
     label:          '创建时间',
+    sort:           ['creationTimestamp'],
     searchField:    false,
     width:          250,
   },

@@ -8,10 +8,15 @@ export default Route.extend({
 
   model(params) {
     const cluster = this.modelFor('authenticated.cluster');
-    const vlan = params.vlan
+    const subnet = params.subnet
 
-    return this.vlansubnet.fetchStaticPods(cluster.id).then((p) => {
-      const data = p.body.items.filter((d) => d.spec.vlan.indexOf(vlan) > -1).map((d) => {
+    return this.vlansubnet.fetchMacvlanIp(cluster.id).then((p) => {
+      let rawData = p.body.items;
+
+      if (subnet) {
+        rawData = rawData.filter((d) => d.spec.subnet.indexOf(subnet) > -1);
+      }
+      const data = rawData.map((d) => {
         return {
           creationTimestamp: d.metadata.creationTimestamp,
           name:              d.metadata.name,
@@ -21,16 +26,16 @@ export default Route.extend({
           ip:                d.spec.ip,
           mac:               d.spec.mac,
           podId:             d.spec['pod-id'],
-          vlan:              d.spec.vlan,
+          subnet:            d.spec.subnet,
         };
       });
 
       return {
         cluster,
-        staticPods: data,
+        macvlanIps: data,
         rawData:    p.body.items,
       }
     });
   },
-  queryParams: { vlan: { refreshModel: true } },
+  queryParams: { subnet: { refreshModel: true } },
 });

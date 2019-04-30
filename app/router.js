@@ -70,7 +70,7 @@ Router.map(function() {
         this.route('new', { path: '/add' });
         this.route('unsupport', { path: '/unsupport' });
       });
-      this.route('static-pods', function() {
+      this.route('macvlan-ip', function() {
         this.route('index', { path: '/' });
       });
 

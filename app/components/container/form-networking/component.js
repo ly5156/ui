@@ -18,9 +18,10 @@ export default Component.extend({
 
   staticPodForm: {
     network: 'static-macvlan-cni',
-    ip:      '',
+    cidr:      '',
     mac:     '',
-    vlan:    '',
+    subnet:    '',
+    podId:   '',
   },
   vlansubnets:          [],
   // unsupport vlansubnet
@@ -40,12 +41,13 @@ export default Component.extend({
     updateStaticPod() {
       const annotationsForm = get(this, 'staticPodForm');
       const annotations = get(this, 'service.annotations');
-      const props = ['k8s.v1.cni.cncf.io/networks', 'static-ip', 'static-mac', 'vlan'];
+      const props = ['k8s.v1.cni.cncf.io/networks', 'cidr', 'mac', 'subnet', 'podId'];
       const propMap = {
-        network:    'k8s.v1.cni.cncf.io/networks',
-        ip:         'static-ip',
-        mac:        'static-mac',
-        vlan:       'vlan',
+        network: 'k8s.v1.cni.cncf.io/networks',
+        cidr:    'cidr',
+        mac:     'mac',
+        subnet:  'subnet',
+        podId:   'podId'
       };
 
       if (!get(this, 'enableStaticPod')) {
@@ -62,14 +64,14 @@ export default Component.extend({
 
         return;
       }
-      const { network, vlan } = annotationsForm;
+      const { network, subnet } = annotationsForm;
 
-      if (network && vlan) {
+      if (network && subnet) {
         const form = {};
 
         Object.keys(annotationsForm).forEach((a) => {
           form[propMap[a]] = annotationsForm[a];
-          if (a === 'ip' && annotationsForm[a] === '') {
+          if (a === 'cidr' && annotationsForm[a] === '') {
             form[propMap[a]] = 'auto';
           }
         });
@@ -85,7 +87,7 @@ export default Component.extend({
       hostAliases.filter((alias) => alias.value && alias.key).forEach((alias) => {
         out.push({
           hostnames: [alias.value],
-          ip:        alias.key,
+          cidr:        alias.key,
         });
       });
       set(this, 'service.hostAliases', out);
@@ -149,7 +151,7 @@ export default Component.extend({
   staticPodDidChanged: observer('staticPod', function() {
     if (get(!this, 'staticPod')) {
       const annotations = get(this, 'service.annotations') || {};
-      const props = ['k8s.v1.cni.cncf.io/networks', 'static-ip', 'static-mac', 'vlan'];
+      const props = ['k8s.v1.cni.cncf.io/networks', 'cidr', 'mac', 'subnet', 'podId'];
       const form = {}
 
       Object.keys(annotations).forEach((a) => {
@@ -169,20 +171,21 @@ export default Component.extend({
 
     return {
       network: annotations['k8s.v1.cni.cncf.io/networks'],
-      ip:      annotations['static-ip'],
-      mac:     annotations['static-mac'],
-      vlan:    annotations.vlan,
+      cidr:    annotations.cidr,
+      mac:     annotations.mac,
+      subnet:  annotations.subnet,
+      podId:   annotations.podId,
     }
   }),
   enableStaticPod: computed('service.annotations.{k8s.v1.cni.cncf.io/networks,static-ip,static-mac,vlan}', 'staticPod', 'editing', function() {
     const {
-      'k8s.v1.cni.cncf.io/networks': network, 'static-ip': staticIp, vlan
+      'k8s.v1.cni.cncf.io/networks': network, cidr, subnet
     } = get(this, 'service.annotations') || {};
 
     if (get(this, 'editing')) {
       return get(this, 'staticPod')
     }
-    if (network && staticIp && vlan) {
+    if (network && cidr && subnet) {
       return true;
     }
 
@@ -230,23 +233,25 @@ export default Component.extend({
   initStaticPod() {
     const annotations = get(this, 'service.annotations') || {};
     const {
-      'k8s.v1.cni.cncf.io/networks': network, 'static-ip': ip, 'static-mac': mac, vlan
+      'k8s.v1.cni.cncf.io/networks': network, cidr, mac, subnet, podId
     } = annotations || {};
 
-    if (network && vlan) {
+    if (network && subnet) {
       set(this, 'staticPod', true);
       set(this, 'staticPodForm', {
         network,
-        ip: ip === 'auto' ? '' : ip,
+        cidr: cidr === 'auto' ? '' : cidr,
         mac,
-        vlan,
+        subnet,
+        podId,
       })
     } else {
       set(this, 'staticPodForm', {
         network: 'static-macvlan-cni',
-        ip:      '',
+        cidr:    '',
         mac:     '',
-        vlan:    '',
+        subnet:  '',
+        podId:   '',
       })
     }
     this.namespaceDidChanged();

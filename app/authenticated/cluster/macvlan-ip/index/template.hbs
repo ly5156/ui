@@ -1,5 +1,5 @@
 <section class="header clearfix">
-  <h1 class="pull-left">Static Pods</h1>
+  <h1 class="pull-left">Macvlan IP</h1>
 </section>
 <section class="mt-30">
   {{#custom-table
@@ -30,8 +30,8 @@
         <td data-title="{{dt.podId}}">
           {{obj.podId}}
         </td>
-        <td data-title="{{dt.vlan}}">
-          {{obj.vlan}}
+        <td data-title="{{dt.subnet}}">
+          {{obj.subnet}}
         </td>
         <td class="text-right pr-20">
           {{date-calendar obj.creationTimestamp}}

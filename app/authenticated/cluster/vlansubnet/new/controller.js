@@ -5,30 +5,55 @@ import Controller from '@ember/controller';
 export default Controller.extend({
   vlansubnet: service(),
   errors:     null,
+  modes:      [
+    {
+      label: 'bridge',
+      value: 'bridge',
+    },
+    {
+      label: 'private',
+      value: 'private',
+    },
+    {
+      label: 'vepa',
+      value: 'vepa',
+    },
+    {
+      label: 'passthru',
+      value: 'passthru',
+    }
+  ],
   form:       {
-    apiVersion: 'staticmacvlan.rancher.com/v1',
-    kind:       'VLANSubnet',
+    apiVersion: 'macvlan.cluster.cattle.io/v1',
+    kind:       'MacvlanSubnet',
     metadata:   {
       name:      '',
       namespace: 'kube-system'
     },
     spec: {
-      master: '',
-      cidr:   ''
+      master:  '',
+      vlan:    2,
+      cidr:    '',
+      mode:    'bridge',
+      gateway: '',
     }
   },
   init() {
     this._super(...arguments);
     set(this, 'form', {
-      apiVersion: 'staticmacvlan.rancher.com/v1',
-      kind:       'VLANSubnet',
+      apiVersion: 'macvlan.cluster.cattle.io/v1',
+      kind:       'MacvlanSubnet',
       metadata:   {
         name:      '',
         namespace: 'kube-system'
       },
       spec: {
-        master: '',
-        cidr:   ''
+        master:  '',
+        vlan:    2,
+        cidr:    '',
+        mode:    'bridge',
+        gateway: '',
+
       }
     });
   },
@@ -74,9 +99,18 @@ export default Controller.extend({
       errors.push('master 不能为空');
     }
 
+    if (!/^\d+$/.test(form.spec.vlan) || form.spec.vlan < 2 || form.spec.vlan > 4095) {
+      errors.push('VLAN值应该是2到4095之间的整数');
+    }
     if (form.spec.cidr === '') {
       errors.push('CIDR 不能为空');
     }
+    const ipRegExp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+
+    if (form.spec.gateway !== '' && !ipRegExp.test(form.spec.gateway)) {
+      errors.push('GATEWAY 地址错误');
+    }
+
     if (errors.length > 0) {
       set(this, 'errors', errors);
 

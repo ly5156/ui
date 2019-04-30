@@ -1,8 +1,8 @@
 <section class="header clearfix">
-  <h1 class="pull-left">VLANSubnet</h1>
+  <h1 class="pull-left">MacvlanSubnet</h1>
   <div class="vertical-middle"></div>
   <div class="right-buttons">
-    <a href="#" {{action "newVlansubent"}} class="btn bg-primary btn-sm ml-10" >创建VLANSubnet</a>
+    <a href="#" {{action "newVlansubent"}} class="btn bg-primary btn-sm ml-10" >创建MacvlanSubnet</a>
   </div>
 </section>
 <section class="mt-30">
@@ -27,18 +27,27 @@
           {{check-box nodeId=obj.id}}
         </td>
         <td data-title="{{dt.name}}">
-          {{#link-to 'authenticated.cluster.static-pods' (query-params vlan=obj.name) class="clip project-link"}}
+          {{#link-to 'authenticated.cluster.macvlan-ip' (query-params vlan=obj.name) class="clip project-link"}}
             {{obj.name}}
           {{/link-to}}
         </td>
         <td data-title="{{dt.namespace}}">
           {{obj.namespace}}
         </td>
+        <td data-title="{{dt.master}}">
+          {{obj.master}}
+        </td>
+        <td data-title="{{dt.vlan}}">
+          {{obj.vlan}}
+        </td>
         <td data-title="{{dt.cidr}}">
           {{obj.cidr}}
         </td>
-        <td data-title="{{dt.master}}">
-          {{obj.master}}
+        <td data-title="{{dt.mode}}">
+          {{obj.mode}}
+        </td>
+        <td data-title="{{dt.gateway}}">
+          {{obj.gateway}}
         </td>
         <td class="text-right pr-20">
           {{date-calendar obj.creationTimestamp}}

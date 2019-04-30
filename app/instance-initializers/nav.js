@@ -169,9 +169,9 @@ const rootNav = [
   },
   // {
   //   scope:          'cluster',
-  //   id:             'cluster-static-pods',
-  //   localizedLabel: 'nav.cluster.staticPods',
-  //   route:          'authenticated.cluster.static-pods',
+  //   id:             'cluster-macvlan-ip',
+  //   localizedLabel: 'nav.cluster.macvlanIp',
+  //   route:          'authenticated.cluster.macvlan-ip',
   //   ctx:            [getClusterId],
   //   resource:       ['node'],
   //   resourceScope:  'global',
