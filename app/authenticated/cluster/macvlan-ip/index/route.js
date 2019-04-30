@@ -23,9 +23,9 @@ export default Route.extend({
           displayName:       d.metadata.name,
           namespace:         d.metadata.namespace,
           id:                d.metadata.uid,
-          ip:                d.spec.ip,
+          cidr:              d.spec.cidr,
           mac:               d.spec.mac,
-          podId:             d.spec['pod-id'],
+          podId:             d.spec.podId,
           subnet:            d.spec.subnet,
         };
       });

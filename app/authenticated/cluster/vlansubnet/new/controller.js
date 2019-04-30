@@ -49,7 +49,7 @@ export default Controller.extend({
       },
       spec: {
         master:  '',
-        vlan:    2,
+        vlan:    '',
         cidr:    '',
         mode:    'bridge',
         gateway: '',
@@ -64,7 +64,13 @@ export default Controller.extend({
 
         return;
       }
-      const form = get(this, 'form');
+      const form = JSON.parse(JSON.stringify(get(this, 'form')));
+
+      if (form.spec.vlan === '') {
+        delete form.spec.vlan
+      } else {
+        form.spec.vlan = parseInt(form.spec.vlan, 10);
+      }
       const clusterId = get(this, 'model.clusterId');
 
       this.vlansubnet.createVlansubnets(clusterId, form).then(() => {
@@ -99,15 +105,16 @@ export default Controller.extend({
       errors.push('master 不能为空');
     }
 
-    if (!/^\d+$/.test(form.spec.vlan) || form.spec.vlan < 2 || form.spec.vlan > 4095) {
+    if (form.spec.vlan !== '' && (!/^\d+$/.test(form.spec.vlan) || form.spec.vlan < 2 || form.spec.vlan > 4095)) {
       errors.push('VLAN值应该是2到4095之间的整数');
     }
+
     if (form.spec.cidr === '') {
       errors.push('CIDR 不能为空');
     }
-    const ipRegExp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    const cidrIPV4RegExp = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/\d{1,2}$/;
 
-    if (form.spec.gateway !== '' && !ipRegExp.test(form.spec.gateway)) {
+    if (form.spec.gateway !== '' && !cidrIPV4RegExp.test(form.spec.gateway)) {
       errors.push('GATEWAY 地址错误');
     }
 

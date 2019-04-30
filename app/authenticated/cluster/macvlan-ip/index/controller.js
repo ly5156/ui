@@ -17,9 +17,9 @@ const headers = [
     translationKey: 'generic.namespace',
   },
   {
-    name:           'ip',
-    label:          'IP',
-    sort:           ['ip'],
+    name:           'cidr',
+    label:          'CIDR',
+    sort:           ['cidr'],
     searchField:    'ip',
     width:          150,
   },
