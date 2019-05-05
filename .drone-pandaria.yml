@@ -1,0 +1,41 @@
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: test
+  pull: default
+  image: rancher/dapper:v0.4.1
+  commands:
+  - dapper ci
+  privileged: true
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  when:
+    event:
+    - pull_request
+
+- name: build
+  pull: default
+  image: rancher/dapper:v0.4.1
+  commands:
+  - BUILD_LATEST=true dapper ci
+  privileged: true
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  when:
+    branch:
+    - 2.2-fixes-cn
+    event:
+      exclude:
+      - pull_request
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
