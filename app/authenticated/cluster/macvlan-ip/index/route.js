@@ -8,14 +8,19 @@ export default Route.extend({
 
   model(params) {
     const cluster = this.modelFor('authenticated.cluster');
-    const subnet = params.subnet
+    const subnet = params.subnet;
+    const p = {};
 
-    return this.vlansubnet.fetchMacvlanIp(cluster.id).then((p) => {
+    if (subnet) {
+      p.labelSelector = encodeURIComponent(`subnet=${ subnet }`);
+    }
+
+    return this.vlansubnet.fetchMacvlanIp(cluster.id, p).then((p) => {
       let rawData = p.body.items;
 
-      if (subnet) {
-        rawData = rawData.filter((d) => d.spec.subnet.indexOf(subnet) > -1);
-      }
+      // if (subnet) {
+      //   rawData = rawData.filter((d) => d.spec.subnet.indexOf(subnet) > -1);
+      // }
       const data = rawData.map((d) => {
         return {
           creationTimestamp: d.metadata.creationTimestamp,

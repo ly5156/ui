@@ -55,7 +55,8 @@ export default Controller.extend({
   scope:            service(),
   router:           service(),
   session:          service(),
-
+  queryParams:      ['subnet'],
+  subnet:           '',
   sortBy:           'name',
   headers,
   data:             [],

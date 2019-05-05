@@ -27,7 +27,7 @@
           {{check-box nodeId=obj.id}}
         </td>
         <td data-title="{{dt.name}}">
-          {{#link-to 'authenticated.cluster.macvlan-ip' (query-params vlan=obj.name) class="clip project-link"}}
+          {{#link-to 'authenticated.cluster.macvlan-ip' (query-params subnet=obj.name) class="clip project-link"}}
             {{obj.name}}
           {{/link-to}}
         </td>
