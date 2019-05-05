@@ -38,8 +38,6 @@ const headers = [
   {
     name:           'subnet',
     label:          'Subnet',
-    sort:           ['subnet'],
-    searchField:    'subnet',
   },
   {
     classNames:     'text-right pr-20',
@@ -85,7 +83,7 @@ export default Controller.extend({
       set(this, 'data', result);
     },
     sortChanged(sort) {
-      const data = [...get(this, 'model.vlansubnets')];
+      const data = [...get(this, 'model.macvlanIps')];
 
       data.sort((a, b) => {
         if (a[sort.sortBy] > b[sort.sortBy]) {
