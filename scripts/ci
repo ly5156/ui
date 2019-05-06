@@ -28,6 +28,9 @@ if [[ "${BUILD_LATEST}" == "true" ]]; then
   echo "Building..."
   ./scripts/build-static -l -v latest2
   # (build-static contains a call to test & build)
+elif [[ "${BUILD_TAG}" == "true" ]]; then
+  echo "Building..."
+  ./scripts/build-static -v ${DRONE_TAG}
 else
   echo "Testing.."
   yarn test
