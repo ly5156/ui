@@ -114,8 +114,14 @@ export default Controller.extend({
     }
     const cidrIPV4RegExp = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/\d{1,2}$/;
 
-    if (form.spec.gateway !== '' && !cidrIPV4RegExp.test(form.spec.gateway)) {
-      errors.push('GATEWAY 地址错误');
+    if (form.spec.cidr !== '' && !cidrIPV4RegExp.test(form.spec.cidr)) {
+      errors.push('CIDR格式错误');
+    }
+
+    const ipv4RegExp = /^(((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.){3}((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))$/
+
+    if (!form.spec.gateway && ipv4RegExp.test(form.spec.gateway)) {
+      errors.push('Gateway IP 格式错误');
     }
 
     if (errors.length > 0) {
