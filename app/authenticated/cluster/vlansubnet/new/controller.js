@@ -13,18 +13,18 @@ export default Controller.extend({
       label: 'bridge',
       value: 'bridge',
     },
-    {
-      label: 'private',
-      value: 'private',
-    },
-    {
-      label: 'vepa',
-      value: 'vepa',
-    },
-    {
-      label: 'passthru',
-      value: 'passthru',
-    }
+    // {
+    //   label: 'private',
+    //   value: 'private',
+    // },
+    // {
+    //   label: 'vepa',
+    //   value: 'vepa',
+    // },
+    // {
+    //   label: 'passthru',
+    //   value: 'passthru',
+    // }
   ],
   form:       {
     apiVersion: 'macvlan.cluster.cattle.io/v1',
@@ -160,7 +160,7 @@ export default Controller.extend({
     }
     if (form.spec.ranges.some((r) => !ipv4RegExp.test(r.rangeEnd) || !ipv4RegExp.test(r.rangeStart))) {
       errors.push('IP Ranges 中，存在IP地址格式不正确的记录');
-    } else if (form.spec.ranges.some((r) => this.ip4CIDRContains(r.rangeEnd) && this.ip4CIDRContains(r.rangeStart))) {
+    } else if (form.spec.ranges.some((r) => !this.ip4CIDRContains(form.spec.cidr, r.rangeEnd) || !this.ip4CIDRContains(form.spec.cidr, r.rangeStart))) {
       errors.push('IP Ranges 中，存在IP地址不在子网范围内的记录');
     }
 

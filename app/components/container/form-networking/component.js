@@ -2,6 +2,7 @@ import { get, set, computed, observer } from '@ember/object';
 import Component from '@ember/component';
 import layout from './template';
 import { inject as service } from '@ember/service';
+import { htmlSafe } from '@ember/string';
 
 export default Component.extend({
   scope:      service(),
@@ -18,10 +19,9 @@ export default Component.extend({
 
   staticPodForm: {
     network: 'static-macvlan-cni',
-    cidr:      '',
+    ip:      '',
     mac:     '',
     subnet:    '',
-    podId:   '',
   },
   vlansubnets:          [],
   // unsupport vlansubnet
@@ -41,13 +41,12 @@ export default Component.extend({
     updateStaticPod() {
       const annotationsForm = get(this, 'staticPodForm');
       const annotations = get(this, 'service.annotations');
-      const props = ['k8s.v1.cni.cncf.io/networks', 'cidr', 'mac', 'subnet', 'podId'];
+      const props = ['k8s.v1.cni.cncf.io/networks', 'macvlan.pandaria.cattle.io/ip', 'macvlan.pandaria.cattle.io/mac', 'macvlan.pandaria.cattle.io/subnet'];
       const propMap = {
         network: 'k8s.v1.cni.cncf.io/networks',
-        cidr:    'cidr',
-        mac:     'mac',
-        subnet:  'subnet',
-        podId:   'podId'
+        ip:      'macvlan.pandaria.cattle.io/ip',
+        mac:     'macvlan.pandaria.cattle.io/mac',
+        subnet:  'macvlan.pandaria.cattle.io/subnet',
       };
 
       if (!get(this, 'enableStaticPod')) {
@@ -71,7 +70,7 @@ export default Component.extend({
 
         Object.keys(annotationsForm).forEach((a) => {
           form[propMap[a]] = annotationsForm[a];
-          if (a === 'cidr' && annotationsForm[a] === '') {
+          if ((a === 'ip' || a === 'mac') && annotationsForm[a] === '') {
             form[propMap[a]] = 'auto';
           }
         });
@@ -133,25 +132,10 @@ export default Component.extend({
     }
   },
 
-  namespaceDidChanged: observer('service.namespaceId', function() {
-    const clusterId = get(this, 'scope.currentCluster.id');
-
-    if (clusterId) {
-      get(this, 'vlansubnet').fetchVlansubnets(clusterId).then((resp) => {
-        const items = resp.body.items.map((item) => ({
-          label: item.metadata.name,
-          value: item.metadata.name
-        }));
-
-        set(this, 'vlansubnets', items);
-        set(this, 'unsupportVlansubnet', false);
-      });
-    }
-  }),
   staticPodDidChanged: observer('staticPod', function() {
-    if (get(!this, 'staticPod')) {
+    if (!get(this, 'staticPod')) {
       const annotations = get(this, 'service.annotations') || {};
-      const props = ['k8s.v1.cni.cncf.io/networks', 'cidr', 'mac', 'subnet', 'podId'];
+      const props = ['k8s.v1.cni.cncf.io/networks', 'macvlan.pandaria.cattle.io/ip', 'macvlan.pandaria.cattle.io/mac', 'macvlan.pandaria.cattle.io/subnet'];
       const form = {}
 
       Object.keys(annotations).forEach((a) => {
@@ -166,26 +150,25 @@ export default Component.extend({
     }
     this.send('updateStaticPod');
   }),
-  staticPodAnnotation: computed('service.annotations.{k8s.v1.cni.cncf.io/networks,static-ip,static-mac,vlan}', function() {
+  staticPodAnnotation: computed('service.annotations.{k8s.v1.cni.cncf.io/networks,macvlan.pandaria.cattle.io/ip,macvlan.pandaria.cattle.io/subnet,macvlan.pandaria.cattle.io/mac}', function() {
     const annotations = get(this, 'service.annotations') || {};
 
     return {
       network: annotations['k8s.v1.cni.cncf.io/networks'],
-      cidr:    annotations.cidr,
-      mac:     annotations.mac,
-      subnet:  annotations.subnet,
-      podId:   annotations.podId,
+      ip:      annotations['macvlan.pandaria.cattle.io/ip'],
+      mac:     annotations['macvlan.pandaria.cattle.io/mac'],
+      subnet:  annotations['macvlan.pandaria.cattle.io/subnet'],
     }
   }),
   enableStaticPod: computed('service.annotations.{k8s.v1.cni.cncf.io/networks,static-ip,static-mac,vlan}', 'staticPod', 'editing', function() {
     const {
-      'k8s.v1.cni.cncf.io/networks': network, cidr, subnet
+      'k8s.v1.cni.cncf.io/networks': network, 'macvlan.pandaria.cattle.io/ip':ip, 'macvlan.pandaria.cattle.io/subnet':subnet
     } = get(this, 'service.annotations') || {};
 
     if (get(this, 'editing')) {
       return get(this, 'staticPod')
     }
-    if (network && cidr && subnet) {
+    if (network && ip && subnet) {
       return true;
     }
 
@@ -200,11 +183,26 @@ export default Component.extend({
   }),
   vlansubnetdisabledStyle: computed('unsupportVlansubnet', function() {
     if (get(this, 'unsupportVlansubnet')) {
-      return 'color: #8b969d;cursor: not-allowed;';
+      return htmlSafe('color: #8b969d;cursor: not-allowed;');
     }
 
-    return '';
+    return htmlSafe('');
   }),
+  loadVlansubnets() {
+    const clusterId = get(this, 'scope.currentCluster.id');
+
+    if (clusterId) {
+      get(this, 'vlansubnet').fetchVlansubnets(clusterId).then((resp) => {
+        const items = resp.body.items.map((item) => ({
+          label: item.metadata.name,
+          value: item.metadata.name
+        }));
+
+        set(this, 'vlansubnets', items);
+        set(this, 'unsupportVlansubnet', false);
+      });
+    }
+  },
   initHostAliases() {
     const aliases = get(this, 'service.hostAliases');
 
@@ -231,29 +229,27 @@ export default Component.extend({
     });
   },
   initStaticPod() {
-    const annotations = get(this, 'service.annotations') || {};
     const {
-      'k8s.v1.cni.cncf.io/networks': network, cidr, mac, subnet, podId
-    } = annotations || {};
+      'k8s.v1.cni.cncf.io/networks': network, 'macvlan.pandaria.cattle.io/ip':ip, 'macvlan.pandaria.cattle.io/subnet':subnet, 'macvlan.pandaria.cattle.io/mac':mac
+    } = get(this, 'service.annotations') || {};
 
     if (network && subnet) {
-      set(this, 'staticPod', true);
       set(this, 'staticPodForm', {
         network,
-        cidr: cidr === 'auto' ? '' : cidr,
+        ip: ip === 'auto' ? '' : ip,
         mac,
         subnet,
-        podId,
-      })
+      });
+      set(this, 'staticPod', true);
     } else {
       set(this, 'staticPodForm', {
         network: 'static-macvlan-cni',
-        cidr:    '',
+        ip:      '',
         mac:     '',
         subnet:  '',
-        podId:   '',
-      })
+      });
+      set(this, 'staticPod', false);
     }
-    this.namespaceDidChanged();
+    this.loadVlansubnets();
   }
 });
