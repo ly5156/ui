@@ -1,6 +1,9 @@
 import { inject as service } from '@ember/service';
 import { get, set } from '@ember/object';
 import Controller from '@ember/controller';
+import CIDRMatcher from 'cidr-matcher';
+
+const ipv4RegExp = /^(((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.){3}((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))$/;
 
 export default Controller.extend({
   vlansubnet: service(),
@@ -36,6 +39,7 @@ export default Controller.extend({
       cidr:    '',
       mode:    'bridge',
       gateway: '',
+      ranges:  [],
     }
   },
   init() {
@@ -53,7 +57,7 @@ export default Controller.extend({
         cidr:    '',
         mode:    'bridge',
         gateway: '',
-
+        ranges:  [],
       }
     });
   },
@@ -66,19 +70,28 @@ export default Controller.extend({
       }
       const form = JSON.parse(JSON.stringify(get(this, 'form')));
 
-      if (form.spec.vlan === '') {
-        delete form.spec.vlan
-      } else {
-        form.spec.vlan = parseInt(form.spec.vlan, 10);
-      }
-      const clusterId = get(this, 'model.clusterId');
+      form.spec.vlan = parseInt(form.spec.vlan, 10) || 0;
 
-      this.vlansubnet.createVlansubnets(clusterId, form).then(() => {
-        this.resetForm();
-        cb(true);
-        this.send('goToPrevious');
+      const clusterId = get(this, 'model.clusterId');
+      const { master, vlan } = form.spec;
+
+      this.hasVlan(master || '', vlan || 0).then((result) => {
+        if (result) {
+          set(this, 'errors', [`master为${ master }且vlan为${ vlan || '空' }, 已经存在`]);
+          cb(false);
+
+          return;
+        }
+
+        return this.vlansubnet.createVlansubnets(clusterId, form).then(() => {
+          this.resetForm();
+          cb(true);
+          this.send('goToPrevious');
+        });
       }).catch((err) => {
-        set(this, 'errors', [err.body.message]);
+        if (err && err.body && err.body.message) {
+          set(this, 'errors', [err.body.message]);
+        }
         cb(false);
       });
     },
@@ -86,12 +99,36 @@ export default Controller.extend({
       this.resetForm();
       this.send('goToPrevious');
     },
+    addIPRange() {
+      const ranges = get(this, 'form.spec.ranges').slice();
+
+      ranges.push({
+        rangeEnd:   '',
+        rangeStart: '',
+      });
+      set(this, 'form.spec.ranges', ranges);
+    },
+    removeIPRange(obj) {
+      const ranges = get(this, 'form.spec.ranges').filter((r) => r !== obj);
+
+      set(this, 'form.spec.ranges', ranges);
+    }
+  },
+  hasVlan(master, vlan) {
+    const clusterId = get(this, 'model.clusterId');
+    const q = [encodeURIComponent(`master=${ master }`), encodeURIComponent(`vlan=${ vlan }`)]
+    const p = { labelSelector: q.join(',') };
+
+    return this.vlansubnet.fetchVlansubnets(clusterId, p).then((resp) => {
+      return resp.body.items.length > 0;
+    });
   },
   resetForm() {
     set(this, 'form.metadata.name', '');
     set(this, 'form.metadata.namespace', '');
     set(this, 'form.spec.master', '');
     set(this, 'form.spec.cidr', '');
+    set(this, 'form.spec.ranges', []);
   },
   validate() {
     const form = get(this, 'form');
@@ -118,10 +155,13 @@ export default Controller.extend({
       errors.push('CIDR格式错误');
     }
 
-    const ipv4RegExp = /^(((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))\.){3}((\d{1,2})|(1\d{2})|(2[0-4]\d)|(25[0-5]))$/
-
     if (form.spec.gateway && !ipv4RegExp.test(form.spec.gateway)) {
       errors.push('Gateway IP 格式错误');
+    }
+    if (form.spec.ranges.some((r) => !ipv4RegExp.test(r.rangeEnd) || !ipv4RegExp.test(r.rangeStart))) {
+      errors.push('IP Ranges 中，存在IP地址格式不正确的记录');
+    } else if (form.spec.ranges.some((r) => this.ip4CIDRContains(r.rangeEnd) && this.ip4CIDRContains(r.rangeStart))) {
+      errors.push('IP Ranges 中，存在IP地址不在子网范围内的记录');
     }
 
     if (errors.length > 0) {
@@ -132,5 +172,19 @@ export default Controller.extend({
     set(this, 'errors', null);
 
     return true;
+  },
+  ip4CIDRContains(cidr, ip) {
+    let result = false;
+
+    try {
+      const matcher = new CIDRMatcher([cidr]);
+
+      result = matcher.contains(ip);
+    } catch (err) {
+      result = false;
+    }
+
+
+    return result;
   },
 });

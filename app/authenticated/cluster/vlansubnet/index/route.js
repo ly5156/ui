@@ -22,6 +22,7 @@ export default Route.extend({
           mode:              item.spec.mode,
           gateway:           item.spec.gateway,
           creationTimestamp: item.metadata.creationTimestamp,
+          ipRanges:          item.spec.ranges.map((item) => `${ item.rangeStart }-${ item.rangeEnd }`).join(','),
           rawData:           item,
         };
       });

@@ -38,10 +38,15 @@
           {{obj.master}}
         </td>
         <td data-title="{{dt.vlan}}">
+          {{#if obj.vlan}}
           {{obj.vlan}}
+          {{/if}}
         </td>
         <td data-title="{{dt.cidr}}">
           {{obj.cidr}}
+        </td>
+        <td data-title="{{dt.ipRanges}}">
+          {{obj.ipRanges}}
         </td>
         <td data-title="{{dt.mode}}">
           {{obj.mode}}

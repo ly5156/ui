@@ -31,7 +31,10 @@ export const headers = [
     label:          'CIDR',
     sort:           ['cidr'],
     searchField:    'cidr',
-    width:          150,
+  },
+  {
+    name:           'ipRanges',
+    label:          'IP Ranges',
   },
   {
     name:           'mode',
