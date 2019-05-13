@@ -66,6 +66,7 @@ export default Controller.extend({
   sortBy:           'name',
   headers,
   data:             [],
+  loading:          false,
   availableActions: [
     {
       action:         'remove',
@@ -78,6 +79,31 @@ export default Controller.extend({
     this.vlansubnetsDidChanged();
   },
   actions: {
+    pageChange(next) {
+      if (get(this, 'loading')) {
+        return;
+      }
+      const clusterId = get(this, 'scope.currentCluster.id');
+      const limit = get(this, 'prefs.tablePerPage');
+      const p = {
+        limit,
+        continue: next
+      };
+
+      get(this, 'vlansubnet').fetchVlansubnets(clusterId, p).then((resp) => {
+        set(this, 'loading', false);
+        const data = [...get(this, 'model.vlansubnets.data')];
+
+        data.push(...resp.body.data);
+
+        set(this, 'model.vlansubnets', {
+          data,
+          continue: resp.body.metadata.continue,
+        });
+      }).catch(() => {
+        set(this, 'loading', false);
+      });
+    },
     search(val) {
       if (!val) {
         set(this, 'data', get(this, 'rows'));
@@ -95,7 +121,7 @@ export default Controller.extend({
       set(this, 'data', result);
     },
     sortChanged(sort) {
-      const data = [...get(this, 'model.vlansubnets')];
+      const data = [...get(this, 'model.vlansubnets.data')];
 
       data.sort((a, b) => {
         if (a[sort.sortBy] > b[sort.sortBy]) {
@@ -141,7 +167,10 @@ export default Controller.extend({
   vlansubnetsDidChanged: observer('rows', function() {
     set(this, 'data', get(this, 'rows'));
   }),
-  rows: computed('model.vlansubnets', function() {
-    return get(this, 'model.vlansubnets');
+  rows: computed('model.vlansubnets.data', function() {
+    return get(this, 'model.vlansubnets.data');
+  }),
+  next: computed('model.vlansubnets.continue', function() {
+    return get(this, 'model.vlansubnets.continue');
   }),
 })

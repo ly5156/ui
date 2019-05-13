@@ -60,11 +60,37 @@ export default Controller.extend({
   data:             [],
   searchText:       '',
   availableActions: [],
+  loading:          false,
   init() {
     this._super(...arguments);
     this.staticPodsDidChanged();
   },
   actions: {
+    pageChange(next) {
+      if (get(this, 'loading')) {
+        return;
+      }
+      const clusterId = get(this, 'scope.currentCluster.id');
+      const limit = get(this, 'prefs.tablePerPage');
+      const p = {
+        limit,
+        continue: next
+      };
+
+      get(this, 'vlansubnet').fetchMacvlanIp(clusterId, p).then((resp) => {
+        set(this, 'loading', false);
+        const data = [...get(this, 'model.vlansubnets.data')];
+
+        data.push(...resp.body.data);
+
+        set(this, 'model.vlansubnets', {
+          data,
+          continue: resp.body.metadata.continue,
+        });
+      }).catch(() => {
+        set(this, 'loading', false);
+      });
+    },
     search(val) {
       if (!val) {
         set(this, 'data', get(this, 'rows'));
@@ -83,7 +109,7 @@ export default Controller.extend({
       set(this, 'data', result);
     },
     sortChanged(sort) {
-      const data = [...get(this, 'model.macvlanIps')];
+      const data = [...get(this, 'model.macvlanIps.data')];
 
       data.sort((a, b) => {
         if (a[sort.sortBy] > b[sort.sortBy]) {
@@ -101,7 +127,10 @@ export default Controller.extend({
   staticPodsDidChanged: observer('rows', function() {
     set(this, 'data', get(this, 'rows'));
   }),
-  rows: computed('model.macvlanIps', function() {
-    return get(this, 'model.macvlanIps');
+  rows: computed('model.macvlanIps.data', function() {
+    return get(this, 'model.macvlanIps.data');
+  }),
+  next: computed('model.macvlanIps.continue', function() {
+    return get(this, 'model.macvlanIps.continue');
   }),
 });

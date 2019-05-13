@@ -8,7 +8,7 @@
 <section class="mt-30">
   {{#custom-table
        tableClassNames="bordered"
-       paging=false
+       paging=true
        primaryKeyName="id"
        search=(action "search")
        sortChanged=(action "sortChanged")
@@ -19,6 +19,8 @@
        data=data
        hasRowActions=true
        remove=(action "promptDelete")
+       pageChange=(action 'pageChange')
+       nextData=next
        as |sortable kind obj dt|
   }}
     {{#if (eq kind "row")}}

@@ -4,13 +4,15 @@
 <section class="mt-30">
   {{#custom-table
        tableClassNames="bordered"
-       paging=false
+       paging=true
        hasBulkActions=false
        primaryKeyName="id"
        search=(action "search")
        sortChanged=(action "sortChanged")
        headers=headers
        data=data
+       pageChange=(action 'pageChange')
+       nextData=next
        as |sortable kind obj dt|
   }}
     {{#if (eq kind "row")}}

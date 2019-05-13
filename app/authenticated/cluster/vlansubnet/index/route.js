@@ -6,26 +6,16 @@ import { hash } from 'rsvp';
 export default Route.extend({
   scope:      service(),
   vlansubnet: service(),
+  prefs:      service(),
 
   model() {
     const clusterId = get(this, 'scope.currentCluster.id');
-    const vlansubnets = get(this, 'vlansubnet').fetchVlansubnets(clusterId).then((resp) => {
-      return  resp.body.items.map((item) => {
-        return {
-          id:                item.metadata.uid,
-          name:              item.metadata.name,
-          displayName:        item.metadata.name,
-          namespace:         item.metadata.namespace,
-          master:            item.spec.master,
-          vlan:              item.spec.vlan,
-          cidr:              item.spec.cidr,
-          mode:              item.spec.mode,
-          gateway:           item.spec.gateway,
-          creationTimestamp: item.metadata.creationTimestamp,
-          ipRanges:          item.spec.ranges.map((item) => `${ item.rangeStart }-${ item.rangeEnd }`).join(','),
-          rawData:           item,
-        };
-      });
+    const p = { limit: get(this, 'prefs.tablePerPage') };
+    const vlansubnets = get(this, 'vlansubnet').fetchVlansubnets(clusterId, p).then((resp) => {
+      return {
+        data:     resp.body.data,
+        continue: resp.body.metadata.continue,
+      };
     });
 
     return hash({
