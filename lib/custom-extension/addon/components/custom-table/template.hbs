@@ -109,6 +109,8 @@
 {{/if}}
 {{#if (and paging hasNextData)}}
   <div class="pagination-container">
-    <a class="arrow next enabled-arrow btn bg-default" disabled={{unless hasNextData 'disabled'}} {{action "pageChange" nextData}}><span class="icon icon-chevron-right"></span></a>
+    <div class="btn-group btn-group-sm">
+      <a class="arrow next enabled-arrow btn bg-default" disabled={{unless hasNextData 'disabled'}} {{action "pageChange" nextData}}><span class="icon icon-chevron-right"></span></a>
+    </div>
   </div>
 {{/if}}
