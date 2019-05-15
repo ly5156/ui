@@ -3763,6 +3763,7 @@ dangerZone:
     'telemetry-opt': 'Telemetry reporting opt-in.'
     'auth-user-info-max-age-seconds': 'The maximum age of a users auth tokens before an auth provider group membership sync will be performed.'
     'auth-user-info-resync-cron': 'Default cron schedule for resyncing auth provider group memberships.'
+    'auditlog-server': 'audit log'
 
 deleteEksCluster:
   title: "Delete {clusterName}?"

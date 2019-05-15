@@ -11,7 +11,10 @@
       <span class="darken"><i class="icon icon-file"></i></span>
       <span>{{t 'k8sPage.configFile.button'}}</span>
     </button>
-
+    <button class="btn bg-primary btn-sm icon-btn ml-10" onClick={{action "goToClusterAuditLog"}}>
+      <span class="darken"><i class="icon icon-file"></i></span>
+      <span>审计日志</span>
+    </button>
     {{action-menu size="sm" classNames="pull-right" model=cluster}}
   </div>
 </section>

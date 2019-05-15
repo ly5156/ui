@@ -73,6 +73,10 @@ Router.map(function() {
       this.route('macvlan-ip', function() {
         this.route('index', { path: '/' });
       });
+      // audit log
+      this.route('audit-log', { path: '/audit-log' }, function() {
+        this.route('index', { path: '/' });
+      });
 
       this.mount('monitoring');
 
