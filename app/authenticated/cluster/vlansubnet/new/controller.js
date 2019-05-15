@@ -127,7 +127,10 @@ export default Controller.extend({
     set(this, 'form.metadata.name', '');
     set(this, 'form.metadata.namespace', '');
     set(this, 'form.spec.master', '');
+    set(this, 'form.spec.vlan', '');
     set(this, 'form.spec.cidr', '');
+    set(this, 'form.spec.mode', 'bridge');
+    set(this, 'form.spec.gateway', '');
     set(this, 'form.spec.ranges', []);
   },
   validate() {
