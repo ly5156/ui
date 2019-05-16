@@ -1,14 +1,16 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import { hash } from 'rsvp';
+import { get } from '@ember/object';
 
 export default Route.extend({
   scope:      service(),
   auditLog:   service(),
+  prefs:      service(),
   model() {
-    const cluster = this.modelFor('authenticated.cluster');
-
-    const logs = this.auditLog.fetchClusterAuditLogs(cluster.id).then((resp) => {
+    const clusterId = get(this, 'scope.currentCluster.id');
+    const pagesize = get(this, 'prefs.tablePerPage');
+    const logs = this.auditLog.fetchClusterAuditLogs(clusterId, { pagesize }).then((resp) => {
       return resp.body;
     });
 
