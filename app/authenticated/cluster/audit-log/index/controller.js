@@ -122,8 +122,27 @@ export default Controller.extend({
       this.resetForm();
       this.send('search');
     },
-    nextData() {
+    pageChange(next) {
+      if (get(this, 'loading')) {
+        return;
+      }
+      const clusterId = get(this, 'scope.currentCluster.id');
+      const pagesize = get(this, 'prefs.tablePerPage');
+      const q = {
+        pagesize,
+        next
+      };
 
+      this.auditLog.fetchClusterAuditLogs(clusterId, q).then((resp) => {
+        set(this, 'loading', false);
+        const data = [...get(this, 'model.logs.data')];
+
+        data.push(...resp.body.data);
+
+        set(this, 'model.logs', Object.assign({}, resp.body, { data }));
+      }).catch(() => {
+        set(this, 'loading', false);
+      });
     },
     sortChanged(sort) {
       const loading = get(this, 'loading');
@@ -153,6 +172,9 @@ export default Controller.extend({
     const fields = get(this, 'searchFields');
 
     return fields.find((item) => item.value === f).label;
+  }),
+  next: computed('model.logs.pagination.next', function() {
+    return !!get(this, 'model.logs.pagination.next');
   }),
   syncForm() {
     const f = get(this, 'form');
@@ -189,5 +211,5 @@ export default Controller.extend({
       dateRange:     -1,
       order:          '',
     });
-  }
+  },
 })
