@@ -37,6 +37,12 @@ export const headers = [
     classNames:     'text-center',
     width:          100
   },
+  {
+    name:        '',
+    sort:        false,
+    searchField: null,
+    width:       30
+  },
 ];
 
 export default Controller.extend({

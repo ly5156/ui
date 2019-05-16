@@ -7172,6 +7172,7 @@ action:
   viewInGrafana: 查看Grafana
   viewInstance: 查看实例
   viewYaml: 查看YAML
+  auditLog: 审计日志
 
 ##############################
 # Resource Actions

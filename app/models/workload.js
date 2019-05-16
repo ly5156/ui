@@ -117,6 +117,13 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
         enabled:  !!a.pause && isPaused,
         bulkable: true
       },
+      {
+        label:    'action.auditLog',
+        icon:     'icon icon-edit',
+        action:   'goToAuditLog',
+        enabled:  true,
+        bulkable: false
+      },
     ];
 
     return choices;
@@ -316,6 +323,9 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
         window.open(`//${ window.location.host }${ route }?podId=${ podId }&windows=${ windows }&isPopup=true`, '_blank', opt);
       });
     },
+    goToAuditLog() {
+      get(this, 'router').transitionTo('containers.audit-log', { queryParams: { workloadId: get(this, 'id') } });
+    }
   },
 
   updateTimestamp() {

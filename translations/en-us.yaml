@@ -7173,6 +7173,7 @@ action:
   viewInGrafana: Go to Grafana
   viewInstance: View Instance
   viewYaml: View YAML
+  auditLog: Audit Log
 
 ##############################
 # Resource Actions

@@ -154,7 +154,11 @@ Router.map(function() {
         this.route('container', {
           path:           '/:pod_id/container/:container_name',
           resetNamespace: true
-        })
+        });
+        // audit log
+        this.route('audit-log', { path: '/audit-log' }, function() {
+          this.route('index', { path: '/' });
+        });
       });
 
       this.route('ingresses', { resetNamespace: true }, function() {
