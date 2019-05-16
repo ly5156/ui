@@ -37,6 +37,7 @@ export default Controller.extend({
   prefs:            service(),
   router:           service(),
   session:          service(),
+  modalService:     service('modal'),
   sortBy:           'requestTimestamp',
   dateRanges:       [
     {
@@ -102,6 +103,12 @@ export default Controller.extend({
   },
   queryForm: {},
   actions:          {
+    showDetail(log) {
+      get(this, 'modalService').toggleModal('modal-audit-log-detail', {
+        escToClose: true,
+        resource:   log
+      });
+    },
     search() {
       this.syncForm();
       const clusterId = get(this, 'scope.currentCluster.id');

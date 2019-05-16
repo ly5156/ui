@@ -42,9 +42,11 @@
        paging=false
        primaryKeyName="id"
        sortChanged=(action "sortChanged")
+       pageChange=(action 'pageChange')
        headers=headers
        availableActions=availableActions
        data=rows
+       nextData=next
        as |sortable kind obj dt|
   }}
     {{#if (eq kind "row")}}
@@ -62,7 +64,7 @@
           {{obj.requestResType}}
         </td>
         <td data-title="{{dt.requestResId}}">
-          {{obj.requestResId}}
+          <a href="#" {{action "showDetail" obj}} >{{obj.requestResId}}</a>
         </td>
       </tr>
     {{else if (eq kind "nomatch")}}
