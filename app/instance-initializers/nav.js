@@ -461,6 +461,13 @@ const rootNav = [
       },
     ],
   },
+  {
+    scope:          'global',
+    id:             'global-audit-log',
+    localizedLabel: 'nav.auditLog.tab',
+    route:          'custom-extension.audit-log.index',
+    resourceScope:  'global',
+  },
 //  {
 //    scope: 'global',
 //    id: 'global-advanced',

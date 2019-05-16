@@ -7099,6 +7099,8 @@ nav:
   project:
     none: 项目/命名空间
     namespaces: 命名空间
+  auditLog:
+    tab: 审计日志
 
 
 ##############################
