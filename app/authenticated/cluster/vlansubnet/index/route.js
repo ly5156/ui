@@ -13,7 +13,11 @@ export default Route.extend({
     const p = { limit: get(this, 'prefs.tablePerPage') };
     const vlansubnets = get(this, 'vlansubnet').fetchVlansubnets(clusterId, p).then((resp) => {
       return {
-        data:     resp.body.data,
+        data:     resp.body.data.map((item) => {
+          item.displayName = item.name;
+
+          return item;
+        }),
         continue: resp.body.metadata.continue,
       };
     });

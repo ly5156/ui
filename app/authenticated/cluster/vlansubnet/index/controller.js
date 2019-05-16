@@ -59,15 +59,17 @@ export const headers = [
 ];
 
 export default Controller.extend({
-  vlansubnet:       service(),
-  scope:            service(),
-  router:           service(),
-  session:          service(),
-  sortBy:           'name',
+  vlansubnet:             service(),
+  scope:                  service(),
+  router:                 service(),
+  session:                service(),
+  sortBy:                 'name',
   headers,
-  data:             [],
-  loading:          false,
-  availableActions: [
+  data:                   [],
+  loading:                false,
+  showConfirmDeleteModal: false,
+  selectedData:           null,
+  availableActions:       [
     {
       action:         'remove',
       icon:           'icon icon-trash',
@@ -136,6 +138,11 @@ export default Controller.extend({
       set(this, 'data', data);
     },
     promptDelete(data) {
+      set(this, 'showConfirmDeleteModal', true)
+      set(this, 'selectedData', data);
+    },
+    confirmDelete() {
+      const data = get(this, 'selectedData');
       const clusterId = get(this, 'model.clusterId');
 
       const promises = data.map((d) => {
@@ -143,8 +150,12 @@ export default Controller.extend({
       });
 
       all(promises).then(() => {
+        set(this, 'selectedData', null);
+        set(this, 'showConfirmDeleteModal', false);
         this.send('refreshModel');
       }).catch(() => {
+        set(this, 'selectedData', null);
+        set(this, 'showConfirmDeleteModal', false);
         this.send('refreshModel');
       });
     },
@@ -154,9 +165,7 @@ export default Controller.extend({
     handleMenuClick(command, data) {
       switch (command) {
       case 'remove':
-        this.vlansubnet.removeVlansubnets(get(this, 'model.clusterId'), get(data, 'name')).then(() => {
-          this.send('refreshModel');
-        });
+        this.send('promptDelete', [data]);
         break;
       }
     },
