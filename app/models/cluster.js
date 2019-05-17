@@ -15,6 +15,7 @@ export default Resource.extend(Grafana, ResourceUsage, {
   scope:       service(),
   router:      service(),
   intl:        service(),
+  settings:    service(),
 
   namespaces:                  hasMany('id', 'namespace', 'clusterId'),
   projects:                    hasMany('id', 'project', 'clusterId'),
@@ -182,7 +183,7 @@ export default Resource.extend(Grafana, ResourceUsage, {
   availableActions: computed('actionLinks.{rotateCertificates}', function() {
     const a = get(this, 'actionLinks') || {};
 
-    return [
+    const actiions =  [
       {
         label:     'action.rotate',
         icon:      'icon icon-history',
@@ -202,6 +203,17 @@ export default Resource.extend(Grafana, ResourceUsage, {
         enabled:   !!a.restoreFromEtcdBackup,
       },
     ];
+
+    if (get(this, 'settings.asMap')['auditlog-server'] && get(this, 'settings.asMap')['auditlog-server']['value']) {
+      actiions.push({
+        label:     'action.auditLog',
+        icon:      'icon icon-file',
+        action:    'goToAuditLog',
+        enabled:   true,
+      });
+    }
+
+    return actiions;
   }),
 
   actions: {
@@ -277,6 +289,9 @@ export default Resource.extend(Grafana, ResourceUsage, {
       });
     },
 
+    goToAuditLog() {
+      get(this, 'router').transitionTo('authenticated.cluster.audit-log');
+    }
   },
 
   clearProvidersExcept(keep) {

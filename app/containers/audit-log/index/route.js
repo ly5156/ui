@@ -8,7 +8,7 @@ export default Route.extend({
   auditLog:   service(),
   prefs:      service(),
   model(params) {
-    const clusterId = get(this, 'scope.currentCluster.id');
+    const clusterId = get(this, 'scope.currentCluster.id') || params.clusterId;
     const workloadId = params.workloadId;
     const pagesize = get(this, 'prefs.tablePerPage');
     const logs = this.auditLog.fetchWorkloadAuditLogs(clusterId, workloadId, { pagesize }).then((resp) => {
@@ -22,5 +22,8 @@ export default Route.extend({
       this.refresh();
     }
   },
-  queryParams: { workloadId: { refreshModel: true } },
+  queryParams: {
+    workloadId: { refreshModel: true },
+    clusterId:  { refreshModel: true }
+  },
 });

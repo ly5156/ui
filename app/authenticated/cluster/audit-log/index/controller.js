@@ -1,12 +1,17 @@
 import { inject as service } from '@ember/service';
 import Controller from '@ember/controller';
-import { get, set, computed, observer } from '@ember/object';
+import { get, set, computed } from '@ember/object';
 
 export const headers = [
   {
     name:           'userID',
     label:          '操作人',
     searchField:    'userID',
+  },
+  {
+    name:           'operation',
+    label:          '操作',
+    searchField:    'operation',
   },
   {
     name:           'requestTimestamp',
@@ -81,11 +86,11 @@ export default Controller.extend({
     //   value: 'userID',
     // },
     {
-      label: 'requestResId',
+      label: '请求资源ID',
       value: 'requestResId',
     },
     {
-      label: 'requestResType',
+      label: '请求资源类型',
       value: 'requestResType',
     },
   ],

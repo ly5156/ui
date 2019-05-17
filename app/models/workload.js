@@ -20,7 +20,8 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
   modalService:  service('modal'),
   scope:         service(),
   router:        service(),
-  clusterStore: service(),
+  clusterStore:  service(),
+  settings:      service(),
 
   pods:         hasMany('id', 'pod', 'workloadId'),
 
@@ -117,14 +118,17 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
         enabled:  !!a.pause && isPaused,
         bulkable: true
       },
-      {
-        label:    'action.auditLog',
-        icon:     'icon icon-edit',
-        action:   'goToAuditLog',
-        enabled:  true,
-        bulkable: false
-      },
     ];
+
+    if (get(this, 'settings.asMap')['auditlog-server'] && get(this, 'settings.asMap')['auditlog-server']['value']) {
+      choices.push({
+        label:     'action.auditLog',
+        icon:      'icon icon-file',
+        action:    'goToAuditLog',
+        enabled:   true,
+        bulkable: false
+      });
+    }
 
     return choices;
   }.property('actionLinks.{activate,deactivate,pause,restart,rollback,garbagecollect}', 'links.{update,remove}',
@@ -324,7 +328,12 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
       });
     },
     goToAuditLog() {
-      get(this, 'router').transitionTo('containers.audit-log', { queryParams: { workloadId: get(this, 'id') } });
+      get(this, 'router').transitionTo('containers.audit-log', {
+        queryParams: {
+          workloadId: get(this, 'id'),
+          clusterId:  get(this, 'scope.currentCluster.id'),
+        }
+      });
     }
   },
 

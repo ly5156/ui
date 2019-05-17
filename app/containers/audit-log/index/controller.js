@@ -1,12 +1,17 @@
 import { inject as service } from '@ember/service';
 import Controller from '@ember/controller';
-import { get, set, computed, observer } from '@ember/object';
+import { get, set, computed } from '@ember/object';
 
 export const headers = [
   {
     name:           'userID',
     label:          '操作人',
     searchField:    'userID',
+  },
+  {
+    name:           'operation',
+    label:          '操作',
+    searchField:    'operation',
   },
   {
     name:           'requestTimestamp',
@@ -38,8 +43,9 @@ export default Controller.extend({
   router:           service(),
   session:          service(),
   modalService:     service('modal'),
-  queryParams:      ['workloadId'],
+  queryParams:      ['workloadId', 'clusterId'],
   workloadId:       null,
+  clusterId:        null,
   sortBy:           'requestTimestamp',
   dateRanges:       [
     {
@@ -83,11 +89,11 @@ export default Controller.extend({
     //   value: 'userID',
     // },
     {
-      label: 'requestResId',
+      label: '请求资源ID',
       value: 'requestResId',
     },
     {
-      label: 'requestResType',
+      label: '请求资源类型',
       value: 'requestResType',
     },
   ],
@@ -113,7 +119,7 @@ export default Controller.extend({
     },
     search() {
       this.syncForm();
-      const clusterId = get(this, 'scope.currentCluster.id');
+      const clusterId = get(this, 'scope.currentCluster.id') || get(this, 'clusterId');
       const q = get(this, 'queryForm');
       const loading = get(this, 'loading');
 
@@ -137,7 +143,7 @@ export default Controller.extend({
       if (get(this, 'loading')) {
         return;
       }
-      const clusterId = get(this, 'scope.currentCluster.id');
+      const clusterId = get(this, 'scope.currentCluster.id') || get(this, 'clusterId');
       const pagesize = get(this, 'prefs.tablePerPage');
       const q = {
         pagesize,
@@ -162,7 +168,7 @@ export default Controller.extend({
         return
       }
       set(this, 'loading', true);
-      const clusterId = get(this, 'scope.currentCluster.id');
+      const clusterId = get(this, 'scope.currentCluster.id') || get(this, 'clusterId');
 
       set(this, 'queryForm.order', sort.descending ? 'desc' : 'asc');
       const q = get(this, 'queryForm');

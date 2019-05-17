@@ -467,6 +467,9 @@ const rootNav = [
     localizedLabel: 'nav.auditLog.tab',
     route:          'custom-extension.audit-log.index',
     resourceScope:  'global',
+    condition() {
+      return !!(get(this, 'settings.asMap')['auditlog-server'] && get(this, 'settings.asMap')['auditlog-server']['value']);
+    }
   },
 //  {
 //    scope: 'global',
