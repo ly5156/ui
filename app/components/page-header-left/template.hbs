@@ -1,0 +1,93 @@
+<nav class="clearfix responsive-nav" role="navigation" id="js-responsive-nav">
+  <ul class="nav-main nav-list no-inline-space">
+    {{#each navTree as |item|}}
+      {{#if item.submenu.length}}
+        {{! Has a submenu }}
+        <li class="nav-item">
+           {{#if (or (not item.resource) (rbac-allows resource=item.resource scope=item.resourceScope))}}
+              {{#if item.route}}
+                {{#link-to-as-attrs
+                   ourRoute=item.route
+                   ctx=item.ctx
+                   qp=item.qp
+                   currentWhen=item.currentWhen
+                   activeParent="LI"
+                   role="button"
+                   aria-haspopup="true"
+                   aria-expanded="false"
+                }}
+                  {{maybe-t item.localizedLabel item.label}}
+                  <div class="pull-right" {{action 'toogleExpand' item}}>
+                    <span class="icon icon-chevron-down" />
+                  </div>
+                {{/link-to-as-attrs}}
+              {{else}}
+                <a role="button" aria-haspopup="true" aria-label={{maybe-t item.localizedLabel item.label}} {{action 'toogleExpand' item}}>
+                  {{maybe-t item.localizedLabel item.label}}
+                  <div class="pull-right">
+                    <span class="icon icon-chevron-down" />
+                  </div>
+                </a>
+              {{/if}}
+            {{/if}}
+            <ul class="{{unless item.expanded 'hide'}}">
+              {{#each item.submenu as |subitem|}}
+                {{#if subitem.route}}
+                  {{#if (or (not subitem.resource) (rbac-allows resource=subitem.resource scope=subitem.resourceScope))}}
+                    <li>
+                      {{#link-to-as-attrs
+                        ourRoute=subitem.route
+                        ctx=subitem.ctx
+                        qp=subitem.qp
+                        activeParent="LI"
+                      }}
+                        <span>
+                          {{maybe-t subitem.localizedLabel subitem.label}}
+                        </span>
+                        <i class="{{subitem.icon}}"/>
+                      {{/link-to-as-attrs}}
+                    </li>
+                  {{/if}}
+                {{else if subitem.divider}}
+                  <li class="divider"></li>
+                {{else}}
+                  {{! Just a label }}
+                  <li class="dropdown-header">
+                    <span>
+                      {{maybe-t subitem.localizedLabel subitem.label}}
+                    </span>
+                    <i class="{{subitem.icon}}"/>
+                  </li>
+                {{/if}}
+              {{/each}}
+            </ul>
+        </li>
+      {{else if item.route}}
+
+        {{#if (or (not item.resource) (rbac-allows resource=item.resource scope=item.resourceScope))}}
+          {{! No submenu }}
+          <li class="nav-item">
+            {{#link-to-as-attrs
+               ourRoute=item.route
+               ctx=item.ctx
+               qp=item.qp
+               activeParent="LI"
+               currentWhen=item.currentWhen
+               class="nav-link"
+            }}
+              {{maybe-t item.localizedLabel item.label}}
+            {{/link-to-as-attrs}}
+          </li>
+        {{/if}}
+
+      {{else}}
+
+        {{! Just a label }}
+        <li class="dropdown-header">
+          {{maybe-t item.localizedLabel item.label}}
+        </li>
+
+      {{/if}}
+    {{/each}}
+  </ul>
+</nav>

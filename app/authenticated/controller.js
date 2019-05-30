@@ -3,7 +3,7 @@ import { alias } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import Controller, { inject as controller } from '@ember/controller';
 import C from 'ui/utils/constants';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { on } from '@ember/object/evented';
 
 export default Controller.extend({
@@ -16,6 +16,9 @@ export default Controller.extend({
   isPopup:     alias('application.isPopup'),
   pageScope:   alias('scope.currentPageScope'),
 
+  sidebar:     computed(`prefs.${ C.PREFS.MENU }`, function() {
+    return get(this, `prefs.${ C.PREFS.MENU }`) !== 'top';
+  }),
   bootstrap: on('init', function() {
     schedule('afterRender', this, () => {
       this.get('application').setProperties({
