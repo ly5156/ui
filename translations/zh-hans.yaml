@@ -5940,6 +5940,7 @@ kontainerDriver:
     import: Import
     rancherKubernetesEngine: Rancher RKE
     tencentkubernetesengine: Tencent TKE
+    baiducloudcontainerengine: Baidu CCE
 
 
 nodeDriver:
@@ -5971,6 +5972,7 @@ nodeDriver:
     tencenttke: Tencent TKE
     vmwarevsphere: vSphere
     zstack: ZStack
+    pinganyunecs: Pinganyun ECS
   driverOptions: "{driver}选项"
   templateOptions: "{appName}模板"
   amazoneks:
