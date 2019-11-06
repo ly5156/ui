@@ -1,13 +1,15 @@
-import { get, set, observer } from '@ember/object';
+import { get, set, observer, computed } from '@ember/object';
 import Component from '@ember/component';
 import ViewNewEdit from 'shared/mixins/view-new-edit';
 import OptionallyNamespaced from 'shared/mixins/optionally-namespaced';
 import layout from './template';
 import  { PRESETS_BY_NAME } from  'ui/models/dockercredential';
-import { inject as service } from '@ember/service'
+import { inject as service } from '@ember/service';
+import { alias } from '@ember/object/computed';
 
 export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
   globalStore: service(),
+  harbor:      service(),
 
   layout,
 
@@ -21,6 +23,9 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
 
   projectType:    'dockerCredential',
   namespacedType: 'namespacedDockerCredential',
+
+  harborAccount: alias('harborConfig.harborAccount'),
+  harborServer:  alias('harborConfig.harborServer'),
 
   init() {
     this._super(...arguments);
@@ -47,7 +52,15 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
       })
     }
 
+    const isHarborCred = get(this, 'model.labels') && get(this, 'model.labels')['rancher.cn/registry-harbor-auth'] === 'true';
+
+    if (isHarborCred) {
+      asArray.forEach((item) => {
+        item.preset = 'harbor';
+      });
+    }
     set(this, 'asArray', asArray);
+    this.arrayChanged();
   },
 
   arrayChanged: observer('asArray.@each.{preset,address,username,password,auth}', function() {
@@ -63,13 +76,24 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
 
       let val = {};
 
-      ['username', 'password', 'auth'].forEach((k) => {
-        let v = get(obj, k);
+      if (preset === 'harbor' && get(this, 'hasHarborAccount')) {
+        const [username, password] = get(this, 'harborAccount').split(':');
 
-        if ( v ) {
-          val[k] = v;
-        }
-      });
+        val.username = username;
+        val.password = password;
+        key = get(this, 'harborServer');
+        key = key.indexOf('://') > -1 ? key.substr(key.indexOf('://') + 3) : key;
+        set(this, 'model.labels', { 'rancher.cn/registry-harbor-auth': 'true' });
+      } else {
+        set(this, 'model.labels', null);
+        ['username', 'password', 'auth'].forEach((k) => {
+          let v = get(obj, k);
+
+          if ( v ) {
+            val[k] = v;
+          }
+        });
+      }
 
       registries[key] = val;
     });
@@ -77,6 +101,20 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
     set(this, 'model.registries', registries);
 
     return this._super(...arguments);
+  }),
+
+  hasHarborAccount: computed('harborAccount', function() {
+    return !!get(this, 'harborAccount');
+  }),
+
+  harborUsername: computed('harborAccount', function() {
+    const account = get(this, 'harborAccount');
+
+    if (!account) {
+      return null;
+    }
+
+    return account.split(':')[0];
   }),
 
   hostname:  window.location.host,
