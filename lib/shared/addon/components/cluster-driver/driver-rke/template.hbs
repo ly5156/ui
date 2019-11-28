@@ -919,6 +919,56 @@
               </CheckOverrideAllowed>
             </div>
           </div>
+          <hr>
+          <div class="row">
+            <div class="col span-4">
+              <label class="acc-label">GPU共享调度（显存单位）</label>
+              <div class="radio">
+                <label>
+                  {{radio-button
+                    selection=enableGPUSharing
+                    value=true
+                  }}
+                  {{t "generic.enabled"}}
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  {{radio-button
+                    selection=enableGPUSharing
+                    value=false
+                  }}
+                  {{t "generic.disabled"}}
+                </label>
+              </div>
+            </div>
+            {{#if enableGPUSharing}}
+            <div class="col span-4">
+              <label class="acc-label">设置GPU扩展调度器使用的NodePort端口</label>
+              {{input
+                type="number"
+                value=gpuNodePort
+                className="form-control"
+                placeholder="例如: 1024"
+              }}
+            </div>
+            {{/if}}
+          </div>
+          {{#if enableGPUSharing}}
+          <div class="row">
+            <div class="col span-12">
+              <label class="acc-label">请将以下配置保存到将要作为control节点的主机下的/etc/gpushare/scheduler-policy-config.json文件中</label>
+              <div class="copy-pre mt-20 mb-20">
+                {{copy-to-clipboard
+                  clipboardText=schedulerPolicyConfigStr
+                  tagName="div"
+                  classNames="copy-to-pre"
+                }}
+                <pre id="scheduler-policy-config" style="font-size: 14px;">{{schedulerPolicyConfigStr}}</pre>
+              </div>
+            </div>
+          </div>
+          {{/if}}
         {{/accordion-list-item}}
 
         {{#accordion-list-item
