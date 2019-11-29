@@ -1359,6 +1359,9 @@ metrics:
   istio-request-duration-p99-top10: P99 Request Latency by Service
   istio-request-duration-p90-top10: P90 Request Latency by Service
   istio-request-duration-p50-top10: P50 Request Latency by Service
+  cluster-gpu-memory-usage: GPU内存使用率
+  node-gpu-memory-usage: GPU内存使用率
+  node-gpu-memory-total: GPU 内存总量
 
 dnsPage:
   noMatch: 没有匹配当前搜索的记录。
@@ -9450,6 +9453,8 @@ monitoringPage:
       memoryLimit:
         label: Node Exporter 内存限制
         placeholder: '例如: 200'
+    gpuMonitoring:
+      enable: 启用GPU监控
   nodeSelector:
     addSelectorLabel: 添加选择器
     helpText: 选择部署监控相关的工作负载所运行的节点。
