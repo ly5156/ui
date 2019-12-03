@@ -2146,6 +2146,11 @@ secretsPage:
   table:
     keys: 键
 
+settingsPage:
+  tabs:
+    settings: 高级设置
+    feature: Feature Flags
+
 configMapsPage:
   index:
     header: 配置映射
@@ -2218,6 +2223,8 @@ servicePage:
         placeholder: '例如: website'
       description:
         placeholder: '例如: Mycompany.com的Ingress'
+      load:
+        label: 扁平网络负载
   portsTab:
     title: 端口
     detail: '从主机IP映射到容器监听的端口'
@@ -3685,12 +3692,12 @@ clusterNew:
       multusFlannelOptions:
         label: 网络高级选项
         detail: 自定义网络插件选项
-        flannelInterfaceName: Flannel Interface Name
+        flannelInterfaceName: Flannel 接口名称
       multusCanal: Canal+Macvlan
       multusCanalOptions:
         label: 网络高级选项
         detail: 自定义网络插件选项
-        canalInterfaceName: Canal Interface Name
+        canalInterfaceName: Canal 接口名称
       flannelBackends:
         label: Flannel Backend
         hostgw: Host Gateway (L2bridge)
@@ -4886,6 +4893,18 @@ stacksPage:
     instanceState: 容器状态
     instanceStateWithIcon: 状态
 
+featureFlags:
+  warningHeader: "Feature flags允许rancher某些功能的使用。您应该谨慎地启用这些功能，它们应该被视为beta功能，这可能会给您的系统带来问题。"
+  features:
+    istioVirtualServiceUi: "启用此功能将为Istio公开其他UI页面。"
+    unsupportedStorageDrivers: "启用此功能将为持久卷和存储类公开不受支持的存储驱动程序选项。"
+  table:
+    state: 状态
+    name: 名称
+    description: 描述
+    noData: 没有特征数据
+    noMatch: 没有与当前搜索匹配的功能数据
+
 formatIp:
   noIp: 无
 
@@ -5456,6 +5475,18 @@ formNetwork:
       label: DNS搜索域
       placeholder: "例如: example.com"
       addActionLabel: 添加搜索域
+  subnet:
+    msg: "因扁平网络使用方式限制，Pod 缩放/升级策略已改为: 先停止旧Pod，再启动新Pod"
+    form:
+      ip:
+        label: IP
+        placeholder: "例如：192.168.1.100,多个IP用逗号连接"
+      mac:
+        label: MAC
+        placeholder: "例如: 0a:00:27:00:00:00, 多个MAC用逗号连接"
+      subnet:
+        label: Subnet
+        placeholder: 请选择一个MacvlanSubnet
   container:
     label: 容器
   requestedIp:
