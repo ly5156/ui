@@ -8510,6 +8510,7 @@ action:
   viewYaml: 查看YAML
   enableAutoInject: 启用Istio自动注入
   disableAutoInject: 禁用Istio自动注入
+  downloadFile: 下载文件
 
 ##############################
 # Resource Actions
