@@ -8907,6 +8907,9 @@ schema:
   inputSecret:
     secret: Choose a Secret...
     certificate: Choose a Certificate...
+  inputMacvlansubnet:
+    prompt: Choose a Macvlansubnet...
+    notSupport: Current cluster not support Macvlansubnet
 
 schedulingRuleRow:
   theHost: The host
