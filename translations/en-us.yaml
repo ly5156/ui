@@ -5357,6 +5357,7 @@ dangerZone:
     'auth-user-info-resync-cron': 'Default cron schedule for resyncing auth provider group memberships.'
     'cluster-template-enforcement': 'Non-admins will be restricted to launching clusters via preapproved RKE Templates only.'
     'auth-user-session-ttl-minutes': 'Custom TTL (in minutes) on a user auth session.'
+    'auditlog-server-url': 'Configure the audit log service url'
     'rke-metadata-config': 'Configure RKE metadata refresh parameters.'
 
 deleteEksCluster:
@@ -9203,6 +9204,8 @@ nav:
   project:
     none: Grouped Projects/Namespaces
     namespaces: Namespaces
+  auditLog:
+    tab: Audit Log
 
 
 ##############################
@@ -9289,6 +9292,7 @@ action:
   viewYaml: View YAML
   enableAutoInject: Enable Istio Auto Injection
   disableAutoInject: Disable Istio Auto Injection
+  auditlog: Audit Log
   downloadFile: Download File
 
 ##############################

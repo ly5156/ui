@@ -4651,6 +4651,7 @@ dangerZone:
     'auth-user-info-resync-cron': '用于重新同步身份验证提供者组成员关系的默认cron调度。'
     'cluster-template-enforcement': '非管理员只能通过预先批准的集群模板启动集群。'
     'auth-user-session-ttl-minutes': '用户验证会话上的自定义TTL(以分钟为单位)。'
+    'auditlog-server-url': '配置审计日志服务地址'
     'rke-metadata-config': '配置RKE元数据刷新参数。'
 
 deleteEksCluster:
@@ -8432,6 +8433,8 @@ nav:
   project:
     none: '项目/命名空间'
     namespaces: 命名空间
+  auditLog:
+    tab: 审计日志
 
 
 ##############################
@@ -8517,6 +8520,7 @@ action:
   viewYaml: 查看YAML
   enableAutoInject: 启用Istio自动注入
   disableAutoInject: 禁用Istio自动注入
+  auditlog: 审计日志
   downloadFile: 下载文件
 
 ##############################

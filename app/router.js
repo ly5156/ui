@@ -74,6 +74,10 @@ Router.map(function() {
       this.route('macvlan-ip', function() {
         this.route('index', { path: '/' });
       });
+      // audit log
+      this.route('audit-log', { path: '/audit-log' }, function() {
+        this.route('index', { path: '/' });
+      });
       this.mount('monitoring');
       this.mount('istio');
 
@@ -154,6 +158,15 @@ Router.map(function() {
           path:           '/:pod_id/container/:container_name',
           resetNamespace: true
         })
+
+        // audit log
+        this.route('audit-log', { path: '/audit-log' }, function() {
+          this.route('index', { path: '/' });
+        });
+      });
+      // audit log
+      this.route('audit-log', { path: '/audit-log' }, function() {
+        this.route('index', { path: '/' });
       });
 
       this.route('ingresses', { resetNamespace: true }, function() {
