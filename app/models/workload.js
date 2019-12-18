@@ -23,11 +23,9 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
   settings:      service(),
   clusterStore:  service(),
 
-  pods:         hasMany('id', 'pod', 'workloadId'),
+  pods:          hasMany('id', 'pod', 'workloadId'),
 
-  scaleTimer:             null,
-  infos:                  [],
-  showConfirmDeleteModal: false,
+  scaleTimer:          null,
 
   // @TODO-2.0 cleanup all these...
   hasPorts:            true,
@@ -41,7 +39,7 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
   canHaveEnvironment:  true,
   canHaveHealthCheck:  true,
   isBalancer:          false,
-  canBalanceTo:         true,
+  canBalanceTo:        true,
 
   grafanaResourceId:    alias('name'),
 
@@ -271,7 +269,7 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
       get(this, 'modalService').toggleModal('modal-container-stop', { model: [this] });
     },
 
-    scaleUp() {
+    /* scaleUp() {
       set(this, 'scale', get(this, 'scale') + 1);
       this.saveScale();
     },
@@ -287,7 +285,7 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
       }
       set(this, 'scale', scale);
       this.saveScale();
-    },
+    }, */
 
     edit(upgradeImage = 'false') {
       var route = 'containers.run';
@@ -346,16 +344,10 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
         window.open(`//${ window.location.host }${ route }?podId=${ podId }&windows=${ windows }&isPopup=true`, '_blank', opt);
       });
     },
-    confirmDelete(){
-      set(this, 'scale', 0);
+    refreshScale({ podNum } = {}){
+      set(this, 'scale', podNum);
       this.saveScale();
-      set(this, 'showConfirmDeleteModal', false);
     }
-  },
-
-  promptDelete(){
-    set(this, 'showConfirmDeleteModal', true);
-    set(this, 'infos', [{ displayName: 'POD数将设置为0，是否继续？' }])
   },
   updateTimestamp() {
     let obj = get(this, 'annotations');
