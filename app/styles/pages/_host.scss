@@ -71,6 +71,7 @@
   &.huaweicce { @include huaweicce; }
   &.otc { @include otc; }
   &.route53 { @include route53; }
+  &.rdns { @include rdns; }
   &.cloudflare { @include cloudflare; }
   &.alidns { @include alidns; }
 }
