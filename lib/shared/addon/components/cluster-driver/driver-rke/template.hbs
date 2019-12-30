@@ -194,12 +194,34 @@
               expand=(action expandFn)
             }}
               <div>
-                <label class="acc-label">{{t "clusterNew.rke.network.multusFlannelOptions.flannelInterfaceName"}}</label>
-                {{input
-                  type="text"
-                  value=cluster.rancherKubernetesEngineConfig.network.options.flannel_iface
-                  classNames="form-control"
-                }}
+                <label class="acc-label">
+                  {{t "clusterNew.rke.network.multusFlannelOptions.flannelInterfaceName"}}
+                  {{#if clusterTemplateCreate}}
+                    <ClusterTemplateOverrideToggle
+                      @path="rancherKubernetesEngineConfig.network.options.flannel_iface"
+                      @configVariable={{config.network.options.flannel_iface}}
+                      @addOverride={{action "addOverride"}}
+                      @questions={{model.clusterTemplateRevision.questions}}
+                    />
+                  {{/if}}
+                </label>
+                <CheckOverrideAllowed
+                  @applyClusterTemplate={{applyClusterTemplate}}
+                  @paramName="rancherKubernetesEngineConfig.network.options.flannel_iface"
+                  @clusterTemplateRevision={{model.clusterTemplateRevision.clusterConfig}}
+                  @questions={{model.clusterTemplateRevision.questions}}
+                >
+                  {{#input-or-display
+                    editable=notView
+                    value=config.network.options.flannel_iface
+                  }}
+                    {{input
+                      type="text"
+                      value=cluster.rancherKubernetesEngineConfig.network.options.flannel_iface
+                      classNames="form-control"
+                    }}
+                  {{/input-or-display}}
+                </CheckOverrideAllowed>
               </div>
             {{/accordion-list-item}}
           {{/if}}
@@ -211,12 +233,34 @@
               expand=(action expandFn)
             }}
               <div>
-                <label class="acc-label">{{t "clusterNew.rke.network.multusCanalOptions.canalInterfaceName"}}</label>
-                {{input
-                  type="text"
-                  value=cluster.rancherKubernetesEngineConfig.network.options.canal_iface
-                  classNames="form-control"
-                }}
+                <label class="acc-label">
+                {{t "clusterNew.rke.network.multusCanalOptions.canalInterfaceName"}}
+                {{#if clusterTemplateCreate}}
+                  <ClusterTemplateOverrideToggle
+                    @path="rancherKubernetesEngineConfig.network.options.canal_iface"
+                    @configVariable={{config.network.options.canal_iface}}
+                    @addOverride={{action "addOverride"}}
+                    @questions={{model.clusterTemplateRevision.questions}}
+                  />
+                {{/if}}
+                </label>
+                  <CheckOverrideAllowed
+                    @applyClusterTemplate={{applyClusterTemplate}}
+                    @paramName="rancherKubernetesEngineConfig.network.options.canal_iface"
+                    @clusterTemplateRevision={{model.clusterTemplateRevision.clusterConfig}}
+                    @questions={{model.clusterTemplateRevision.questions}}
+                  >
+                    {{#input-or-display
+                      editable=notView
+                      value=config.network.options.canal_iface
+                    }}
+                    {{input
+                      type="text"
+                      value=cluster.rancherKubernetesEngineConfig.network.options.canal_iface
+                      classNames="form-control"
+                    }}
+                  {{/input-or-display}}
+                </CheckOverrideAllowed>
               </div>
             {{/accordion-list-item}}
           {{/if}}
@@ -957,11 +1001,31 @@
           <hr>
           <div class="row">
             <div class="col span-4">
-              <label class="acc-label">GPU共享调度（显存单位）</label>
+              <label class="acc-label">
+                {{t "clusterNew.rke.gpu.enableGPUManagement.label"}}
+                {{#if clusterTemplateCreate}}
+                  <ClusterTemplateOverrideToggle
+                    @path="enableGPUManagement"
+                    @configVariable={{cluster.enableGPUManagement}}
+                    @addOverride={{action "addOverride"}}
+                    @questions={{model.clusterTemplateRevision.questions}}
+                  />
+                {{/if}}
+              </label>
+              <CheckOverrideAllowed
+                @paramName="enableGPUManagement"
+                @applyClusterTemplate={{applyClusterTemplate}}
+                @clusterTemplateRevision={{model.clusterTemplateRevision.clusterConfig}}
+                @questions={{model.clusterTemplateRevision.questions}}
+              >
+              {{#input-or-display
+                editable=notView
+                value=cluster.enableGPUManagement
+              }}
               <div class="radio">
                 <label>
                   {{radio-button
-                    selection=enableGPUSharing
+                    selection=cluster.enableGPUManagement
                     value=true
                   }}
                   {{t "generic.enabled"}}
@@ -970,26 +1034,50 @@
               <div class="radio">
                 <label>
                   {{radio-button
-                    selection=enableGPUSharing
+                    selection=cluster.enableGPUManagement
                     value=false
                   }}
                   {{t "generic.disabled"}}
                 </label>
               </div>
+              {{/input-or-display}}
+              </CheckOverrideAllowed>
             </div>
-            {{#if enableGPUSharing}}
+            {{#if cluster.enableGPUManagement}}
             <div class="col span-4">
-              <label class="acc-label">设置GPU扩展调度器使用的NodePort端口</label>
+              <label class="acc-label">
+                {{t "clusterNew.rke.gpu.nodePort.label"}}
+                {{!-- {{#if clusterTemplateCreate}}
+                  <ClusterTemplateOverrideToggle
+                    @path="annotations['gpuschedulerport.cattle.io']"
+                    @configVariable={{gpuNodePort}}
+                    @addOverride={{action "addOverride"}}
+                    @questions={{model.clusterTemplateRevision.questions}}
+                  />
+                {{/if}} --}}
+              </label>
+              {{!-- <CheckOverrideAllowed
+                @paramName="annotations['gpuschedulerport.cattle.io']"
+                @applyClusterTemplate={{applyClusterTemplate}}
+                @clusterTemplateRevision={{model.clusterTemplateRevision.clusterConfig}}
+                @questions={{model.clusterTemplateRevision.questions}}
+              > --}}
+              {{#input-or-display
+                editable=notView
+                value=gpuNodePort
+              }}
               {{input
                 type="number"
                 value=gpuNodePort
                 className="form-control"
-                placeholder="例如: 1024"
+                placeholder=(t "clusterNew.rke.gpu.nodePord.placeholder")
               }}
+              {{/input-or-display}}
+              {{!-- </CheckOverrideAllowed> --}}
             </div>
             {{/if}}
           </div>
-          {{#if enableGPUSharing}}
+          {{#if cluster.enableGPUManagement}}
           <div class="row">
             <div class="col span-12">
               <label class="acc-label">请将以下配置保存到将要作为control节点的主机下的/etc/gpushare/scheduler-policy-config.json文件中</label>
