@@ -1047,33 +1047,33 @@
             <div class="col span-4">
               <label class="acc-label">
                 {{t "clusterNew.rke.gpu.nodePort.label"}}
-                {{!-- {{#if clusterTemplateCreate}}
+                {{#if clusterTemplateCreate}}
                   <ClusterTemplateOverrideToggle
-                    @path="annotations['gpuschedulerport.cattle.io']"
-                    @configVariable={{gpuNodePort}}
+                    @path="gpuSchedulerNodePort"
+                    @configVariable={{cluster.gpuSchedulerNodePort}}
                     @addOverride={{action "addOverride"}}
                     @questions={{model.clusterTemplateRevision.questions}}
                   />
-                {{/if}} --}}
+                {{/if}}
               </label>
-              {{!-- <CheckOverrideAllowed
-                @paramName="annotations['gpuschedulerport.cattle.io']"
+              <CheckOverrideAllowed
+                @paramName="gpuSchedulerNodePort"
                 @applyClusterTemplate={{applyClusterTemplate}}
                 @clusterTemplateRevision={{model.clusterTemplateRevision.clusterConfig}}
                 @questions={{model.clusterTemplateRevision.questions}}
-              > --}}
+              >
               {{#input-or-display
                 editable=notView
-                value=gpuNodePort
+                value=cluster.gpuSchedulerNodePort
               }}
               {{input
                 type="number"
-                value=gpuNodePort
+                value=cluster.gpuSchedulerNodePort
                 className="form-control"
                 placeholder=(t "clusterNew.rke.gpu.nodePord.placeholder")
               }}
               {{/input-or-display}}
-              {{!-- </CheckOverrideAllowed> --}}
+              </CheckOverrideAllowed>
             </div>
             {{/if}}
           </div>
