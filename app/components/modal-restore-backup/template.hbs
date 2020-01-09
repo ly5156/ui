@@ -33,7 +33,7 @@
             <option
               value={{backup.id}}
               selected={{eq backup.id value}}
-              disabled={{eq backup.state "activating"}}
+              disabled={{not (eq backup.state "active")}}
             >
               {{backup.label}}
             </option>
