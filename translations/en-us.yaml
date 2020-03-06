@@ -4156,6 +4156,10 @@ clusterNew:
       label: Metrics Server Monitoring
     networkPolicy:
       label: Project Network Isolation
+    networkMTU:
+      label: CNI Plugin MTU Override
+      help: "Only applied if the value is non-zero. When applied, the MTU value is explicitly configured for the chosen network provider (disabling auto-discovery). The override must be calculated from the host's MTU minus the CNI plugin's required overhead."
+      detail: e.g. 1500
     version:
       label: Kubernetes Version
     registry:
@@ -4221,7 +4225,7 @@ clusterNew:
       windows: Windows
     windowsSupport:
       label: Windows Support
-      help: Available for Kubernetes 1.15 with Flannel network provider.
+      help: Available for Kubernetes 1.15 or above with Flannel network provider.
       disabled: Not support {plugin} network provider.
     advanced:
       label: Advanced Options
@@ -6814,6 +6818,8 @@ formVersions:
   downgrade: "(can't downgrade)"
   notallowed: "(not allowed by template)"
   unsupported: "(unsupported)"
+  helpBlock:
+    label: When upgrading Kubernetes versions, please review the <a href="https://groups.google.com/forum/#!forum/kubernetes-announce" target="_blank" rel="nofollow noreferrer noopener">Kubernetes release notes</a> for any breaking changes.
 
 formIstioHost:
   prompt: Select a host...
@@ -7201,6 +7207,8 @@ loggingPage:
       helpText: How often buffered logs would be flushed.
     includeSystemComponent:
       label: Include System Log
+    jsonParsing:
+      label: Enable JSON Parsing
   advanced:
     file: Edit as File
     cancel: Edit as a Form
@@ -7393,8 +7401,8 @@ machineTemplatesPage:
 modalDeleteIstio:
   title: 'Are you sure you want to disable:'
   onlyIstio:
-    true: Istio Only
-    false: Both Istio and Monitoring
+    true: Istio and remove Istio system namespace
+    false: Istio, Monitoring and remove Istio system namespace
   disable: Disable
   disabling: Disabling
 
@@ -8237,6 +8245,14 @@ nodeDriver:
     rootSize:
       label: Root Disk Size
       unit: GB
+    encryptEbsVolume:
+      label: Encryption
+      radioLabel: Encrypt EBS Volume
+    volumeType:
+      label: Amazon EBS volume type
+    useEbsOptimizedInstance:
+      label: Optimized Instance
+      radioLabel: Create EBS optimized instance
     ami:
       label: AMI
       placeholder: An Ubuntu AMI
@@ -8390,6 +8406,12 @@ nodeDriver:
     hostOptions:
       any:
         label: 'Any'
+    cloudconfig:
+      label: Cloud Config YAML
+    contentLibrary: 'Content library:'
+    libraryTemplate: 'Library template:'
+    virtualMachine: 'Virtual machine:'
+    template: 'Template:'
     creationType:
       label: Creation method
       library: "Deploy from template: Content Library"
@@ -8419,7 +8441,7 @@ nodeDriver:
       detail: Choose OVF environment properties
     vcenter:
       label: vCenter or ESXi Server
-      placeholder: vCenter or ESXi hostname/IP
+      placeholder: vcenter.domain.com
     vcenterPort:
       label: Port
     username:
