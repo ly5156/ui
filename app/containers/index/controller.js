@@ -48,7 +48,7 @@ export default Controller.extend({
   sortBy:            'name',
 
   headers,
-  extraSearchFields:    ['id:prefix', 'displayIp:ip'],
+  extraSearchFields:    ['id:prefix', 'displayIp:ip', 'namespaceId'],
   extraSearchSubFields: containerSearchFields,
 
   group:             alias('projectController.group'),
