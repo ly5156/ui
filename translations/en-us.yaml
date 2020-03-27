@@ -5635,6 +5635,7 @@ dangerZone:
     'rke-metadata-config': 'Configure RKE metadata refresh parameters.'
     'ui-footer-text': 'Extra text in footer.'
     'ui-footer-url': 'URL for the extra text in footer.'
+    'extra-menus': 'Configure custom menus.'
 
 deleteEksCluster:
   title: "Delete {clusterName}?"
@@ -10182,3 +10183,18 @@ selectValueCheck:
       =1 {Please select a new value. The following is no longer valid:}
       other {Please select new values. The following are no longer valid:}
     }
+
+customMenus:
+  index:
+    header: Extra Menus
+    globalMenu: Global level Menu
+    clusterMenu: Cluster level Menu
+    projectMenu: Project level Menu
+
+formMenu:
+  menu:
+    add: Add Menus
+  name:
+    label: Menu Name
+  link:
+    label: Menu Link

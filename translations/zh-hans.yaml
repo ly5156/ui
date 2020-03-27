@@ -5588,6 +5588,7 @@ dangerZone:
     'rke-metadata-config': '配置RKE元数据刷新参数。'
     'ui-footer-text': '额外的页脚内容'
     'ui-footer-url': '额外页脚内容对应的链接'
+    'extra-menus': '配置扩展菜单'
 
 deleteEksCluster:
   title: "确定删除集群{clusterName}吗?"
@@ -10187,3 +10188,18 @@ selectValueCheck:
       =1 {请选择新的值。以下内容不再有效:}
       other {请选择新的值。以下内容不再有效:}
     }
+  
+customMenus:
+  index:
+    header: 自定义菜单
+    globalMenu: 全局级别自定义菜单
+    clusterMenu: 集群级别自定义菜单
+    projectMenu: 项目级别自定义菜单
+
+formMenu:
+  menu:
+    add: 添加菜单
+  name:
+    label: 菜单名称
+  link:
+    label: 链接地址
