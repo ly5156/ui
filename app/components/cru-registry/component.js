@@ -164,15 +164,17 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
   doSave() {
     let self                       = this;
     let sup                        = self._super;
-    const currentProjectsNamespace = get(this, 'clusterStore').all('namespace').findBy('projectId', get(this, 'scopeService.currentProject.id'));
+    let currentProjectsNamespace = get(this, 'namespace');
+
+    if (get(this, 'isClone')) {
+      set(this, 'namespace', get(this, 'model.namespace'));
+    }
 
     if (isEmpty(currentProjectsNamespace)) {
       return this.namespacePromise().then(() => sup.apply(self, arguments));
-    } else {
-      set(this, 'namespace', currentProjectsNamespace);
-
-      return sup.apply(self, arguments);
     }
+
+    return sup.apply(self, arguments);
   },
 
   doneSaving() {
