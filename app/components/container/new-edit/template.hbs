@@ -250,6 +250,7 @@
       isUpgrade=isUpgrade
       expandAll=al.expandAll
       expandFn=expandFn
+      toggleMacvlan=toggleMacvlan
     }}
   {{/unless}}
 
@@ -274,6 +275,7 @@
         editing=true
         expandAll=al.expandAll
         expandFn=expandFn
+        toggleMacvlan=(action "handleToggleMacvlan")
       }}
 
       {{form-labels-annotations

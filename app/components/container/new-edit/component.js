@@ -60,6 +60,8 @@ export default Component.extend(NewOrEdit, ChildHook, {
   header:        '',
   showTargetOS: false,
 
+  toggleMacvlan: false,
+
   isSidekick:    equal('scaleMode', 'sidekick'),
   init() {
     window.nec = this;
@@ -165,6 +167,10 @@ export default Component.extend(NewOrEdit, ChildHook, {
 
       ary.removeAt(idx);
     },
+
+    handleToggleMacvlan(enabled) {
+      set(this, 'toggleMacvlan', enabled);
+    }
   },
 
   updateHeader: function() {
