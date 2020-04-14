@@ -5,12 +5,13 @@ import C from 'ui/utils/constants';
 import { get, set } from '@ember/object';
 
 export default Route.extend({
-  access:   service(),
-  cookies:  service(),
-  language: service('user-language'),
-  modal:    service(),
-  prefs:    service(),
-  settings: service(),
+  access:     service(),
+  cookies:    service(),
+  language:   service('user-language'),
+  modal:      service(),
+  prefs:      service(),
+  settings:   service(),
+  autoLogout: service(),
 
   previousParams: null,
   previousRoute:  null,
@@ -51,6 +52,10 @@ export default Route.extend({
     if (params.isPopup) {
       this.controllerFor('application').set('isPopup', true);
     }
+  },
+
+  afterModel(params, transition) {
+    get(this, 'autoLogout').start(transition);
   },
 
   actions: {
