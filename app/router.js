@@ -50,6 +50,7 @@ Router.map(function() {
 
     this.route('apikeys');
     this.route('prefs');
+    this.route('iframe', { path: '/iframe/:url' });
 
     // Per-Cluster
     this.route('cluster', { path: '/c/:cluster_id' }, function() {
@@ -122,6 +123,10 @@ Router.map(function() {
             this.route('edit');
           });
         });
+      });
+
+      this.route('iframe', { path: '/iframe' }, function() {
+        this.route('detail', { path: '/:url' });
       });
     });
 
@@ -282,6 +287,10 @@ Router.map(function() {
       });
 
       this.route('help');
+
+      this.route('iframe', { path: '/iframe' }, function() {
+        this.route('detail', { path: '/:url' });
+      });
 
       // Popup Routes
       this.route('console');
