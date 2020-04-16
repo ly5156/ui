@@ -3022,6 +3022,9 @@ notifierPage:
     placeholder: e.g. http://my-proxy/
   sendResolved:
     label: Send Resolved Alerts
+  bearerToken:
+    label: Bearer Token
+    placeholder: Bearer token
 
   webhook:
     url: URL
