@@ -5587,7 +5587,7 @@ dangerZone:
     'auth-user-info-resync-cron': '用于重新同步身份验证提供者组成员关系的默认cron调度。'
     'cluster-template-enforcement': '非管理员只能通过预先批准的集群模板启动集群。'
     'auth-user-session-ttl-minutes': '用户验证会话上的自定义TTL(以分钟为单位)。'
-    'none-operate-session-time': '用户超过配置时间没有任何操作将自动注销(以秒为单位)'
+    'ui-session-logout-minutes': '用户超过配置时间没有任何操作将自动注销(以分钟为单位)'
     'rke-metadata-config': '配置RKE元数据刷新参数。'
     'ui-footer-text': '额外的页脚内容'
     'ui-footer-url': '额外页脚内容对应的链接'
