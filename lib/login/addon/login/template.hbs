@@ -103,6 +103,10 @@
               provider="keycloak"
             }}
           {{/if}}
+
+          {{#if isCAS}}
+            {{login-cas action="started"}}
+          {{/if}}
         {{/if}}
 
         {{#unless onlyLocal}}
