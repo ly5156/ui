@@ -62,12 +62,20 @@
         {{node-metrics resourceId=model.node.id}}
       {{/metrics-summary}}
     {{/if}}
-    {{resource-condition-list
-      resourceType=(t "generic.node")
-      conditions=model.node.conditions
-      expandAll=al.expandAll
-      expandFn=expandFn
-    }}
+    <PodSection
+      @taints={{model.node.taints}}
+      @expandAll={{al.expandAll}}
+      @expandFn={{expandFn}}
+      @model={{model}}
+    />
+    <div class="mt-20">
+      {{resource-condition-list
+        resourceType=(t "generic.node")
+        conditions=model.node.conditions
+        expandAll=al.expandAll
+        expandFn=expandFn
+      }}
+    </div>
     <div class="mt-20">
       {{system-info-section
         node=model.node
