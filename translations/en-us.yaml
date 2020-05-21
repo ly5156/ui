@@ -10097,3 +10097,5 @@ formMenu:
     label: Menu Name
   link:
     label: Menu Link
+  iframeEnabled:
+    label: Use iframe

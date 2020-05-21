@@ -10091,3 +10091,5 @@ formMenu:
     label: 菜单名称
   link:
     label: 链接地址
+  iframeEnabled:
+    label: 使用iframe
