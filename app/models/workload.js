@@ -133,9 +133,16 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
         icon:     'icon icon-play',
         action:   'resume',
         enabled:  !!a.pause && isPaused,
-        bulkable: true
       },
     ];
+
+    // if (this.canCloneCrossCluster) {
+    choices.unshift({
+      label:    'action.cloneCrossCluster',
+      icon:     'icon icon-copy',
+      action:   'cloneCrossCluster',
+    });
+    // }
 
     return choices;
   }.property('actionLinks.{activate,deactivate,pause,restart,rollback,garbagecollect}', 'links.{update,remove}',
@@ -217,6 +224,13 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
     const { pods = [] } = this
 
     return pods.filter((p) => p.state === 'running').length
+  }),
+
+  canCloneCrossCluster: computed('scope.allClusters.@each.state', 'scope.pendingCluster', function() {
+    const cluster = get(this, 'scope.pendingCluster');
+    const clusters = get(this, 'scope.allClusters').filter((c) => cluster && cluster.id !== c.id && c.state === 'active');
+
+    return clusters.length > 0;
   }),
 
   actions: {
@@ -347,6 +361,10 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
     refreshScale({ podNum } = {}){
       set(this, 'scale', podNum);
       this.saveScale();
+    },
+    cloneCrossCluster() {
+      get(this, 'router').transitionTo('authenticated.project.clone-cross-cluster.clone-cross-cluster.run', get(this, 'id'));
+      // get(this, 'router').transitionTo('authenticated.project.pipeline.pipelines');
     }
   },
   updateTimestamp() {
