@@ -10,6 +10,8 @@ import { alias } from '@ember/object/computed';
 const harborAuthKey = 'rancher.cn/registry-harbor-auth'
 const harborAdminAuthKey = 'rancher.cn/registry-harbor-admin-auth'
 
+const TEMP_NAMESPACE_ID = '__TEMP__';
+
 export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
   globalStore:  service(),
   clusterStore: service(),
@@ -140,15 +142,12 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
   hostname:  window.location.host,
 
   willSave() {
-    let pr = get(this, 'primaryResource');
+    const { primaryResource: pr } = this;
+    const nsId = this.namespace && this.namespace.id;
 
-    // Namespace is required, but doesn't exist yet... so lie to the validator
-    let nsId = get(pr, 'namespaceId');
+    set(pr, 'namespaceId', nsId ? nsId : TEMP_NAMESPACE_ID);
 
-    set(pr, 'namespaceId', '__TEMP__');
     let ok = this.validate();
-
-    set(pr, 'namespaceId', nsId);
 
     return ok;
   },
@@ -169,17 +168,17 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
   doSave() {
     let self                       = this;
     let sup                        = self._super;
-    let currentProjectsNamespace = get(this, 'namespace');
 
     if (get(this, 'isClone')) {
       set(this, 'namespace', get(this, 'model.namespace'));
     }
+    const { primaryResource: { namespaceId } } = this;
 
-    if (isEmpty(currentProjectsNamespace)) {
+    if (isEmpty(namespaceId) || namespaceId === TEMP_NAMESPACE_ID) {
       return this.namespacePromise().then(() => sup.apply(self, arguments));
+    } else {
+      return sup.apply(self, arguments);
     }
-
-    return sup.apply(self, arguments);
   },
 
   doneSaving() {
