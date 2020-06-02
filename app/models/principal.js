@@ -17,8 +17,8 @@ var Principal = Resource.extend({
       .get('firstObject');
   }),
 
-  avatarSrc: computed('isGithub', 'id', 'profilePicture', function() {
-    if ( get(this, 'isGithub') && get(this, 'profilePicture') ) {
+  avatarSrc: computed('isGithub', 'isGoogleOauth', 'id', 'profilePicture', function() {
+    if ( (get(this, 'isGithub') && get(this, 'profilePicture')) || (get(this, 'isGoogleOauth') && get(this, 'profilePicture')) ) {
       return get(this, 'profilePicture');
     } else {
       let id = get(this, 'id') || 'Unknown';
@@ -34,16 +34,23 @@ var Principal = Resource.extend({
     return (get(this, 'provider') || '').toLowerCase() === 'github';
   }),
 
+  isGoogleOauth: computed('parsedExternalType', function() {
+    return (get(this, 'provider') || '').toLowerCase() === 'googleoauth';
+  }),
+
   logicalType: computed('parsedExternalType', function() {
     switch ( get(this, 'parsedExternalType') ) {
     case C.PROJECT.TYPE_ACTIVE_DIRECTORY_USER:
+    case C.PROJECT.TYPE_ACTIVE_DIRECTORY_USER_UID:
     case C.PROJECT.TYPE_ADFS_USER:
     case C.PROJECT.TYPE_AZURE_USER:
     case C.PROJECT.TYPE_FREEIPA_USER:
     case C.PROJECT.TYPE_GITHUB_USER:
+    case C.PROJECT.TYPE_GOOGLE_USER:
     case C.PROJECT.TYPE_KEYCLOAK_USER:
     case C.PROJECT.TYPE_LDAP_USER:
     case C.PROJECT.TYPE_OPENLDAP_USER:
+    case C.PROJECT.TYPE_OPENLDAP_USER_UID:
     case C.PROJECT.TYPE_PING_USER:
     case C.PROJECT.TYPE_RANCHER:
     case C.PROJECT.TYPE_SHIBBOLETH_USER:
@@ -53,6 +60,7 @@ var Principal = Resource.extend({
       return C.PROJECT.TEAM;
 
     case C.PROJECT.TYPE_ACTIVE_DIRECTORY_GROUP:
+    case C.PROJECT.TYPE_ACTIVE_DIRECTORY_GROUP_UID:
     case C.PROJECT.TYPE_ADFS_GROUP:
     case C.PROJECT.TYPE_AZURE_GROUP:
     case C.PROJECT.TYPE_FREEIPA_GROUP:
@@ -60,8 +68,10 @@ var Principal = Resource.extend({
     case C.PROJECT.TYPE_KEYCLOAK_GROUP:
     case C.PROJECT.TYPE_LDAP_GROUP:
     case C.PROJECT.TYPE_OPENLDAP_GROUP:
+    case C.PROJECT.TYPE_OPENLDAP_GROUP_UID:
     case C.PROJECT.TYPE_PING_GROUP:
     case C.PROJECT.TYPE_SHIBBOLETH_GROUP:
+    case C.PROJECT.TYPE_GOOGLE_GROUP:
       return C.PROJECT.ORG;
     }
   }),
@@ -81,20 +91,24 @@ var Principal = Resource.extend({
 
     switch ( type ) {
     case C.PROJECT.TYPE_ACTIVE_DIRECTORY_USER:
+    case C.PROJECT.TYPE_ACTIVE_DIRECTORY_USER_UID:
     case C.PROJECT.TYPE_ADFS_USER:
     case C.PROJECT.TYPE_OKTA_USER:
     case C.PROJECT.TYPE_AZURE_USER:
     case C.PROJECT.TYPE_FREEIPA_USER:
     case C.PROJECT.TYPE_GITHUB_USER:
+    case C.PROJECT.TYPE_GOOGLE_USER:
     case C.PROJECT.TYPE_KEYCLOAK_USER:
     case C.PROJECT.TYPE_LDAP_USER:
     case C.PROJECT.TYPE_OPENLDAP_USER:
+    case C.PROJECT.TYPE_OPENLDAP_USER_UID:
     case C.PROJECT.TYPE_PING_USER:
     case C.PROJECT.TYPE_SHIBBOLETH_USER:
       key = 'model.identity.displayType.user';
       break;
 
     case C.PROJECT.TYPE_ACTIVE_DIRECTORY_GROUP:
+    case C.PROJECT.TYPE_ACTIVE_DIRECTORY_GROUP_UID:
     case C.PROJECT.TYPE_ADFS_GROUP:
     case C.PROJECT.TYPE_OKTA_GROUP:
     case C.PROJECT.TYPE_AZURE_GROUP:
@@ -102,8 +116,10 @@ var Principal = Resource.extend({
     case C.PROJECT.TYPE_KEYCLOAK_GROUP:
     case C.PROJECT.TYPE_LDAP_GROUP:
     case C.PROJECT.TYPE_OPENLDAP_GROUP:
+    case C.PROJECT.TYPE_OPENLDAP_GROUP_UID:
     case C.PROJECT.TYPE_PING_GROUP:
     case C.PROJECT.TYPE_SHIBBOLETH_GROUP:
+    case C.PROJECT.TYPE_GOOGLE_GROUP:
       key = 'model.identity.displayType.group';
       break;
 

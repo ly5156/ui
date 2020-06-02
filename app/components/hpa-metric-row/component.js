@@ -3,6 +3,8 @@ import {
 } from '@ember/object'
 import Component from '@ember/component';
 import layout from './template';
+import { convertToMillis } from 'shared/utils/util';
+import { parseSi } from 'shared/utils/parse-unit';
 
 const RESOURCE = 'Resource';
 const PODS = 'Pods';
@@ -65,6 +67,23 @@ export default Component.extend({
   typeChoices:     METRICS_TYPES,
   resourceChoices: RESOURCE_TYPES,
 
+  init() {
+    this._super(...arguments);
+
+    const metricTargetType = get(this, 'metric.target.type');
+    const metricType = get(this, 'metric.type');
+    const metricName = get(this, 'metric.name');
+    const averageValue = get(this, 'metric.target.averageValue');
+
+    if ( metricName === CPU && metricTargetType === AVERAGE_VALUE && metricType === RESOURCE ) {
+      set(this, 'metric.target.stringValue', convertToMillis(averageValue));
+    }
+
+    if ( metricName === MEMORY && metricTargetType === AVERAGE_VALUE && metricType === RESOURCE ) {
+      set(this, 'metric.target.stringValue', parseSi(averageValue, 1024) / 1048576)
+    }
+  },
+
   actions: {
     removeMetric(metric) {
       if ( this.removeMetric ) {
@@ -95,6 +114,7 @@ export default Component.extend({
     setProperties(target, {
       utilization:  null,
       averageValue: null,
+      stringValue:  null,
       value:        null,
     });
   }),
@@ -112,6 +132,7 @@ export default Component.extend({
           type:         AVERAGE_UTILIZATION,
           value:        null,
           averageValue: null,
+          stringValue:  null,
           utilization:  null,
         }
       });
@@ -154,6 +175,21 @@ export default Component.extend({
     }
   }),
 
+  metricAverageValueDidChange: observer('metric.target.type', 'metric.type', 'metric.name', 'metric.target.stringValue', function() {
+    const metricTargetType = get(this, 'metric.target.type');
+    const metricType = get(this, 'metric.type');
+    const metricName = get(this, 'metric.name');
+    const stringValue = get(this, 'metric.target.stringValue');
+
+    if ( metricName === CPU && metricTargetType === AVERAGE_VALUE && metricType === RESOURCE ) {
+      set(this, 'metric.target.averageValue', stringValue ? `${ stringValue }m` : null)
+    }
+
+    if ( metricName === MEMORY && metricTargetType === AVERAGE_VALUE && metricType === RESOURCE ) {
+      set(this, 'metric.target.averageValue', stringValue ? `${ stringValue }Mi` : null)
+    }
+  }),
+
   targetChoices: computed('metric.type', function() {
     switch (get(this, 'metric.type')) {
     case RESOURCE:
@@ -164,6 +200,34 @@ export default Component.extend({
       return [TARGET_TYPES.VALUE, TARGET_TYPES.AVERAGE_VALUE];
     case OBJECT:
       return [TARGET_TYPES.VALUE, TARGET_TYPES.AVERAGE_VALUE];
+    }
+  }),
+
+  showCpuReservationWarning: computed('metric.name', 'metric.type', 'metric.target.type', 'selectedWorkload.launchConfig.hasCpuReservation', function() {
+    const targetType = get(this, 'metric.target.type');
+    const type =  get(this, 'metric.type');
+    const name = get(this, 'metric.name');
+    const selectedWorkload = get(this, 'selectedWorkload');
+    const hasCpuReservation = get(this, 'selectedWorkload.launchConfig.hasCpuReservation');
+
+    if ( name === CPU && targetType === AVERAGE_UTILIZATION && type === RESOURCE && selectedWorkload ) {
+      return !hasCpuReservation;
+    } else {
+      return false;
+    }
+  }),
+
+  showMemoryReservationWarning: computed('metric.name', 'metric.type', 'metric.target.type', 'selectedWorkload.launchConfig.hasMemoryReservation', function() {
+    const targetType = get(this, 'metric.target.type');
+    const type =  get(this, 'metric.type');
+    const name = get(this, 'metric.name');
+    const selectedWorkload = get(this, 'selectedWorkload');
+    const hasMemoryReservation = get(this, 'selectedWorkload.launchConfig.hasMemoryReservation');
+
+    if ( name === MEMORY && targetType === AVERAGE_UTILIZATION && type === RESOURCE && selectedWorkload ) {
+      return !hasMemoryReservation;
+    } else {
+      return false;
     }
   }),
 });

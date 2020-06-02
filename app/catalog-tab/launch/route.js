@@ -64,6 +64,10 @@ export default Route.extend({
         def = get(app, 'externalIdInfo.version');
       }
 
+      if ( !links[def] ) {
+        def = get(results, 'tpl.latestVersion');
+      }
+
       catalogTemplateUrl = links[def];
 
       var version = get(this, 'settings.rancherVersion');
@@ -139,7 +143,7 @@ export default Route.extend({
 
             set(neuApp, 'name', newAppName);
           } else {
-            neuApp = results.app;
+            neuApp = results.app.clone();
           }
         } else {
           neuApp = this.store.createRecord({
@@ -148,11 +152,24 @@ export default Route.extend({
           });
         }
 
+        let catalogTemplateUrlKey = def;
+
         if ( neuApp.id ) {
-          verArr.filter((ver) => ver.version === get(neuApp, 'externalIdInfo.version'))
-            .forEach((ver) => {
-              set(ver, 'version', `${ ver.version } (current)`);
+          const v = get(neuApp, 'externalIdInfo.version');
+          const currentVersion = verArr.filter((ver) => ver.version === v);
+
+          if ( currentVersion.length === 0 ) {
+            verArr.unshift({
+              link:        get(verArr, 'firstObject.link').substring(0, get(verArr, 'firstObject.link.length') - get(verArr, 'firstObject.version.length')) + v,
+              sortVersion: v,
+              version:     `${ v } (current)`
             })
+          } else {
+            currentVersion.forEach((ver) => {
+              set(ver, 'version', `${ ver.version } (current)`);
+            });
+            catalogTemplateUrlKey = v;
+          }
         }
 
         if ( !params.namespaceId && params.istio ) {
@@ -162,9 +179,8 @@ export default Route.extend({
         return EmberObject.create({
           catalogTemplate,
           namespace,
-          allTemplates:       this.modelFor(get(this, 'parentRoute')).get('catalog'),
           catalogApp:         neuApp,
-          catalogTemplateUrl: links[def], // catalogTemplateUrl gets qp's added and this needs with out
+          catalogTemplateUrl: links[catalogTemplateUrlKey], // catalogTemplateUrl gets qp's added and this needs with out
           namespaces:         results.namespaces,
           tpl:                results.tpl,
           tplKind:            kind,

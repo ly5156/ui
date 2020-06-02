@@ -19,6 +19,10 @@
 </section>
 
 <section class="pl-0 pr-0">
+  <div class="row mb-15">
+    {{search-text searchText=searchText}}
+  </div>
+
   {{#each filteredApps as |group|}}
     <div class="row flex">
       {{#each group as |app|}}
@@ -30,11 +34,12 @@
       {{/each}}
     </div>
   {{else}}
-    {{empty-table
-      resource="container"
-      newRoute="global-admin.multi-cluster-apps.catalog.index"
-      newTranslationKey="nav.apps.launch"
-      ctx=""
-    }}
+    <div class="text-center text-muted">
+      {{#if searchText}}
+        {{t "multiClusterAppsPage.noMatch"}}
+      {{else}}
+        {{t "multiClusterAppsPage.noData"}}
+      {{/if}}
+    </div>
   {{/each}}
 </section>

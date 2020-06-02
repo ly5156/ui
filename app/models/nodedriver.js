@@ -4,7 +4,7 @@ import Resource from '@rancher/ember-api-store/models/resource';
 import C from 'ui/utils/constants';
 import { parseExternalId } from 'ui/utils/parse-externalid';
 
-export const BUILT_IN_UI = ['amazonec2', 'digitalocean', 'azure', 'exoscale', 'packet', 'rackspace', 'vmwarevsphere', 'aliyunecs'];
+export const BUILT_IN_UI = ['amazonec2', 'digitalocean', 'azure', 'exoscale', 'packet', 'rackspace', 'vmwarevsphere'];
 export const BUILT_IN_ICON_ONLY = ['openstack', 'otc'];
 
 function displayUrl(url) {
@@ -28,8 +28,7 @@ function displayUrl(url) {
 export default Resource.extend({
   modalService:        service('modal'),
   catalog:             service(),
-  intl:         service(),
-
+  intl:                service(),
   type:                'nodeDriver',
   catalogTemplateIcon: computed('externalId', function() {
     let parsedExtId = parseExternalId(get(this, 'externalId')) || null;
@@ -108,6 +107,10 @@ export default Resource.extend({
     return !!get(this, 'links.update') && !get(this, 'builtin');
   }),
 
+  canRemove: computed('state', function() {
+    return get(this, 'state') === 'inactive'
+  }),
+
   availableActions: computed('actionLinks.{activate,deactivate}', function() {
     let a = get(this, 'actionLinks') || {};
 
@@ -116,15 +119,16 @@ export default Resource.extend({
         label:    'action.activate',
         icon:     'icon icon-play',
         action:   'activate',
-        enabled:  !!a.activate,
+        enabled:  !!a.activate && get(this, 'state') === 'inactive',
         bulkable: true
       },
       {
-        label:    'action.deactivate',
-        icon:     'icon icon-pause',
-        action:   'deactivate',
-        enabled:  !!a.deactivate,
-        bulkable: true
+        label:     'action.deactivate',
+        icon:      'icon icon-pause',
+        action:    'promotDeactivate',
+        enabled:   !!a.deactivate && get(this, 'state') === 'active',
+        bulkable:  true,
+        altAction: 'deactivate',
       },
     ];
   }),
@@ -132,6 +136,7 @@ export default Resource.extend({
   externalIdInfo: computed('externalId', function() {
     return parseExternalId(get(this, 'externalId'));
   }),
+
   actions: {
     activate() {
       return this.doAction('activate');
@@ -139,6 +144,13 @@ export default Resource.extend({
 
     deactivate() {
       return this.doAction('deactivate');
+    },
+
+    promotDeactivate() {
+      get(this, 'modalService').toggleModal('modal-confirm-deactivate', {
+        originalModel: this,
+        action:        'deactivate'
+      });
     },
 
     edit() {

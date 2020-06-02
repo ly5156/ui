@@ -1,6 +1,7 @@
 {
   "name": "ui",
-  "version": "2.3.1",
+  "version": "2.3-dev",
+  "cnVersion": "2.3.48-cn-rc1",
   "private": true,
   "repository": "https://github.com/rancher/ui",
   "license": "Apache-2.0",
@@ -26,12 +27,14 @@
   "devDependencies": {
     "@ember/jquery": "^0.5.2",
     "@ember/optional-features": "^0.6.3",
-    "@rancher/ember-api-store": "2.9.2",
+    "@rancher/ember-api-store": "2.9.6",
     "ansi_up": "^2.0.2",
     "async": "2.1.2",
     "babel-eslint": "^9.0.0",
     "broccoli-asset-rev": "^2.7.0",
     "card": "2.4.0",
+    "crypto-js": "^4.0.0",
+    "cytoscape": "3.3.2",
     "d3": "3.5.17",
     "dot-object": "^1.7.0",
     "dotenv": "^6.0.0",
@@ -60,12 +63,14 @@
     "ember-concurrency": "^0.8.24",
     "ember-copy": "^1.0.0",
     "ember-credit-card": "^2.4.0",
+    "ember-deep-set": "^0.2.0",
     "ember-drag-drop": "^0.4.7",
     "ember-engines": "^0.6.1",
     "ember-export-application-global": "^2.0.0",
+    "ember-fetch": "^6.5.1",
     "ember-flatpickr": "^2.7.0",
     "ember-href-to": "^2.0.1",
-    "ember-intl": "^2.33.4",
+    "ember-intl": "^4.2.0",
     "ember-load-initializers": "^2.0.0",
     "ember-math-helpers": "^2.2.3",
     "ember-maybe-import-regenerator": "^0.1.6",
@@ -84,7 +89,7 @@
     "ipaddr.js": "^1.8.1",
     "ivy-codemirror": "^2.1.0",
     "jgrowl": "~1.4.2",
-    "js-yaml": "^3.13.1",
+    "js-yaml": "3.13.1",
     "json2yaml": "^1.1.0",
     "jsondiffpatch": "^0.3.11",
     "jszip": "^3.1.5",
@@ -95,23 +100,34 @@
     "prettycron": "^0.10.0",
     "prismjs": "^1.15.0",
     "qunit-dom": "^0.8.0",
+    "rancher-cytoscape-dagre": "2.2.7",
     "semver": "^5.4.1",
     "shell-quote": "^1.6.1",
     "url-regex": "^4.1.1",
     "webpack": "^4.12.0",
     "xterm": "^3.8.1",
-    "yamljs": "^0.3.0",
-    "cytoscape": "3.3.2",
-    "rancher-cytoscape-dagre": "2.2.7"
+    "yamljs": "^0.3.0"
   },
   "dependencies": {
+    "cidr-matcher": "^2.1.0",
+    "dompurify": "^1.0.11",
     "mysql": "^2.15.0",
     "request": "^2.83.0",
     "sendgrid": "^4.7.1",
     "stripe": "^4.15.0"
   },
   "resolutions": {
-    "jquery": "^3.4.1"
+    "jquery": "^3.4.1",
+    "clean-css": "^4.1.11",
+    "fstream": "^1.0.12",
+    "handlebars": "^4.0.14",
+    "lodash": "^4.17.13",
+    "lodash.defaultsdeep": "^4.6.1",
+    "lodash.merge": "^4.6.2",
+    "lodash.mergewith": "^4.6.2",
+    "mem": "^4.0.0",
+    "merge": "^1.2.1",
+    "underscore.string": "^3.3.5"
   },
   "ember-addon": {
     "paths": [
@@ -123,7 +139,8 @@
       "lib/pipeline",
       "lib/monitoring",
       "lib/istio",
-      "lib/shared"
+      "lib/shared",
+      "lib/custom-extension"
     ]
   }
 }

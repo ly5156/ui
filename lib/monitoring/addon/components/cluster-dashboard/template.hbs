@@ -1,3 +1,8 @@
+{{#if cluster.certsExpiring}}
+  {{#banner-message color="bg-warning"}}
+    <p>{{t "tooltipExpire.label"}} <a href="#" {{action "rotate"}}>{{t "tooltipExpire.link"}}</a></p>
+  {{/banner-message}}
+{{/if}}
 {{#if showDashboard}}
   {{cluster-basic-info cluster=cluster}}
 
@@ -37,7 +42,7 @@
       url=grafana.etcdUrl
     }}
 
-    {{#if (eq cluster.provider "azureaks")}}
+    {{#if hideManagerAndSchedulerStatus}}
       <div class="col span-3 mt-0">
         {{#banner-message
            icon="icon-alert"
@@ -56,7 +61,7 @@
       }}
     {{/if}}
 
-    {{#if (eq cluster.provider "azureaks")}}
+    {{#if hideManagerAndSchedulerStatus}}
       <div class="col span-3 mt-0">
         {{#banner-message
            icon="icon-alert"
@@ -82,16 +87,11 @@
     }}
   </div>
 
-  {{#unless (eq cluster.provider "azureaks")}}
+  {{#unless hideManagerAndSchedulerStatus}}
     <div class="row">
-      {{#each unhealthyComponents as |component|}}
+      {{#each cluster.displayWarnings as |warning|}}
         {{#banner-message icon="icon-alert" color="text-left bg-error mt-30"}}
-          <p>{{t "clusterDashboard.alert.component" component=component.name}}</p>
-        {{/banner-message}}
-      {{/each}}
-      {{#each inactiveNodes as |node|}}
-        {{#banner-message icon="icon-alert" color="text-left bg-error mt-30"}}
-          <p>{{t "clusterDashboard.alert.node" node=node.displayName}}</p>
+          <p>{{warning}}</p>
         {{/banner-message}}
       {{/each}}
     </div>
@@ -99,14 +99,18 @@
 
   {{#if (and showClusterTabs scope.currentCluster.isMonitoringReady)}}
     {{cluster-dashboard-tabs dashboards=dashboards}}
+  {{else}}
+    {{#accordion-list showExpandAll=false as | al expandFn |}}
+      {{resource-event-list
+        resourceType=(t "generic.cluster")
+        clusterEvents=true
+        expandAll=al.expandAll
+        expandFn=expandFn
+      }}
+    {{/accordion-list}}
   {{/if}}
 {{else}}
-  {{empty-table
-    resource="container"
-    showNew=scope.currentCluster.canAddNode
-    newRoute="authenticated.cluster.nodes.templates"
-    newTranslationKey="nodesPage.addNode"
-    disabled=(rbac-prevents resource="machine" scope="global" permission="create")
-    ctx=""
-  }}
+  <div class="text-center text-muted">
+    {{t 'clusterDashboard.clusterNotReady'}}
+  </div>
 {{/if}}

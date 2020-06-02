@@ -5,32 +5,17 @@
   </div>
 
   <div class="vertical-middle">
-    <label class="acc-label vertical-middle p-0">{{t 'clustersPage.version.label'}}:</label>
+    <label class="acc-label vertical-middle p-0">{{t 'clustersPage.kubernetesVersion.label'}}:</label>
     <span>{{cluster.version.gitVersion}}</span>
   </div>
 
-  <div class="vertical-middle">
-    <label class="acc-label vertical-middle p-0">{{t 'clustersPage.nodes.label'}}:</label>
-    <span>
-      {{#if (eq cluster.state "inactive")}}
-        {{t 'clusterRow.noHosts'}}
-      {{else}}
-        {{cluster.machines.length}}
-      {{/if}}
-    </span>
-  </div>
-</div>
-
-<div class="row banner bg-info basics">
-  <div class="vertical-middle">
-    <label class="acc-label vertical-middle p-0">{{t 'generic.cpu'}}:</label>
-    <span>{{cluster.cpuTotal}}</span>
-  </div>
-
-  <div class="vertical-middle">
-    <label class="acc-label vertical-middle p-0">{{t 'generic.memory'}}:</label>
-    <span>{{cluster.memoryTotal}}</span>
-  </div>
+  {{#if cluster.clusterTemplateId}}
+    <div class="vertical-middle">
+      <label class="acc-label vertical-middle p-0">{{t 'clustersPage.rkeTemplate.label'}}:</label>
+      <span>{{cluster.clusterTemplateDisplayName}}/{{cluster.clusterTemplateRevisionDisplayName}}</span>
+      {{cluster-template-revision-upgrade-notification cluster=cluster}}
+    </div>
+  {{/if}}
 
   <div class="vertical-middle">
     <label class="acc-label vertical-middle p-0">{{t 'generic.created'}}:</label>

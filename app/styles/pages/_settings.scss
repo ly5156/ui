@@ -67,6 +67,15 @@
   &.freeipa {
     background-image: url('images/providers/provider-freeipa.svg');
   }
+
+  &.googleoauth {
+    background-image: url('images/providers/provider-google.svg');
+  }
+
+  &.cas {
+    background-image: url('images/providers/provider-cas.png');
+    background-size: contain;
+  }
 }
 
 .advanced-setting {
@@ -87,7 +96,7 @@
   }
 
   .help-block {
-    margin: 5px 0 0 0;
+    margin: 2.5px 0 5px 0;
   }
 
   .edit {
@@ -129,6 +138,27 @@
 
 .jaeger {
   background-image: url('images/providers/jaeger.svg');
+  background-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.global-monitoring {
+  background-image: url('images/providers/global-monitoring.svg');
+  background-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.thanos {
+  background-image: url('images/providers/thanos.svg');
+  background-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.istio {
+  background-image: url('images/providers/istio.svg');
   background-size: 20px;
   width: 20px;
   height: 20px;

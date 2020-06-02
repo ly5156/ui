@@ -1,0 +1,27 @@
+{{#if modalVisible}}
+<form class="modal-container large-modal alert">
+  {{top-errors errors=errors}}
+  <h2 class="alert-header">{{t "harborConfig.newProject"}}</h2>
+  <hr/>
+  <div class="row">
+    <div class="col span-12">
+      <label class="acc-label">{{t "harborConfig.form.projectName.label"}}{{field-required}}</label>
+      {{input
+          class="form-control"
+          value=project.project_name
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-12">
+      <label class="acc-label">{{t "harborConfig.form.accessLevel.label"}}</label>
+      <label>
+      {{input type="checkbox" class="form-control" checked=project.metadata.public label="ddd"}}{{t "harborConfig.form.accessLevel.checkPublic"}}
+      </label>
+    </div>
+  <br/>
+  <span class="text-info">{{t "harborConfig.form.accessLevel.info"}}</span>
+</div>
+{{save-cancel editing=editing save=(action "save") cancel=(action "cancel")}}
+</form>
+{{/if}}

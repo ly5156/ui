@@ -31,7 +31,7 @@ Connect to UI at https://localhost:8000/ .  The server automatically picks up fi
 
 Run development server pointed at another instance of the Rancher API
 ```bash
-  RANCHER="https://rancher-server/" yarn start
+  RANCHER="https://rancher-server" yarn start
 ```
 
 RANCHER can also be `hostname[:port]` or `ip[:port]`.
@@ -42,10 +42,19 @@ Rancher releases include a static copy of the UI passed in during build as a tar
 ```bash
   ./scripts/build-static
 ```
-
 ### Customizing
 
 We highly suggest making customizations as an [ember-cli addon](http://ember-cli.com/extending/#developing-addons-and-blueprints) rather than forking this repo, making a bunch of changes and then fighting conflicts to keep it up to date with upstream forever.  [ui-example-addon-machine](https://github.com/rancher/ui-example-addon-machine) is an example addon that adds a custom screen for a docker-machine driver.  If there is no way for you to get to what you want to change from an addon, PRs to this repo that add generalized hooks so that you can are accepted.
+
+### Project Structure
+
+Rancher UI uses [Ember CLI Pods](https://cli.emberjs.com/release/advanced-use/project-layouts/#podslayout) for its project structure. We suggest reading the documentation if you have questions about the layout of the Rancher UI project.
+
+### Engines and In-repo Addons
+
+Rancher UI uses [Ember Engines](http://ember-engines.com) to break the deliverable code into smaller chunks and only deliver what the end-user will need. When adding new components to an engine ensure you are only re-exporting the component back out of the engine if it is required and can not be placed in the `shared` in-repo addon. When adding a new service or dependency that is required by an engine ensure that you pass the dependencies to the engine, more info can be found [here](http://ember-engines.com/guide/services)
+
+The `shared` in-repo addon is a central repository of shared components for use with both the main app and any in-repo engine.
 
 ### Translations
 Rancher UI supports localization via translations files. You can swap translations live by utilizing the Language Picker located in the footer. If you would like to add your own translations files follow the directions below.
@@ -62,10 +71,10 @@ Rancher UI supports localization via translations files. You can swap translatio
 If you want to customize the UI, re-packaging all of Rancher to distribute the UI is possible but not terribly convenient. Instead you can change Cattle to load the UI source from a remote web server:
 
 - Build with `./scripts/build-static -l -c 'your-server.com'`
-- Upload `./dist/static/latest2` so that it's available at https://your-server.com/latest2
+- Upload `./dist/static/latest-2.3` so that it's available at https://your-server.com/latest-2.3
   - It must be available over HTTPS.
-  - You can rename the "latest2" part with the `-v` flag
-- Change the value of http[s]://your-rancher:8080/v3/settings/ui-index to the same `https://yourserver.com/latest2` URL
+  - You can rename the "latest-2.3" part with the `-v` flag
+- Change the value of http[s]://your-rancher:8080/v3/settings/ui-index to the same `https://yourserver.com/latest-2.3` URL
 
 ### Running Tests
 
@@ -90,6 +99,7 @@ Or just [click here](//github.com/rancher/rancher/issues/new?title=%5BUI%5D%20) 
 
 * ember: http://emberjs.com/
 * ember-cli: http://www.ember-cli.com/
+* ember-engines: http://ember-engines.com/
 * Development Browser Extensions
   * [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
   * [ember inspector for firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)

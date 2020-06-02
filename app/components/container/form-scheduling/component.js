@@ -55,7 +55,9 @@ export default Component.extend({
       const hostId = get(this, 'requestedHostId') || get(this, 'hostChoices.firstObject.id');
 
       Object.keys(scheduling).forEach((key) => {
-        delete scheduling.node[key];
+        if ( scheduling.node ) {
+          delete scheduling.node[key];
+        }
       });
       set(this, 'requestedHostId', hostId);
     } else {
@@ -67,7 +69,11 @@ export default Component.extend({
   requestedHostIdDidChange: observer('requestedHostId', function() {
     const hostId = get(this, 'requestedHostId');
 
-    set(this, 'scheduling.node.nodeId', hostId);
+    if ( get(this, 'scheduling.node') ) {
+      set(this, 'scheduling.node.nodeId', hostId);
+    } else {
+      set(this, 'scheduling.node', { nodeId: hostId });
+    }
   }),
 
   selectedChoice: computed('_allNodes.@each.{id,clusterId,name,state}', function() {
@@ -78,7 +84,7 @@ export default Component.extend({
     const list = get(this, '_allNodes').filter((node) => !get(node, 'isUnschedulable'))
       .filterBy('clusterId', get(this, 'scope.currentCluster.id'))
       .map((host) => {
-        let hostLabel = get(host, 'hostname');
+        let hostLabel = get(host, 'displayName');
 
         if ( get(host, 'state') !== 'active' ) {
           hostLabel += ` (${  get(host, 'state')  })`;

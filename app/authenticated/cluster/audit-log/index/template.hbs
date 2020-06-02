@@ -1,0 +1,101 @@
+<section class="header clearfix">
+  <h1 class="pull-left">{{t "auditLog.title"}}</h1>
+</section>
+<section>
+  <div class="row">
+    <div class="col span-2">
+      {{input
+        class="form-control"
+        value=form.userdisplayname
+        placeholder=(t 'auditLog.form.operator.placeholder')
+      }}
+    </div>
+    <div class="col span-2">
+      {{input
+        class="form-control"
+        value=form.fieldValue
+        placeholder=fieldPlaceholder
+      }}
+    </div>
+    <div class="col span-2">
+      {{new-select
+        value=form.operationLabel
+        change=(action "operationsChanged")
+        content=sourceTypes
+      }}
+    </div>
+    <div class="col span-2">
+      {{new-select
+        value=form.operation
+        content=operations
+      }}
+    </div>
+    <div class="col span-2">
+      {{new-select
+        value=form.dateRange
+        content=dateRanges
+      }}
+    </div>
+    <div class="col span-2">
+       <button class="btn bg-danger" {{action "clear"}}>{{t "auditLog.btn.clearAll"}}</button>
+        <button class="btn bg-primary" {{action "search"}}>{{t "auditLog.btn.search"}}</button>
+    </div>
+  </div>
+</section>
+<section class="mt-30">
+  {{#custom-table
+       tableClassNames="bordered"
+       hasBulkActions=false
+       search=false
+       paging=true
+       primaryKeyName="id"
+       sortChanged=(action "sortChanged")
+       pageChange=(action 'pageChange')
+       headers=headers
+       availableActions=availableActions
+       data=rows
+       nextData=next
+       as |sortable kind obj dt|
+  }}
+    {{#if (eq kind "row")}}
+      <tr class="main-row">
+        <td data-title="{{dt.username}}">
+          {{obj.userDisplayName}}
+        </td>
+        <td data-title="{{dt.operation}}">
+          {{#if obj.requestAction}}
+            {{obj.requestAction}}
+          {{else}}
+            {{obj.operation}}
+          {{/if}}
+        </td>
+        <td data-title="{{dt.responseCode}}">
+          {{obj.responseCode}}
+        </td>
+        <td data-title="{{dt.requestTimestamp}}">
+          {{date-calendar obj.requestTimestamp}}
+        </td>
+        {{!-- <td data-title="{{dt.clusterId}}">
+          {{obj.clusterId}}
+        </td> --}}
+        <td data-title="{{dt.requestResType}}">
+          {{obj.requestResType}}
+        </td>
+        <td data-title="{{dt.requestResId}}">
+          {{#if obj.requestResName}}
+          {{obj.requestResName}}
+          {{else}}
+          {{obj.requestResId}}
+          {{/if}}
+        </td>
+        <td style="text-align:center;" data-title="{{dt.requestResId}}">
+          <a href="#" {{action "showDetail" obj}} >{{t "auditLog.btn.detail"}}</a>
+        </td>
+      </tr>
+    {{else if (eq kind "nomatch")}}
+      <tr><td colspan="{{sortable.fullColspan}}" class="text-center text-muted lacsso pt-20 pb-20">{{t "auditLog.table.noMatch"}}</td></tr>
+    {{else if (eq kind "norows")}}
+      <tr><td colspan="{{sortable.fullColspan}}" class="text-center text-muted lacsso pt-20 pb-20">{{t "auditLog.table.noData"}}</td></tr>
+    {{/if}}
+  {{/custom-table}}
+</section>

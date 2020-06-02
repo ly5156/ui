@@ -5,9 +5,11 @@ import { get, set, computed } from '@ember/object';
 import layout from './template';
 import { getProvisioners } from 'ui/models/storageclass';
 import ChildHook from 'shared/mixins/child-hook';
+import C from 'ui/utils/constants';
 
 export default Component.extend(ViewNewEdit, ChildHook, {
-  intl: service(),
+  intl:        service(),
+  features:     service(),
 
   layout,
   model: null,
@@ -59,6 +61,13 @@ export default Component.extend(ViewNewEdit, ChildHook, {
 
     return out.sortBy('priority', 'label');
   }),
+
+  supportedProvisionerChoices: computed('provisionerChoices', function() {
+    const showUnsupported = get(this, 'features').isFeatureEnabled(C.FEATURES.UNSUPPORTED_STORAGE_DRIVERS);
+
+    return get(this, 'provisionerChoices').filter((choice) => showUnsupported || choice.supported)
+  }),
+
   willSave() {
     const self = this;
     const sup = this._super;

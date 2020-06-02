@@ -6,6 +6,7 @@ import { inject as service } from '@ember/service';
 import Grafana from 'shared/mixins/grafana';
 import { alias } from '@ember/object/computed';
 import { later } from '@ember/runloop';
+import C from 'ui/utils/constants';
 
 var Container = Resource.extend(Grafana, DisplayImage, {
   modalService: service('modal'),
@@ -28,15 +29,19 @@ var Container = Resource.extend(Grafana, DisplayImage, {
     return get(this, 'pod.namespaceId');
   }),
 
-  availableActions: computed('state', function() {
-    let isRunning = get(this, 'state') === 'running';
+  canShell: computed('state', function() {
+    return C.CAN_SHELL_STATES.indexOf(get(this, 'state')) > -1
+  }),
+
+  availableActions: computed('canShell', function() {
+    const canShell = get(this, 'canShell');
 
     var choices = [
       {
         label:     'action.execute',
         icon:      'icon icon-terminal',
         action:    'shell',
-        enabled:   isRunning,
+        enabled:   canShell,
         altAction: 'popoutShell',
       },
       {
@@ -45,6 +50,13 @@ var Container = Resource.extend(Grafana, DisplayImage, {
         action:    'logs',
         enabled:   true,
         altAction: 'popoutLogs',
+      },
+      {
+        label:     'action.downloadFile',
+        icon:      'icon icon-download',
+        action:    'popoutDownload',
+        enabled:   canShell && get(this, 'pod.actionLinks.download'),
+        altAction: 'popoutDownload'
       },
     ];
 
@@ -57,6 +69,14 @@ var Container = Resource.extend(Grafana, DisplayImage, {
     if ( state ) {
       return get(state, 'restartCount');
     }
+  }),
+
+  hasCpuReservation: computed('resources.requests.cpu', function() {
+    return !!get(this, 'resources.requests.cpu');
+  }),
+
+  hasMemoryReservation: computed('resources.requests.memory', function() {
+    return !!get(this, 'resources.requests.memory');
   }),
 
   validateQuota(namespace) {
@@ -128,6 +148,12 @@ var Container = Resource.extend(Grafana, DisplayImage, {
 
       later(() => {
         window.open(`//${ window.location.host }${ route }?podId=${ podId }&containerName=${ get(this, 'name') }&isPopup=true`, '_blank', 'toolbars=0,width=900,height=700,left=200,top=200');
+      });
+    },
+    popoutDownload() {
+      get(this, 'modalService').toggleModal('modal-download-file', {
+        originalModel: get(this, 'pod'),
+        containers:    [this],
       });
     },
   },

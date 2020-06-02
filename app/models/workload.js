@@ -1,7 +1,7 @@
 import { later, cancel } from '@ember/runloop';
 import { computed, get, set } from '@ember/object';
 import Grafana from 'shared/mixins/grafana';
-import { alias, gt, not } from '@ember/object/computed';
+import { alias, gt } from '@ember/object/computed';
 import Resource from '@rancher/ember-api-store/models/resource';
 import { sortableNumericSuffix } from 'shared/utils/util';
 import { formatSi } from 'shared/utils/parse-unit';
@@ -20,11 +20,12 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
   modalService:  service('modal'),
   scope:         service(),
   router:        service(),
-  clusterStore: service(),
+  settings:      service(),
+  clusterStore:  service(),
 
-  pods:         hasMany('id', 'pod', 'workloadId'),
+  pods:          hasMany('id', 'pod', 'workloadId'),
 
-  scaleTimer:       null,
+  scaleTimer:          null,
 
   // @TODO-2.0 cleanup all these...
   hasPorts:            true,
@@ -38,12 +39,12 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
   canHaveEnvironment:  true,
   canHaveHealthCheck:  true,
   isBalancer:          false,
-  canBalanceTo:         true,
+  canBalanceTo:        true,
+  canClone:            true,
 
   grafanaResourceId:    alias('name'),
 
   namespace:    reference('namespaceId', 'namespace', 'clusterStore'),
-  canClone:  not('hasSidekicks'),
 
   hasSidekicks: gt('containers.length', 1),
 
@@ -121,6 +122,13 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
         bulkable: true
       },
       {
+        label:    'action.auditlog',
+        icon:     'cnicon-cnrancher-audit-log',
+        action:   'auditlog',
+        bulkable:  false,
+        enabled:   !!(get(this, 'settings.asMap')['auditlog-server-url'] && get(this, 'settings.asMap')['auditlog-server-url']['value'])
+      },
+      {
         label:    'action.resume',
         icon:     'icon icon-play',
         action:   'resume',
@@ -191,9 +199,9 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
     }
   }),
 
-  podForShell: function() {
-    return get(this, 'pods').findBy('combinedState', 'running');
-  }.property('pods.@each.combinedState'),
+  podForShell: computed('pods.@each.canShell', function() {
+    return get(this, 'pods').findBy('canShell', true);
+  }),
 
   secondaryLaunchConfigs: computed('containers.[]', function() {
     return (get(this, 'containers') || []).slice(1);
@@ -236,6 +244,12 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
       get(this, 'modalService').toggleModal('modal-rollback-service', { originalModel: this });
     },
 
+    auditlog() {
+      var route = 'containers.audit-log';
+
+      get(this, 'router').transitionTo(route, { queryParams: { workloadId: get(this, 'id') } });
+    },
+
     garbageCollect() {
       return this.doAction('garbagecollect');
     },
@@ -255,7 +269,7 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
       get(this, 'modalService').toggleModal('modal-container-stop', { model: [this] });
     },
 
-    scaleUp() {
+    /* scaleUp() {
       set(this, 'scale', get(this, 'scale') + 1);
       this.saveScale();
     },
@@ -264,10 +278,14 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
       let scale = get(this, 'scale');
 
       scale -= 1;
-      scale = Math.max(scale, 0);
+      if (scale <= 0){
+        this.promptDelete(scale)
+
+        return;
+      }
       set(this, 'scale', scale);
       this.saveScale();
-    },
+    }, */
 
     edit(upgradeImage = 'false') {
       var route = 'containers.run';
@@ -326,8 +344,11 @@ var Workload = Resource.extend(Grafana, DisplayImage, StateCounts, EndpointPorts
         window.open(`//${ window.location.host }${ route }?podId=${ podId }&windows=${ windows }&isPopup=true`, '_blank', opt);
       });
     },
+    refreshScale({ podNum } = {}){
+      set(this, 'scale', podNum);
+      this.saveScale();
+    }
   },
-
   updateTimestamp() {
     let obj = get(this, 'annotations');
 

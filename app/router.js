@@ -33,6 +33,7 @@ Router.map(function() {
 
   this.route('verify-auth');
   this.route('verify-auth-azure');
+  this.route('verify-auth-cas');
   this.route('update-password', { path: '/update-password' });
   this.route('update-critical-settings', { path: '/update-setting' });
 
@@ -50,6 +51,7 @@ Router.map(function() {
 
     this.route('apikeys');
     this.route('prefs');
+    this.route('iframe', { path: '/iframe/:url' });
 
     // Per-Cluster
     this.route('cluster', { path: '/c/:cluster_id' }, function() {
@@ -64,7 +66,20 @@ Router.map(function() {
       this.route('nodes', function() {
         this.route('index', { path: '/' });
       });
-
+      // vlansubnet
+      this.route('vlansubnet', { path: '/vlansubnet' }, function() {
+        this.route('index', { path: '/' });
+        this.route('new', { path: '/add' });
+        this.route('edit', { path: '/:macvlan_name' });
+        this.route('unsupport', { path: '/unsupport' });
+      });
+      this.route('macvlan-ip', function() {
+        this.route('index', { path: '/' });
+      });
+      // audit log
+      this.route('audit-log', { path: '/audit-log' }, function() {
+        this.route('index', { path: '/' });
+      });
       this.mount('monitoring');
       this.mount('istio');
 
@@ -110,6 +125,10 @@ Router.map(function() {
           });
         });
       });
+
+      this.route('iframe', { path: '/iframe' }, function() {
+        this.route('detail', { path: '/:url' });
+      });
     });
 
     // Per-Project
@@ -118,8 +137,12 @@ Router.map(function() {
 
       this.route('ns', { path: '/ns' }, function() {
         this.route('index', { path: '/' });
+        this.route('resource-quota', { path: '/:ns' });
       });
 
+      this.route('quotas-cn', { path: '/quotas-cn' }, function() {
+        this.route('index', { path: '/' });
+      });
       // alert/logging
       this.mount('logging', { path: '/logging' });
       this.mount('alert', { path: '/alerts' });
@@ -145,6 +168,15 @@ Router.map(function() {
           path:           '/:pod_id/container/:container_name',
           resetNamespace: true
         })
+
+        // audit log
+        this.route('audit-log', { path: '/audit-log' }, function() {
+          this.route('index', { path: '/' });
+        });
+      });
+      // audit log
+      this.route('audit-log', { path: '/audit-log' }, function() {
+        this.route('index', { path: '/' });
       });
 
       this.route('ingresses', { resetNamespace: true }, function() {
@@ -257,11 +289,19 @@ Router.map(function() {
 
       this.route('help');
 
+      this.route('iframe', { path: '/iframe' }, function() {
+        this.route('detail', { path: '/:url' });
+      });
+
       // Popup Routes
       this.route('console');
       this.route('container-log');
     });
-
+    // Custom Extension
+    this.mount('custom-extension', {
+      path:           '/custom-extension',
+      resetNamespace: true,
+    })
     // End: Authenticated
   });
 

@@ -114,6 +114,7 @@ export default Component.extend({
       }
     });
 
+    console.log(array)
     set(this, 'quotaArray', array);
   }
 });

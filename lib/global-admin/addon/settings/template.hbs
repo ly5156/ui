@@ -1,0 +1,16 @@
+<section class="header has-tabs clearfix p-0">
+  <ul class="tab-nav">
+    <li>
+      {{#link-to "settings.advanced"}}
+        {{t "settingsPage.tabs.settings"}}
+      {{/link-to}}
+    </li>
+    <li>
+      {{#link-to "settings.features"}}
+        {{t "settingsPage.tabs.feature"}}
+      {{/link-to}}
+    </li>
+  </ul>
+</section>
+
+{{outlet}}

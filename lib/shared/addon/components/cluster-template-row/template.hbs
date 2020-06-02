@@ -1,0 +1,42 @@
+{{#if isGroup}}
+  <td colspan="{{sub fullColspan 2}}" data-title="cluster-template" class="pl-20">
+    {{t "clusterTemplateRow.label"}}: {{model.displayName}}
+    {{#if model.description}}
+      <p class="text-small text-muted m-0">
+        {{linkify model.description}}
+      </p>
+    {{/if}}
+  </td>
+  <td data-title="{{dt.created}}" class="text-right pr-20">
+    {{date-from-now model.created}}
+  </td>
+  <td data-title="{{dt.actions}}" class="actions">
+    {{action-menu model=model}}
+  </td>
+{{else}}
+  <td class="row-check" valign="middle" style="padding-top: 2px;">
+    {{check-box nodeId=model.id disabled=(not model.canBulkRemove)}}
+  </td>
+  <td data-title="{{dt.state}}" class="state">
+    {{badge-state model=model}}
+  </td>
+  <td data-title="{{dt.displayName}}">
+    {{#link-to
+       "cluster-templates.detail"
+       model.id
+    }}
+      {{model.displayName}}
+    {{/link-to}}
+  </td>
+  <td data-title="{{dt.defaultRevisionId}}" class="text-center">
+    {{#if (eq model.clusterTemplate.defaultRevisionId model.id)}}
+      <i class="icon icon-check" />
+    {{/if}}
+  </td>
+  <td data-title="{{dt.created}}" class="text-right pr-20">
+    {{date-from-now model.created}}
+  </td>
+  <td data-title="{{dt.actions}} "class="actions">
+    {{action-menu model=model}}
+  </td>
+{{/if}}

@@ -1,4 +1,30 @@
 <div class="box mb-10">
+  {{#unless (eq metric.type "Resource")}}
+    {{banner-message
+      color="bg-warning"
+      message=(t (if (eq metric.type "External") "cruHpa.metrics.types.warning.external" "cruHpa.metrics.types.warning.custom" ))
+    }}
+  {{else if (not resourceMetricsAvailable)}}
+    {{banner-message
+      color="bg-warning"
+      message=(t "cruHpa.metrics.types.warning.resource")
+    }}
+  {{/unless}}
+
+  {{#if showCpuReservationWarning}}
+    {{banner-message
+      color="bg-warning"
+      message=(t "cruHpa.metrics.types.warning.cpu")
+    }}
+  {{/if}}
+
+  {{#if showMemoryReservationWarning}}
+    {{banner-message
+      color="bg-warning"
+      message=(t "cruHpa.metrics.types.warning.memory")
+    }}
+  {{/if}}
+
   {{#if (and editing (gt metrics.length 1))}}
     <div class="row">
       <div class="pull-right">
@@ -114,20 +140,37 @@
           value=metric.target.utilization
           classesForDisplay="text-muted form-control-static"
         }}
-          <span class="with-input">
-            <div class="input-group">
-              {{input-integer
-                min=0
-                id=(concat elementId "-input-metrics-target-type")
-                value=metric.target.utilization
-                classNames="form-control"
-                placeholder=(t "cruHpa.metrics.value.utilizationPlaceholder")
-              }}
-              <div class="input-group-addon bg-default">
-                %
-              </div>
+          <div class="input-group">
+            {{input-integer
+              min=1
+              id=(concat elementId "-input-metrics-target-type")
+              value=metric.target.utilization
+              classNames="form-control"
+              placeholder=(t "cruHpa.metrics.value.utilizationPlaceholder")
+            }}
+            <div class="input-group-addon bg-default">
+              %
             </div>
-          </span>
+          </div>
+        {{/input-or-display}}
+      {{else if (and (eq metric.type "Resource") (eq metric.target.type "AverageValue"))}}
+        {{#input-or-display
+          editable=editing
+          value=metric.target.averageValue
+          classesForDisplay="text-muted form-control-static"
+        }}
+          <div class="input-group">
+            {{input-integer
+              min=0
+              id=(concat elementId "-input-metrics-target-type")
+              value=metric.target.stringValue
+              classNames="form-control"
+              placeholder=(t "cruHpa.metrics.value.placeholder")
+            }}
+            <div class="input-group-addon bg-default">
+              {{t (if (eq metric.name "cpu") "units.cpu" "generic.mibibyte")}}
+            </div>
+          </div>
         {{/input-or-display}}
       {{else if (eq metric.target.type "AverageValue")}}
         {{#input-or-display
@@ -140,7 +183,7 @@
             type="text"
             id=(concat elementId "-input-metrics-target-type")
             value=metric.target.averageValue
-            placeholder=(t (if (eq metric.name "cpu") "cruHpa.metrics.value.cpuPlaceholder" "cruHpa.metrics.value.placeholder"))
+            placeholder=(t "cruHpa.metrics.value.placeholder")
           }}
         {{/input-or-display}}
       {{else}}
@@ -154,7 +197,7 @@
             class="form-control"
             type="text"
             value=metric.target.value
-            placeholder=(t (if (eq metric.name "cpu") "cruHpa.metrics.value.cpuPlaceholder" "cruHpa.metrics.value.placeholder"))
+            placeholder=(t "cruHpa.metrics.value.placeholder")
           }}
         {{/input-or-display}}
       {{/if}}

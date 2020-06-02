@@ -25,6 +25,7 @@
   {{top-errors errors=otherErrors}}
   {{top-errors errors=clusterErrors}}
   {{save-cancel
+    saving=saving
     createLabel="clusterNew.googlegke.checkServiceAccount"
     savingLabel="clusterNew.googlegke.checkingServiceAccount"
     save=(action "checkServiceAccount")
@@ -34,8 +35,8 @@
 {{else}}
   {{#accordion-list showExpandAll=false as |al expandFn|}}
     {{#accordion-list-item
-       title=(t "clusterNew.customize.title")
-       detail=(t "clusterNew.customize.detail")
+       title=(t "clusterNew.kubernetesOptions.title")
+       detail=(t "clusterNew.kubernetesOptions.detail")
        everExpanded=true
        expandOnInit=true
        expandAll=al.expandAll
@@ -44,43 +45,90 @@
       <div class="row">
         <div class="col span-6">
           <label class="acc-label">
-            {{t "clusterNew.googlegke.zone.label"}}
+            {{t "clusterNew.googlegke.locationType.label"}}
           </label>
           {{#input-or-display
              editable=isNew
-             value=config.zone
+             value=locationType
           }}
-            {{new-select
-              classNames="form-control select-algin-checkbox"
-              optionValuePath="name"
-              optionLabelPath="name"
-              content=zoneChoices
-              value=config.zone
-              prompt="clusterNew.googlegke.zone.prompt"
-              localizedPrompt=true
-              disabled=editing
-            }}
+            <div class="radio">
+              <label>
+                {{radio-button selection=locationType value="zonal"}}
+                {{t "clusterNew.googlegke.locationType.zone"}}
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                {{radio-button selection=locationType value="regional"}}
+                {{t "clusterNew.googlegke.locationType.region"}}
+              </label>
+            </div>
           {{/input-or-display}}
         </div>
-        {{#unless hideNewField}}
+        {{#if (eq locationType "zonal")}}
+          <div class="col span-4">
+            <label class="acc-label">
+              {{t "clusterNew.googlegke.zone.label"}}
+            </label>
+            {{#input-or-display
+              editable=isNew
+              value=config.zone
+            }}
+              {{new-select
+                classNames="form-control select-algin-checkbox"
+                optionValuePath="name"
+                optionLabelPath="name"
+                content=zoneChoices
+                value=config.zone
+                prompt="clusterNew.googlegke.zone.prompt"
+                localizedPrompt=true
+                disabled=editing
+              }}
+            {{/input-or-display}}
+          </div>
+          {{#unless hideNewField}}
+            <div class="col span-2">
+              <label class="acc-label">
+                {{t "clusterNew.googlegke.locations.label"}}
+              </label>
+              {{#each locationContent as |location|}}
+                <div class="checkbox">
+                  <label class={{if editing "text-muted"}}>
+                    {{input
+                      type="checkbox"
+                      checked=location.checked
+                      disabled=editing
+                    }}
+                    {{location.name}}
+                  </label>
+                </div>
+              {{/each}}
+            </div>
+          {{/unless}}
+        {{/if}}
+
+        {{#if (eq locationType "regional")}}
           <div class="col span-6">
             <label class="acc-label">
-              {{t "clusterNew.googlegke.locations.label"}}
+              {{t "clusterNew.googlegke.region.label"}}
             </label>
-            {{#each locationContent as |location|}}
-              <div class="checkbox">
-                <label class={{if editing "text-muted"}}>
-                  {{input
-                    type="checkbox"
-                    checked=location.checked
-                    disabled=editing
-                  }}
-                  {{location.name}}
-                </label>
-              </div>
-            {{/each}}
+            {{#input-or-display
+              editable=isNew
+              value=config.region
+            }}
+              {{new-select
+                classNames="form-control select-algin-checkbox"
+                optionValuePath="name"
+                optionLabelPath="name"
+                content=regionChoices
+                value=config.region
+                prompt="clusterNew.googlegke.region.prompt"
+                localizedPrompt=true
+                disabled=editing
+              }}
+            {{/input-or-display}}
           </div>
-        {{/unless}}
+        {{/if}}
       </div>
 
       <div class="row">
@@ -88,14 +136,11 @@
           <label class="acc-label">
             {{t "clusterNew.googlegke.masterVersion.label"}}
           </label>
-          {{form-versions
-            cluster=cluster
-            editing=editing
-            initialVersion=config.masterVersion
+          {{new-select
+            classNames="form-control"
+            content=versionChoices
             value=config.masterVersion
-            versions=versionChoices
           }}
-
           {{#if (and editing (not-eq initialMasterVersion config.masterVersion))}}
             {{banner-message
               icon="icon-alert"
@@ -792,16 +837,31 @@
         </div>
         {{#if config.enableNodepoolAutoscaling}}
           <div class="col span-4">
-            <label class="acc-label">
+            <label
+              class="acc-label"
+              for="input-min-node-count"
+            >
               {{t "clusterNew.googlegke.minNodeCount.label"}}
             </label>
-            {{input-number min=1 value=config.minNodeCount max=5}}
+            {{input-number
+              id="input-min-node-count"
+              min=1
+              max=config.maxNodeCount
+              value=config.minNodeCount
+            }}
           </div>
           <div class="col span-4">
-            <label class="acc-label">
+            <label
+              class="acc-label"
+              for="input-max-node-count"
+            >
               {{t "clusterNew.googlegke.maxNodeCount.label"}}
             </label>
-            {{input-number min=1 value=config.maxNodeCount max=5}}
+            {{input-number
+              id="input-max-node-count"
+              min=config.minNodeCount
+              value=config.maxNodeCount
+            }}
           </div>
         {{/if}}
       </div>
@@ -899,5 +959,11 @@
   {{top-errors errors=errors}}
   {{top-errors errors=otherErrors}}
   {{top-errors errors=clusterErrors}}
-  {{save-cancel editing=(eq mode "edit")  save=(action "driverSave") cancel=close}}
+  {{save-cancel
+    editing=(eq mode "edit")
+    save=(action "driverSave")
+    cancel=close
+    saving=saving
+    saved=saved
+  }}
 {{/if}}

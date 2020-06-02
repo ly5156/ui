@@ -25,6 +25,10 @@ $project-nav-active: $dropdown-link-hover-bg !default;
     align-items: center;
 
     .ember-basic-dropdown-content {
+      body.touch & {
+        position: static;
+      }
+
       font-size:  15px;
     }
 
@@ -104,6 +108,8 @@ $project-nav-active: $dropdown-link-hover-bg !default;
   .nav-user {
     border-radius: 0 3px 3px 0;
     margin: 0;
+    position: relative;
+    z-index: 4;
 
     .nav-item {
       a.nav-link {
@@ -359,7 +365,7 @@ $project-nav-active: $dropdown-link-hover-bg !default;
   .search {
     grid-column-start: 2;
     grid-row-start: 1;
-    padding: 5px 10px;
+    padding: 7px 10px;
   }
 
   .search-match {

@@ -1,51 +1,9 @@
+/* eslint-disable */
 import { getProjectId, getClusterId, bulkAdd } from 'ui/utils/navigation-tree';
 import { get } from '@ember/object';
 
 const rootNav = [
   // Project
-  {
-    scope:           'project',
-    id:              'containers',
-    localizedLabel:  'nav.containers.tab',
-    route:           'authenticated.project.index',
-    ctx:             [getProjectId],
-    resource:        ['workload', 'ingress', 'service'],
-    resourceScope:   'project',
-    moreCurrentWhen: [
-      'containers', 'workload',
-      'ingresses',
-      'authenticated.project.dns',
-      'authenticated.project.hpa',
-      'volumes',
-      'authenticated.project.pipeline.pipelines',
-      'authenticated.project.pipeline.repositories',
-    ],
-  },
-
-  {
-    scope:          'project',
-    id:             'project-apps',
-    localizedLabel: 'nav.apps.tab',
-    route:          'apps-tab',
-    ctx:            [getProjectId],
-    resource:       ['app'],
-    resourceScope:  'project',
-  },
-  {
-    scope:                    'project',
-    id:                       'project-istio',
-    localizedLabel:           'nav.tools.istio',
-    route:                    'authenticated.project.istio.index',
-    ctx:                      [getProjectId],
-    resource:                 [],
-    resourceScope:            'project',
-    disableIfClusterNotReady: true,
-    moreCurrentWhen:          [
-      'authenticated.project.istio.graph',
-      'authenticated.project.istio.metrics',
-      'authenticated.project.istio.rules',
-    ],
-  },
   {
     scope:          'project',
     id:             'infra',
@@ -53,12 +11,59 @@ const rootNav = [
     ctx:            [getProjectId],
     submenu:        [
       {
-        id:             'infra-certificates',
-        localizedLabel: 'nav.infra.certificates',
-        route:          'authenticated.project.certificates',
+        id:             'containers',
+        localizedLabel: 'nav.containers.tab',
+        route:          'authenticated.project.index',
         ctx:            [getProjectId],
-        resource:       ['certificate'],
+        resource:       ['workload', 'ingress', 'service'],
         resourceScope:  'project',
+        currentWhen:    [
+          'containers',
+          'workload',
+          'ingresses',
+          'authenticated.project.dns',
+          'volumes',
+        ],
+      },
+      {
+        id:             'hpa',
+        localizedLabel: 'nav.infra.hpa',
+        route:          'authenticated.project.hpa',
+        ctx:            [getProjectId],
+        resource:       ['horizontalpodautoscaler'],
+        resourceScope:  'project',
+      },
+      {
+        id:             'pipelines',
+        localizedLabel: 'nav.infra.pipelines',
+        route:          'authenticated.project.pipeline.pipelines',
+        ctx:            [getProjectId],
+        resource:       [],
+        resourceScope:  'project',
+      },
+      {
+        id:             'istio',
+        localizedLabel: 'nav.tools.istio',
+        route:          'authenticated.project.istio.index',
+        ctx:            [getProjectId],
+        resource:       [],
+        resourceScope:  'project',
+        currentWhen:    [
+          'authenticated.project.istio.project-istio',
+        ],
+      },
+      {
+        id:             'infra-secrets',
+        localizedLabel: 'nav.infra.secrets',
+        route:          'authenticated.project.secrets',
+        ctx:            [getProjectId],
+        resource:       ['namespacedsecret', 'secret', 'dockercredential', 'certificate'],
+        resourceScope:  'project',
+        currentWhen:    [
+          'authenticated.project.certificates',
+          'authenticated.project.registries',
+          'authenticated.project.secrets',
+        ],
       },
       {
         id:             'infra-config-maps',
@@ -68,23 +73,16 @@ const rootNav = [
         resource:       ['configmap'],
         resourceScope:  'project',
       },
-      {
-        id:             'infra-registries',
-        localizedLabel: 'nav.infra.registries',
-        route:          'authenticated.project.registries',
-        ctx:            [getProjectId],
-        resource:       ['dockercredential'],
-        resourceScope:  'project',
-      },
-      {
-        id:             'infra-secrets',
-        localizedLabel: 'nav.infra.secrets',
-        route:          'authenticated.project.secrets',
-        ctx:            [getProjectId],
-        resource:       ['namespacedsecret', 'secret'],
-        resourceScope:  'project',
-      },
     ],
+  },
+  {
+    scope:          'project',
+    id:             'project-apps',
+    localizedLabel: 'nav.apps.tab',
+    route:          'apps-tab',
+    ctx:            [getProjectId],
+    resource:       ['app'],
+    resourceScope:  'project',
   },
   {
     scope:          'project',
@@ -284,7 +282,6 @@ const rootNav = [
         localizedLabel:           'nav.tools.istio',
         route:                    'authenticated.cluster.istio.cluster-setting',
         resourceScope:            'global',
-        disableIfClusterNotReady: true,
         resource:                 [],
         ctx:                      [getClusterId],
       },
@@ -295,7 +292,7 @@ const rootNav = [
   {
     scope:          'global',
     id:             'global-clusters',
-    localizedLabel: 'nav.admin.clusters',
+    localizedLabel: 'nav.admin.clusters.tab',
     route:          'global-admin.clusters',
     resource:       ['cluster'],
     resourceScope:  'global',
@@ -390,11 +387,27 @@ const rootNav = [
         resourceScope:  'global',
       },
       {
-        id:             'global-registry',
-        localizedLabel: 'nav.admin.globalRegistry',
-        route:          'global-admin.global-registry',
-        // There is no schema for global registry. But we can use global dns to check if it is a HA env.
-        resource:       ['globaldns'],
+        id:             'global-monitoring',
+        localizedLabel: 'nav.admin.globalMonitoring',
+        route:          'global-admin.global-monitoring',
+        resourceScope:  'global',
+        condition() {
+          return !!get(this, 'access.admin');
+        }
+      },
+      // {
+      //   id:             'global-registry',
+      //   localizedLabel: 'nav.admin.globalRegistry',
+      //   route:          'global-admin.global-registry',
+      //   // There is no schema for global registry. But we can use global dns to check if it is a HA env.
+      //   resource:       ['globaldns'],
+      //   resourceScope:  'global',
+      // },
+      {
+        id:             'rke-template',
+        localizedLabel: 'nav.admin.clusters.rkeTemplate',
+        route:          'global-admin.cluster-templates',
+        resource:       ['clustertemplate'],
         resourceScope:  'global',
       },
     ],
@@ -409,7 +422,7 @@ const rootNav = [
 ]
 
 export function initialize(/* appInstance*/) {
-  bulkAdd(rootNav);
+  // bulkAdd(rootNav); Reduce the conflict, The original is 'bulkAdd(rootNav)'
 }
 
 export default {

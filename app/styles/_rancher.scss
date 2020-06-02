@@ -49,10 +49,13 @@
 @import "app/styles/components/dropdown";
 @import "app/styles/components/pagination";
 @import "app/styles/components/theme-toggle";
+@import "app/styles/components/new-select";
 @import "app/styles/components/progress";
 @import "app/styles/components/percent-gauge";
 @import "app/styles/components/namespace-app";
 @import "app/styles/components/page-header";
+@import "app/styles/components/page-header-left-top";
+@import "app/styles/components/page-header-left";
 @import "app/styles/components/over-hr";
 @import "app/styles/components/accordion";
 @import "app/styles/components/jsondiffpatch";
@@ -62,6 +65,12 @@
 @import "app/styles/components/logging";
 @import "app/styles/components/identity-block";
 @import "app/styles/components/istio-graph";
+@import "app/styles/components/cluster-template-revision-upgrade-notification";
+@import "app/styles/components/quota-item-cn";
+@import "app/styles/components/custom-kubeshell-toolbox-cn";
+@import "app/styles/components/custom-menu";
+@import "app/styles/components/custom-modal-confirm-delete";
+@import "app/styles/components/form-security.scss";
 
 // Vendor
 // Pretty much what it says. Vendor specific changes/overrides or includes.

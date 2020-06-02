@@ -11,8 +11,13 @@ const VALID_ROUTES = ['apps-tab', 'catalog-tab.index', 'authenticated.project.se
   'authenticated.project.secrets', 'authenticated.project.config-maps',
   'authenticated.project.registries', 'authenticated.project.alert',
   'authenticated.project.logging', 'authenticated.project.pipeline.settings',
-  'authenticated.project.monitoring.project-setting', 'authenticated.project.istio.graph',
-  'authenticated.project.istio.metrics', 'authenticated.project.istio.rules'];
+  'authenticated.project.monitoring.project-setting', 'authenticated.project.istio.project-istio.graph',
+  'authenticated.project.istio.project-istio.metrics', 'authenticated.project.istio.project-istio.rules',
+  'authenticated.project.istio.project-istio.destination-rules', 'authenticated.project.istio.project-istio.virtual-services',
+  'authenticated.project.istio.project-istio.gateways',
+  'authenticated.project.hpa', 'authenticated.project.pipeline.pipelines',
+  'authenticated.project.audit-log.index'
+];
 
 export default Route.extend(Preload, {
   access:       service(),
@@ -52,6 +57,10 @@ export default Route.extend(Preload, {
       .catch((err) => this.loadingError(err, transition));
   },
 
+  afterModel(model) {
+    return this.scope.finishSwitchToProject(get(model, 'project'));
+  },
+
   redirect(model, transition) {
     let route = this.get(`session.${ C.SESSION.PROJECT_ROUTE }`);
 
@@ -59,11 +68,6 @@ export default Route.extend(Preload, {
     if ( get(transition, 'targetName') === 'authenticated.project.index' && VALID_ROUTES.includes(route) ) {
       this.replaceWith(route);
     }
-  },
-
-  setupController(controller, model) {
-    this._super(...arguments);
-    get(this, 'scope').finishSwitchToProject(get(model, 'project'));
   },
 
   actions: {

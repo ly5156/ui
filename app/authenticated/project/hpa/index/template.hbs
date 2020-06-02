@@ -1,22 +1,26 @@
-{{#containers-header showGroup=false}}
-  <button
-    {{action "importYaml"}}
-    class="btn btn-sm bg-default mr-10"
-    disabled={{rbac-prevents resource="horizontalpodautoscaler" scope="project" permission="create"}}
-  >
-    {{t "nav.containers.importCompose"}}
-  </button>
-  {{#link-to
-    "authenticated.project.hpa.new"
-    scope.currentProject.id
-    class="btn btn-sm bg-primary"
-    disabled=(rbac-prevents resource="horizontalpodautoscaler" scope="project" permission="create")
-  }}
-    {{t "nav.containers.addHpa"}}
-  {{/link-to}}
-{{/containers-header}}
+<section class="header clearfix">
+  <div class="right-buttons">
+    <button
+      {{action "importYaml"}}
+      class="btn btn-sm bg-default mr-10"
+      disabled={{rbac-prevents resource="horizontalpodautoscaler" scope="project" permission="create"}}
+    >
+      {{t "nav.containers.importCompose"}}
+    </button>
+    {{#link-to
+      "authenticated.project.hpa.new"
+      scope.currentProject.id
+      class="btn btn-sm bg-primary"
+      disabled=(or (not model.supported) (rbac-prevents resource="horizontalpodautoscaler" scope="project" permission="create"))
+    }}
+      {{t "nav.containers.addHpa"}}
+    {{/link-to}}
+  </div>
 
-{{#if rows.length}}
+  <h1>{{t "nav.infra.hpa"}}</h1>
+</section>
+
+{{# if model.supported }}
   <section class="pl-0 pr-0">
     {{#sortable-table
       classNames="grid sortable-table"
@@ -68,10 +72,9 @@
     {{/sortable-table}}
   </section>
 {{else}}
-  {{empty-table
-    disabled=(rbac-prevents resource="horizontalpodautoscaler" scope="project" permission="create")
-    resource="container"
-    newRoute="authenticated.project.hpa.new"
-    newTranslationKey="nav.containers.addHpa"
+  {{banner-message
+    icon="icon-alert"
+    color="bg-warning mb-10"
+    message=(t "hpaPage.notSupported" htmlSafe=true)
   }}
 {{/if}}

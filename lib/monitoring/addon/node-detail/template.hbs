@@ -1,8 +1,13 @@
 <section class="header clearfix">
   <div class="pull-left">
     <h1 class="vertical-middle">
-      {{t 'hostsPage.hostPage.header.title' name=model.node.displayName}}
+      {{t 'hostsPage.hostPage.header.title' name=model.node.displayName}}{{copy-to-clipboard clipboardText=model.node.displayName size="small"}}
     </h1>
+    {{#each model.node.displayRoles as |role|}}
+      <span class="badge badge-xs vertical-middle bg-info">
+        {{role}}
+      </span>
+    {{/each}}
   </div>
   <div class="right-buttons">
     {{badge-state model=model.node}}

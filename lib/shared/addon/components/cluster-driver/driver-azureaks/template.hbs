@@ -123,10 +123,9 @@
     {{/if}}
 
     {{#if (gte step 2) }}
-
       {{#accordion-list-item
-         title=(t "clusterNew.customize.title")
-         detail=(t "clusterNew.customize.detail")
+         title=(t "clusterNew.kubernetesOptions.title")
+         detail=(t "clusterNew.kubernetesOptions.detail")
          expandAll=al.expandAll
          expandOnInit=true
          expand=(action expandFn)
@@ -136,12 +135,10 @@
             <label class="acc-label" for="azureaks-kube-version">
               {{t "clusterNew.azureaks.kubernetesVersion.label"}}
             </label>
-            {{form-versions
-              cluster=cluster
-              editing=(eq mode "edit")
-              initialVersion=config.kubernetesVersion
+            {{new-select
+              classNames="form-control"
+              content=versionChoices
               value=config.kubernetesVersion
-              versions=versions
             }}
           </div>
           <div class="col span-6">
@@ -164,27 +161,29 @@
         </div>
 
         <div class="row">
-          <div class="col span-6">
-            <label class="acc-label">
-              {{t "clusterNew.azureaks.enableHttpApplicationRouting.label"}}
-            </label>
-            <div class="form-control-static">
-              <label class="hand mr-20">
-                {{radio-button
-                  selection=config.enableHttpApplicationRouting
-                  value=true
-                }}
-                {{t "generic.enabled"}}
+          {{#unless isChinaRegion}}
+            <div class="col span-6">
+              <label class="acc-label">
+                {{t "clusterNew.azureaks.enableHttpApplicationRouting.label"}}
               </label>
-              <label class="hand">
-                {{radio-button
-                  selection=config.enableHttpApplicationRouting
-                  value=false
-                }}
-                {{t "generic.disabled"}}
-              </label>
+              <div class="form-control-static">
+                <label class="hand mr-20">
+                  {{radio-button
+                    selection=config.enableHttpApplicationRouting
+                    value=true
+                  }}
+                  {{t "generic.enabled"}}
+                </label>
+                <label class="hand">
+                  {{radio-button
+                    selection=config.enableHttpApplicationRouting
+                    value=false
+                  }}
+                  {{t "generic.disabled"}}
+                </label>
+              </div>
             </div>
-          </div>
+          {{/unless}}
           <div class="col span-6">
             <label class="acc-label">
               {{t "clusterNew.azureaks.enableMonitoring.label"}}
@@ -205,6 +204,36 @@
                 {{t "generic.disabled"}}
               </label>
             </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col span-6">
+            <label class="acc-label">
+              {{t "clusterNew.azureaks.loadBalancerSku.label"}}
+            </label>
+
+            {{#input-or-display
+               editable=isNew
+               value=config.loadBalancerSku
+            }}
+              <div class="form-control-static">
+                <label class="hand mr-20">
+                  {{radio-button
+                    selection=config.loadBalancerSku
+                    value="basic"
+                  }}
+                  {{t "clusterNew.azureaks.loadBalancerSku.basic"}}
+                </label>
+                <label class="hand">
+                  {{radio-button
+                    selection=config.loadBalancerSku
+                    value="standard"
+                  }}
+                  {{t "clusterNew.azureaks.loadBalancerSku.standard"}}
+                </label>
+              </div>
+            {{/input-or-display}}
           </div>
         </div>
 
@@ -335,35 +364,60 @@
         </div>
         <div class="row">
           <div class="col span-12">
-            {{t "clusterNew.azureaks.networking.label"}}
-            <div class="radio">
-              <label class={{concat (if editing "text-muted") " acc-label mr-20"}}>
-                {{radio-button
-                  selection=netMode
-                  value="default"
-                  disabled=editing
-                }}
-                {{t "clusterNew.azureaks.networking.default"}}
-              </label>
-              <label class={{concat (if editing "text-muted") " acc-label"}}>
-                {{radio-button
-                  selection=netMode
-                  value="advanced"
-                  disabled=editing
-                }}
-                {{t "clusterNew.azureaks.networking.advanced"}}
-              </label>
-            </div>
+            <label class="acc-label" for="azureaks-netwok-mode">
+              {{t "clusterNew.azureaks.networking.label"}}
+            </label>
+            {{#input-or-display
+               editable=isNew
+               value=(if (eq netMode "default") (t "clusterNew.azureaks.networking.default") (t "clusterNew.azureaks.networking.advanced"))
+            }}
+              <div class="radio">
+                <label class={{concat (if editing "text-muted") " hand mr-20"}}>
+                  {{radio-button
+                    selection=netMode
+                    value="default"
+                    disabled=editing
+                  }}
+                  {{t "clusterNew.azureaks.networking.default"}}
+                </label>
+                <label class={{concat (if editing "text-muted") " hand"}}>
+                  {{radio-button
+                    selection=netMode
+                    value="advanced"
+                    disabled=editing
+                  }}
+                  {{t "clusterNew.azureaks.networking.advanced"}}
+                </label>
+              </div>
+            {{/input-or-display}}
           </div>
           {{#if (eq netMode "advanced")}}
             <div class="row">
+              <div class="col span-6 mt-0">
+                <label class="acc-label" for="azureaks-advanced-network-plugin">
+                  {{t "clusterNew.azureaks.networking.networkPlugin.label"}}
+                </label>
+                {{#input-or-display
+                   editable=isNew
+                   value=config.networkPlugin
+                }}
+                  {{new-select
+                    classNames="form-control"
+                    content=networkPlugins
+                    id="azureaks-advanced-network-plugin"
+                    localizedPrompt=false
+                    prompt=(t "clusterNew.azureaks.networking.networkPlugin.prompt")
+                    value=config.networkPlugin
+                  }}
+                {{/input-or-display}}
+              </div>
               <div class="col span-6 mt-0">
                 <label class="acc-label" for="azureaks-advanced-virtual-network">
                   {{t "clusterNew.azureaks.networking.vnet.label"}}
                 </label>
                 {{#input-or-display
                    editable=isNew
-                   value=networkChoice
+                   value=networkChoiceDisplay
                 }}
                   {{new-select
                     classNames="form-control"
@@ -400,6 +454,28 @@
                   {{t "clusterNew.azureaks.networking.serviceCidr.help"}}
                 </p>
               </div>
+              <div class="col span-6 mt-0">
+                <label class="acc-label" for="azureaks-pod-cidr">
+                  {{t "clusterNew.azureaks.networking.podCidr.label"}}
+                </label>
+                {{#input-or-display
+                   editable=isNew
+                   value=config.podCidr
+                }}
+                  {{input
+                    classNames="form-control"
+                    id="azureaks-pod-cidr"
+                    type="text"
+                    value=config.podCidr
+                    placeholder=(t "clusterNew.azureaks.networking.podCidr.placeholder")
+                  }}
+                {{/input-or-display}}
+                <p class="help-block">
+                  {{t "clusterNew.azureaks.networking.podCidr.help"}}
+                </p>
+              </div>
+            </div>
+            <div class="row">
               <div class="col span-6 mt-0">
                 <label class="acc-label" for="azureaks-dns-service-ip">
                   {{t "clusterNew.azureaks.networking.dnsServiceIp.label"}}
@@ -461,7 +537,6 @@
             </div>
           {{/if}}
         </div>
-
         <div class="row">
           <div class="col span-12">
             <label class="acc-label" for="azureaks-advanced-ssh-pub-key">
@@ -479,7 +554,7 @@
                 canChangeName=false
                 accept="application/x-x509-ca-cert,text/plain,.pem,.crt,.pub"
                 minHeight=60
-                placeholder="newCertificate.cert.placeholder"
+                placeholder="clusterNew.azureaks.ssh.placeholder"
                 shouldChangeName=false
               }}
             {{/input-or-display}}

@@ -59,6 +59,8 @@
   &.vmwarevsphere { @include vmwarevsphere; }
   &.other { @include other; }
   &.custom { @include custom; }
+  &.custom-driver { @include custom-driver; }
+  &.import-driver { @include import-driver; }
   &.import { @include import; }
   &.aliyunecs { @include aliyunecs; }
   &.amazoneks { @include amazoneks; }
@@ -69,8 +71,51 @@
   &.huaweicce { @include huaweicce; }
   &.otc { @include otc; }
   &.route53 { @include route53; }
+  &.rdns { @include rdns; }
   &.cloudflare { @include cloudflare; }
   &.alidns { @include alidns; }
+}
+
+.cluster-launch {
+  .cluster-driver-box {
+    border: solid $light-grey 1px;
+    padding: 15px 0px;
+    max-height: 130px;
+    text-decoration: none;
+
+    &.small {
+      max-height: 100px;
+      min-width: 175px;
+      .machine-driver {
+        height: 50px;
+        width: 50px;
+        border-right: none;
+        background-size: 50px 50px;
+      }
+    }
+
+    &:hover {
+      outline: 4px solid $link-color;
+      border-color: $link-color;
+    }
+  }
+  .machine-driver {
+    height: 100px;
+    width: 100px;
+    float: left;
+    border-right: solid $light-grey 1px;
+
+    &.custom-driver,
+    &.import-driver {
+      background-size: 75px 75px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  }
+  .driver-content {
+    overflow: hidden;
+    padding-left: 10px;
+  }
 }
 
 .machine-driver-empty {
@@ -224,6 +269,36 @@
     line-height: 30px;
     border-radius: 50%;
     color: white;
+  }
+}
+
+.launch-cluster {
+  .driver {
+
+    &.nav-box-item {
+      opacity: 1;
+      filter: none;
+      -webkit-filter: none;
+      -moz-filter: none;
+      -ms-filter: none;
+      -o-filter: none;
+      text-decoration: none;
+
+      &.import,
+      &.custom {
+        .machine-driver {
+          filter: grayscale(100%);
+          -webkit-filter: grayscale(100%);
+          -moz-filter: grayscale(100%);
+          -ms-filter: grayscale(100%);
+          -o-filter: grayscale(100%);
+        }
+      }
+
+      &:hover {
+        outline: 5px solid $link-color;
+      }
+    }
   }
 }
 

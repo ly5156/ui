@@ -115,7 +115,6 @@
     showWarning=(and isUpgrade (not service.isCreatedByRancher))
     changed=(action (mut launchConfig.ports))
     errors=portErrors
-    showHostPortWarning=(and showTargetOS (not-eq targetOs "linux"))
     editing=true
   }}
 </div>
@@ -172,7 +171,6 @@
       errors=schedulingErrors
       editing=true
       expandAll=null
-      setLabels=(action "setLabels" "scheduling")
       setRequestedHost=(action "setRequestedHostId")
       expandAll=al.expandAll
       expandFn=expandFn
@@ -252,6 +250,7 @@
       isUpgrade=isUpgrade
       expandAll=al.expandAll
       expandFn=expandFn
+      toggleMacvlan=toggleMacvlan
     }}
   {{/unless}}
 
@@ -273,16 +272,17 @@
         instance=launchConfig
         errors=networkingErrors
         service=service
+        scaleMode=scaleMode
         editing=true
         expandAll=al.expandAll
         expandFn=expandFn
+        toggleMacvlan=(action "handleToggleMacvlan")
       }}
 
       {{form-labels-annotations
         classNames="accordion-wrapper"
         labelErrors=labelErrors
         initialLabels=service.labels
-        setLabels=(action "setLabels" "user")
         expandAll=al.expandAll
         expandFn=expandFn
         model=service
@@ -302,7 +302,7 @@
     }}
 
     {{#unless isSidekick}}
-      {{#if scope.currentProject.enableProjectMonitoring}}
+      {{#if (or (and scope.currentProject.isSystemProject scope.currentCluster.enableClusterMonitoring) scope.currentProject.enableProjectMonitoring)}}
         {{container/form-custom-metrics
           classNames="accordion-wrapper"
           workload=service

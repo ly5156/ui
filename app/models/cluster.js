@@ -2,39 +2,41 @@ import { get, set, computed, observer } from '@ember/object';
 import { on } from '@ember/object/evented';
 import { inject as service } from '@ember/service';
 import Resource from '@rancher/ember-api-store/models/resource';
-import { hasMany } from '@rancher/ember-api-store/utils/denormalize';
+import { hasMany, reference } from '@rancher/ember-api-store/utils/denormalize';
 import ResourceUsage from 'shared/mixins/resource-usage';
 import Grafana from 'shared/mixins/grafana';
 import { equal, alias } from '@ember/object/computed';
 import { resolve } from 'rsvp';
 import C from 'ui/utils/constants';
 import { isEmpty } from '@ember/utils';
-
-const FLANNEL = 'flannel';
-const HOST_GW = 'host-gw';
-const VXLAN = 'vxlan';
-const BACKEND_PORT = '4789';
-const BACKEND_VNI = '4096';
+import moment from 'moment';
+const TRUE = 'True';
+const CLUSTER_TEMPLATE_ID_PREFIX = 'cattle-global-data:';
 
 export default Resource.extend(Grafana, ResourceUsage, {
   globalStore: service(),
   growl:       service(),
-  scope:       service(),
-  router:      service(),
   intl:        service(),
+  router:      service(),
+  scope:       service(),
+  settings:    service(),
 
-  namespaces:                  hasMany('id', 'namespace', 'clusterId'),
-  projects:                    hasMany('id', 'project', 'clusterId'),
-  nodes:                       hasMany('id', 'node', 'clusterId'),
-  nodePools:                   hasMany('id', 'nodePool', 'clusterId'),
   clusterRoleTemplateBindings: hasMany('id', 'clusterRoleTemplateBinding', 'clusterId'),
   etcdbackups:                 hasMany('id', 'etcdbackup', 'clusterId'),
+  namespaces:                  hasMany('id', 'namespace', 'clusterId'),
+  nodePools:                   hasMany('id', 'nodePool', 'clusterId'),
+  nodes:                       hasMany('id', 'node', 'clusterId'),
+  projects:                    hasMany('id', 'project', 'clusterId'),
+  expiringCerts:               null,
   grafanaDashboardName:        'Cluster',
   isMonitoringReady:           false,
+  _cachedConfig:               null,
+  clusterTemplate:             reference('clusterTemplateId'),
+  clusterTemplateRevision:     reference('clusterTemplateRevisionId'),
   machines:                    alias('nodes'),
   roleTemplateBindings:        alias('clusterRoleTemplateBindings'),
-  isGKE:                       equal('driver', 'googleKubernetesEngine'),
   isAKS:                       equal('driver', 'azureKubernetesService'),
+  isGKE:                       equal('driver', 'googleKubernetesEngine'),
 
   conditionsDidChange:        on('init', observer('enableClusterMonitoring', 'conditions.@each.status', function() {
     if ( !get(this, 'enableClusterMonitoring') ) {
@@ -50,6 +52,29 @@ export default Resource.extend(Grafana, ResourceUsage, {
       set(this, 'isMonitoringReady', status);
     }
   })),
+
+  clusterTemplateDisplayName: computed('clusterTemplate.name', 'clusterTemplateId', function() {
+    const displayName = get(this, 'clusterTemplate.displayName');
+    const clusterTemplateId = (get(this, 'clusterTemplateId') || '').replace(CLUSTER_TEMPLATE_ID_PREFIX, '');
+
+    return displayName || clusterTemplateId;
+  }),
+
+  clusterTemplateRevisionDisplayName: computed('clusterTemplateRevision.name', 'clusterTemplateRevisionId', function() {
+    const displayName = get(this, 'clusterTemplateRevision.displayName');
+    const revisionId = (get(this, 'clusterTemplateRevisionId') || '').replace(CLUSTER_TEMPLATE_ID_PREFIX, '')
+
+    return displayName || revisionId;
+  }),
+
+  isClusterTemplateUpgradeAvailable: computed('clusterTemplate.latestRevision', 'clusterTemplate.latestRevision.id', 'clusterTemplateRevision.id', function() {
+    const latestClusterTemplateRevisionId = get(this, 'clusterTemplate.latestRevision.id');
+    const currentClusterTemplateRevisionId = get(this, 'clusterTemplateRevision.id');
+
+    return latestClusterTemplateRevisionId
+      && currentClusterTemplateRevisionId
+      && currentClusterTemplateRevisionId !== latestClusterTemplateRevisionId;
+  }),
 
   getAltActionDelete: computed('action.remove', function() { // eslint-disable-line
     return get(this, 'canBulkRemove') ? 'delete' : null;
@@ -70,6 +95,25 @@ export default Resource.extend(Grafana, ResourceUsage, {
 
   canBulkRemove: computed('action.remove', function() { // eslint-disable-line
     return get(this, 'hasSessionToken') ? false : true;
+  }),
+
+  canSaveAsTemplate: computed('actionLinks.saveAsTemplate', 'isReady', 'clusterTemplateRevisionId', 'clusterTemplateId', function() {
+    let {
+      actionLinks,
+      isReady,
+      clusterTemplateRevisionId,
+      clusterTemplateId,
+    } = this;
+
+    if (!isReady) {
+      return false;
+    }
+
+    if (clusterTemplateRevisionId || clusterTemplateId) {
+      return false;
+    }
+
+    return !!actionLinks.saveAsTemplate;
   }),
 
   configName: computed(function() {
@@ -93,9 +137,9 @@ export default Resource.extend(Grafana, ResourceUsage, {
     return get(this, 'configName') === 'rancherKubernetesEngineConfig';
   }),
 
-  provider: computed('configName', 'nodePools.@each.nodeTemplateId', 'driver', function() {
+  provider: computed('configName', 'nodePools.@each.{driver,nodeTemplateId}', 'driver', function() {
     const pools = get(this, 'nodePools') || [];
-    const firstTemplate = get(pools, 'firstObject.nodeTemplate');
+    const firstPool = pools.objectAt(0);
 
     switch ( get(this, 'configName') ) {
     case 'amazonElasticContainerServiceConfig':
@@ -106,20 +150,15 @@ export default Resource.extend(Grafana, ResourceUsage, {
       return 'googlegke';
     case 'tencentEngineConfig':
       return 'tencenttke';
-    case 'aliyunEngineConfig':
-      return 'aliyunkcs';
     case 'huaweiEngineConfig':
       return 'huaweicce';
     case 'rancherKubernetesEngineConfig':
-      if ( pools.length > 0 ) {
-        if ( firstTemplate ) {
-          return get(firstTemplate, 'driver');
-        } else {
-          return null;
-        }
-      } else {
+      if ( !pools.length ) {
         return 'custom';
       }
+
+
+      return firstPool.driver || get(firstPool, 'nodeTemplate.driver') || null;
     default:
       if (get(this, 'driver') && get(this, 'configName')) {
         return get(this, 'driver');
@@ -143,8 +182,6 @@ export default Resource.extend(Grafana, ResourceUsage, {
       return intl.t('clusterNew.googlegke.shortLabel');
     case 'tencentEngineConfig':
       return intl.t('clusterNew.tencenttke.shortLabel');
-    case 'aliyunEngineConfig':
-      return intl.t('clusterNew.aliyunkcs.shortLabel');
     case 'huaweiEngineConfig':
       return intl.t('clusterNew.huaweicce.shortLabel');
     case 'rancherKubernetesEngineConfig':
@@ -183,7 +220,7 @@ export default Resource.extend(Grafana, ResourceUsage, {
   }),
 
   defaultProject: computed('projects.@each.{name,clusterOwner}', function() {
-    let projects = get(this, 'projects');
+    let projects = get(this, 'projects') || [];
 
     let out = projects.findBy('isDefault');
 
@@ -201,7 +238,39 @@ export default Resource.extend(Grafana, ResourceUsage, {
     return out;
   }),
 
-  availableActions: computed('actionLinks.{rotateCertificates}', function() {
+  certsExpiring: computed('certificatesExpiration', function() {
+    let { certificatesExpiration = {}, expiringCerts } = this;
+
+    if (!expiringCerts) {
+      expiringCerts = [];
+    }
+
+    if (!isEmpty(certificatesExpiration)) {
+      let expKeys = Object.keys(certificatesExpiration);
+
+      expKeys.forEach((kee) => {
+        let certDate  = get(certificatesExpiration[kee], 'expirationDate');
+        const expirey = moment(certDate);
+        let diff      = expirey.diff(moment());
+
+        if (diff < 2592000000) { // milliseconds in a month
+          expiringCerts.pushObject({
+            expiringCertName: kee,
+            milliUntil:       diff,
+            exactDateTime:    certDate
+          });
+        }
+      });
+
+      set(this, 'expiringCerts', expiringCerts);
+
+      return expiringCerts.length > 0;
+    }
+
+    return false;
+  }),
+
+  availableActions: computed('actionLinks.{rotateCertificates}', 'canSaveAsTemplate', function() {
     const a = get(this, 'actionLinks') || {};
 
     return [
@@ -223,6 +292,12 @@ export default Resource.extend(Grafana, ResourceUsage, {
         action:    'restoreFromEtcdBackup',
         enabled:   !!a.restoreFromEtcdBackup,
       },
+      {
+        label:     'action.saveAsTemplate',
+        icon:      'icon icon-file',
+        action:    'saveAsTemplate',
+        enabled:   this.canSaveAsTemplate,
+      },
     ];
   }),
 
@@ -232,29 +307,83 @@ export default Resource.extend(Grafana, ResourceUsage, {
     return backend === 'vxlan';
   }),
 
-  isWindows:  computed('rancherKubernetesEngineConfig', 'rancherKubernetesEngineConfig.network.plugin', 'rancherKubernetesEngineConfig.network.options.flannel_backend_type', function() {
-    const config = get(this, 'rancherKubernetesEngineConfig');
+  isWindows:  computed('windowsPreferedCluster', function() {
+    return !!get(this, 'windowsPreferedCluster');
+  }),
 
-    if ( !config ) {
-      return false;
-    }
+  isGlobalMonitoringCluster: computed('settings.globalMonitoringClusterId', function() {
+    return this.settings.globalMonitoringClusterId === this.id;
+  }),
 
-    const plugin = get(config, 'network.plugin');
-    const flannelBackend = get(config, 'network.options.flannel_backend_type');
-    const port = get(config, 'network.options.flannel_backend_port');
-    const vni = get(config, 'network.options.flannel_backend_vni');
+  unhealthyComponents: computed('componentStatuses.@each.conditions', function() {
+    return (get(this, 'componentStatuses') || [])
+      .filter((s) => !(s.conditions || []).any((c) => c.status === 'True'));
+  }),
 
-    if ( plugin === FLANNEL ) {
-      if ( flannelBackend === HOST_GW ) {
-        return true;
+  inactiveNodes: computed('nodes.@each.state', function() {
+    return (get(this, 'nodes') || []).filter( (n) => C.ACTIVEISH_STATES.indexOf(get(n, 'state')) === -1 );
+  }),
+
+  unhealthyNodes: computed('nodes.@each.conditions', function() {
+    const out = [];
+
+    (get(this, 'nodes') || []).forEach((n) => {
+      const conditions = get(n, 'conditions') || [];
+      const outOfDisk = conditions.find((c) => c.type === 'OutOfDisk');
+      const diskPressure = conditions.find((c) => c.type === 'DiskPressure');
+      const memoryPressure = conditions.find((c) => c.type === 'MemoryPressure');
+
+      if ( outOfDisk && get(outOfDisk, 'status') === TRUE ) {
+        out.push({
+          displayName: get(n, 'displayName'),
+          error:       'outOfDisk'
+        });
       }
 
-      if ( flannelBackend === VXLAN && port === BACKEND_PORT && vni === BACKEND_VNI ) {
-        return true;
+      if ( diskPressure && get(diskPressure, 'status') === TRUE ) {
+        out.push({
+          displayName: get(n, 'displayName'),
+          error:       'diskPressure'
+        });
       }
-    }
 
-    return false;
+      if ( memoryPressure && get(memoryPressure, 'status') === TRUE ) {
+        out.push({
+          displayName: get(n, 'displayName'),
+          error:       'memoryPressure'
+        });
+      }
+    });
+
+    return out;
+  }),
+
+  displayWarnings: computed('unhealthyNodes.[]', 'provider', 'inactiveNodes.[]', 'unhealthyComponents.[]', function() {
+    const intl = get(this, 'intl');
+    const out = [];
+    const unhealthyComponents = get(this, 'unhealthyComponents') || [];
+    const inactiveNodes = get(this, 'inactiveNodes') || [];
+    const unhealthyNodes = get(this, 'unhealthyNodes') || [];
+    const provider = get(this, 'provider');
+
+    const grayOut = C.GRAY_OUT_SCHEDULER_STATUS_PROVIDERS.indexOf(provider) > -1;
+
+    unhealthyComponents.forEach((component) => {
+      if ( grayOut && (get(component, 'name') === 'scheduler' || get(component, 'name') === 'controller-manager') ) {
+        return;
+      }
+      out.pushObject(intl.t('clusterDashboard.alert.component', { component: get(component, 'name') }));
+    });
+
+    inactiveNodes.forEach((node) => {
+      out.pushObject(intl.t('clusterDashboard.alert.node', { node: get(node, 'displayName') }))
+    });
+
+    unhealthyNodes.forEach((node) => {
+      out.pushObject(intl.t(`clusterDashboard.alert.nodeCondition.${ get(node, 'error') }`, { node: get(node, 'displayName') }))
+    });
+
+    return out;
   }),
 
   actions: {
@@ -262,7 +391,13 @@ export default Resource.extend(Grafana, ResourceUsage, {
       const getBackupType = () => {
         let services = get(this, 'rancherKubernetesEngineConfig.services.etcd');
 
-        if (get(services, 'backupConfig')) {
+        if (get(services, 'cachedConfig')) {
+          if (isEmpty(services.cachedConfig.s3BackupConfig)) {
+            return 'local';
+          } else if (!isEmpty(services.cachedConfig.s3BackupConfig)) {
+            return 's3';
+          }
+        } else if (get(services, 'backupConfig')){
           if (isEmpty(services.backupConfig.s3BackupConfig)) {
             return 'local';
           } else if (!isEmpty(services.backupConfig.s3BackupConfig)) {
@@ -272,7 +407,7 @@ export default Resource.extend(Grafana, ResourceUsage, {
       }
 
       const backupType     = getBackupType();
-      const successTitle   = this.intl.t('action.backupEtcdMessage.success.title');
+      const successTitle   = this.intl.t('action.backupEtcdMessage.success.start');
       const successMessage = this.intl.t('action.backupEtcdMessage.success.message', {
         clusterId: this.displayName || this.id,
         backupType
@@ -303,8 +438,13 @@ export default Resource.extend(Grafana, ResourceUsage, {
 
     edit() {
       let provider = get(this, 'provider') || get(this, 'driver');
+      let queryParams = { queryParams: { provider } };
 
-      get(this, 'router').transitionTo('authenticated.cluster.edit', get(this, 'id'), { queryParams: { provider } });
+      if (this.clusterTemplateRevisionId) {
+        set(queryParams, 'queryParams.clusterTemplateRevision', this.clusterTemplateRevisionId);
+      }
+
+      this.router.transitionTo('authenticated.cluster.edit', get(this, 'id'), queryParams);
     },
 
     scaleDownPool(id) {
@@ -323,6 +463,10 @@ export default Resource.extend(Grafana, ResourceUsage, {
       }
     },
 
+    saveAsTemplate() {
+      this.modalService.toggleModal('modal-save-rke-template', { cluster: this });
+    },
+
     rotateCertificates() {
       const model = this;
 
@@ -332,6 +476,32 @@ export default Resource.extend(Grafana, ResourceUsage, {
       });
     },
 
+  },
+
+  clearConfigFieldsForClusterTemplate() {
+    let clearedNull   = ['localClusterAuthEndpoint', 'rancherKubernetesEngineConfig', 'enableNetworkPolicy'];
+    let clearedDelete = ['defaultClusterRoleForProjectMembers', 'defaultPodSecurityPolicyTemplateId'];
+    let {
+      localClusterAuthEndpoint,
+      rancherKubernetesEngineConfig,
+      enableNetworkPolicy,
+      defaultClusterRoleForProjectMembers,
+      defaultPodSecurityPolicyTemplateId,
+    } = this;
+
+    let cachedConfig = {
+      localClusterAuthEndpoint,
+      rancherKubernetesEngineConfig,
+      enableNetworkPolicy,
+      defaultClusterRoleForProjectMembers,
+      defaultPodSecurityPolicyTemplateId,
+    };
+
+    // set this incase we fail to save the cluster;
+    set(this, '_cachedConfig', cachedConfig);
+
+    clearedDelete.forEach((c) => delete this[c]);
+    clearedNull.forEach((c) => set(this, c, null));
   },
 
   clearProvidersExcept(keep) {
@@ -351,6 +521,15 @@ export default Resource.extend(Grafana, ResourceUsage, {
     return promise.then((/* resp */) => {
       if (get(this, 'scope.currentCluster.id') === get(this, 'id')) {
         get(this, 'router').transitionTo('global-admin.clusters');
+      }
+
+      if ( this.isGlobalMonitoringCluster) {
+        const enabled = this.globalStore.all('setting').findBy('id', C.SETTING.GLOBAL_MONITORING_ENABLED)
+
+        if ( enabled ) {
+          set(enabled, 'value', 'false')
+          enabled.save();
+        }
       }
     });
   },
@@ -374,4 +553,21 @@ export default Resource.extend(Grafana, ResourceUsage, {
       }
     });
   },
+
+  waitForClusterTemplateToBeAttached() {
+    return this._waitForTestFn(() => {
+      return this.hasClusterTemplate();
+    }, `Wait for Cluster Template to be attached`);
+  },
+
+  hasClusterTemplate() {
+    const { clusterTemplateId, clusterTemplateRevisionId } = this;
+
+    if (isEmpty(clusterTemplateId) && isEmpty(clusterTemplateRevisionId)) {
+      return false;
+    }
+
+    return true;
+  },
+
 });

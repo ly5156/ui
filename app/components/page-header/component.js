@@ -25,6 +25,7 @@ export default Component.extend({
   settings:         service(),
   access:           service(),
   prefs:            service(),
+  router:           service(),
 
   layout,
   // Inputs
@@ -92,12 +93,12 @@ export default Component.extend({
     });
   },
 
-  willRender() {
-    if ($('BODY').hasClass('touch') && $('header > nav').hasClass('nav-open')) {// eslint-disable-line
-      run.later(() => {
+  didInsertElement() {
+    run.scheduleOnce('afterRender', this, function() {
+      this.get('router').on('willTransition', () => {
         $('header > nav').removeClass('nav-open');// eslint-disable-line
       });
-    }
+    });
   },
 
   shouldUpdateNavTree: observer(
@@ -141,6 +142,8 @@ export default Component.extend({
       const itemRoute = fnOrValue(get(item, 'route'), this);
       const itemContext = (get(item, 'ctx') || []).map( (prop) =>  fnOrValue(prop, this));
 
+      set(this, 'currentItemContext', itemContext)
+
       setProperties(item, {
         localizedLabel: fnOrValue(get(item, 'localizedLabel'), this),
         label:          fnOrValue(get(item, 'label'), this),
@@ -170,7 +173,48 @@ export default Component.extend({
       return true;
     });
 
-    set(this, 'navTree', out);
+    const extraMenus = get(this, 'settings.extra-menus') || '';
+
+    extraMenus.split(';').forEach((menu) => {
+      const [menuScope, menuLabel, menuUrl = '', strIframeEnabled] = menu.split(',');
+      const iframeEnabled = strIframeEnabled === 'true' ? true : false
+
+      if ( menuScope === currentScope ) {
+        let url = `https://${  menuUrl }`
+        let customRoute
+        let ctx
+
+        const isRancherUrl = url.startsWith(window.location.origin)
+
+        if (isRancherUrl) {
+          url = url.replace(window.location.origin, '')
+        } else {
+          if (menuScope === 'global') {
+            customRoute = `global-admin.iframe.detail`
+            ctx = [encodeURIComponent(url)]
+          } else {
+            customRoute = `authenticated.${ menuScope }.iframe.detail`
+            ctx = [...get(this, 'currentItemContext'), encodeURIComponent(url)]
+          }
+        }
+
+        out.push({
+          url:         iframeEnabled ? url : menuUrl,
+          label:       menuLabel,
+          scope:       menuScope,
+          customRoute,
+          ctx,
+          iframeEnabled,
+        })
+      }
+    })
+
+    const old = JSON.stringify(get(this, 'navTree'));
+    const neu = JSON.stringify(out);
+
+    if ( old !== neu ) {
+      set(this, 'navTree', out);
+    }
   },
 
   keyUp(e) {

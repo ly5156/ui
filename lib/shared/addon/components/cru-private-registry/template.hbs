@@ -2,27 +2,50 @@
   <div class="col span-6">
     <label class="acc-label">
       {{t "cruPrivateRegistry.title.label"}}
+      {{#if clusterTemplateCreate}}
+        <ClusterTemplateOverrideToggle
+          @path="uiOverridePrivateRegistry"
+          @configVariable={{enablePrivateRegistry}}
+          @addOverride={{addOverride}}
+          @questions={{clusterTemplateRevision.questions}}
+        />
+      {{/if}}
     </label>
-    <div class="radio">
-      <label>
-        {{radio-button
-          selection=enablePrivateRegistry
-          value=false
-          disabled=(if multipleRegistries true false)
-        }}
-        {{t "generic.disabled"}}
-      </label>
-    </div>
-    <div class="radio">
-      <label>
-        {{radio-button
-          selection=enablePrivateRegistry
-          value=true
-          disabled=(if multipleRegistries true false)
-        }}
-        {{t "generic.enabled"}}
-      </label>
-    </div>
+    <CheckOverrideAllowed
+      @applyClusterTemplate={{applyClusterTemplate}}
+      @clusterTemplateRevision={{clusterTemplateRevision.clusterConfig}}
+      @enablePrivateRegistry={{mut enablePrivateRegistry}}
+      @multipleRegistries={{multipleRegistries}}
+      @paramName="uiOverridePrivateRegistry"
+      @questions={{clusterTemplateRevision.questions}}
+      @value={{enablePrivateRegistry}}
+    >
+      {{#input-or-display
+         editable=(not-eq mode "view")
+         value=(if enablePrivateRegistry (t "generic.enabled") (t "generic.disabled"))
+      }}
+        <div class="radio">
+          <label>
+            {{radio-button
+              selection=enablePrivateRegistry
+              value=false
+              disabled=(if multipleRegistries true false)
+            }}
+            {{t "generic.disabled"}}
+          </label>
+        </div>
+        <div class="radio">
+          <label>
+            {{radio-button
+              selection=enablePrivateRegistry
+              value=true
+              disabled=(if multipleRegistries true false)
+            }}
+            {{t "generic.enabled"}}
+          </label>
+        </div>
+      {{/input-or-display}}
+    </CheckOverrideAllowed>
   </div>
 </div>
 
@@ -31,54 +54,102 @@
     <div class="col {{if multipleRegistries "span-3" "span-4"}}">
       <label class="acc-label" for="cru-private-registry-url">
         {{t "cruPrivateRegistry.registry.url.label"}}
+        {{#if clusterTemplateCreate}}
+          <ClusterTemplateOverrideToggle
+            @path="rancherKubernetesEngineConfig.privateRegistries[0].url"
+            @configVariable={{privateRegistry.url}}
+            @addOverride={{addOverride}}
+            @questions={{clusterTemplateRevision.questions}}
+          />
+        {{/if}}
       </label>
-      {{#input-or-display
-         editable=editing
-         value=privateRegistry.url
-      }}
-        {{input-url
-          id="cru-private-registry-url"
-          classNames="form-control input-sm"
-          isInvalid=(action (mut urlInvalid))
-          urlWarning=(action (mut urlWarning))
-          urlError=(action (mut urlError))
-          value=privateRegistry.url
-          stripScheme=false
+      <CheckOverrideAllowed
+        @questions={{clusterTemplateRevision.questions}}
+        @paramName="rancherKubernetesEngineConfig.privateRegistries[0].url"
+        @value={{privateRegistry.url}}
+        @clusterTemplateRevision={{clusterTemplateRevision.clusterConfig}}
+        @applyClusterTemplate={{applyClusterTemplate}}
+      >
+        {{#input-or-display
+           editable=(not-eq mode "view")
+           value=privateRegistry.url
         }}
-      {{/input-or-display}}
+          {{input-url
+            id="cru-private-registry-url"
+            classNames="form-control input-sm"
+            isInvalid=(action (mut urlInvalid))
+            urlWarning=(action (mut urlWarning))
+            urlError=(action (mut urlError))
+            value=privateRegistry.url
+            stripScheme=true
+          }}
+        {{/input-or-display}}
+      </CheckOverrideAllowed>
     </div>
     <div class="col {{if multipleRegistries "span-3" "span-4"}}">
       <label class="acc-label" for="cru-private-registry-username">
         {{t "cruPrivateRegistry.registry.user.label"}}
+        {{#if clusterTemplateCreate}}
+          <ClusterTemplateOverrideToggle
+            @path="rancherKubernetesEngineConfig.privateRegistries[0].user"
+            @configVariable={{privateRegistry.user}}
+            @addOverride={{addOverride}}
+            @questions={{clusterTemplateRevision.questions}}
+          />
+        {{/if}}
       </label>
-      {{#input-or-display
-         editable=editing
-         value=privateRegistry.user
-      }}
-        {{input
-          id="cru-private-registry-username"
-          class="input-sm"
-          type="text"
-          value=privateRegistry.user
+      <CheckOverrideAllowed
+        @questions={{clusterTemplateRevision.questions}}
+        @paramName="rancherKubernetesEngineConfig.privateRegistries[0].user"
+        @value={{privateRegistry.user}}
+        @clusterTemplateRevision={{clusterTemplateRevision.clusterConfig}}
+        @applyClusterTemplate={{applyClusterTemplate}}
+      >
+        {{#input-or-display
+           editable=(not-eq mode "view")
+           value=privateRegistry.user
         }}
-      {{/input-or-display}}
+          {{input
+            id="cru-private-registry-username"
+            class="input-sm"
+            type="text"
+            value=privateRegistry.user
+          }}
+        {{/input-or-display}}
+      </CheckOverrideAllowed>
     </div>
     <div class="col {{if multipleRegistries "span-3" "span-4"}}">
       <label class="acc-label" for="cru-private-registry-password">
         {{t "cruPrivateRegistry.registry.password.label"}}
+        {{#if clusterTemplateCreate}}
+          <ClusterTemplateOverrideToggle
+            @path="rancherKubernetesEngineConfig.privateRegistries[0].password"
+            @configVariable={{privateRegistry.password}}
+            @addOverride={{addOverride}}
+            @questions={{clusterTemplateRevision.questions}}
+          />
+        {{/if}}
       </label>
-      {{#input-or-display
-         id="cru-private-registry-password"
-         editable=editing
-         obfuscate=true
-         value=privateRegistry.password
-      }}
-        {{input
-          class="conceal input-sm"
-          type="password"
-          value=privateRegistry.password
+      <CheckOverrideAllowed
+        @questions={{clusterTemplateRevision.questions}}
+        @paramName="rancherKubernetesEngineConfig.privateRegistries[0].password"
+        @value={{privateRegistry.password}}
+        @clusterTemplateRevision={{clusterTemplateRevision.clusterConfig}}
+        @applyClusterTemplate={{applyClusterTemplate}}
+      >
+        {{#input-or-display
+           id="cru-private-registry-password"
+           editable=(not-eq mode "view")
+           obfuscate=true
+           value=privateRegistry.password
         }}
-      {{/input-or-display}}
+          {{input
+            class="conceal input-sm"
+            type="password"
+            value=privateRegistry.password
+          }}
+        {{/input-or-display}}
+      </CheckOverrideAllowed>
     </div>
     {{#if multipleRegistries}}
       <div class="col span-2">
@@ -86,11 +157,16 @@
           {{t "cruPrivateRegistry.registry.default.label"}}
         </label>
         <div class="text-center m-5">
-          {{input
-            type="checkbox"
-            checked=privateRegistry.isDefault
-            disabled=(and (not privateRegistry.isDefault) hasDefault)
+          {{#input-or-display
+             editable=(not-eq mode "view")
+             value=privateRegistry.isDefault
           }}
+            {{input
+              type="checkbox"
+              checked=privateRegistry.isDefault
+              disabled=(and (not privateRegistry.isDefault) hasDefault)
+            }}
+          {{/input-or-display}}
         </div>
       </div>
       <div class="col span-1">
@@ -113,7 +189,7 @@
             {{t "cruPrivateRegistry.registry.url.label"}}
           </label>
           {{#input-or-display
-             editable=editing
+             editable=(not-eq mode "view")
              value=reg.url
           }}
             {{input-url
@@ -131,7 +207,7 @@
             {{t "cruPrivateRegistry.registry.user.label"}}
           </label>
           {{#input-or-display
-             editable=editing
+             editable=(not-eq mode "view")
              value=reg.user
           }}
             {{input
@@ -146,7 +222,7 @@
             {{t "cruPrivateRegistry.registry.password.label"}}
           </label>
           {{#input-or-display
-             editable=editing
+             editable=(not-eq mode "view")
              obfuscate=true
              value=reg.password
           }}

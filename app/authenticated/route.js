@@ -23,6 +23,7 @@ export default Route.extend(Preload, {
   intl:         service(),
   growl:        service(),
   userTheme:    service('user-theme'),
+  menuPosition: service('menu-position'),
 
   testTimer:    null,
 
@@ -116,6 +117,7 @@ export default Route.extend(Preload, {
             this.preload('authConfig', 'globalStore', { url: 'authConfigs' }),
             this.preload('globalRoleBinding', 'globalStore', { url: 'globalRoleBinding' }),
             this.preload('user', 'globalStore', { url: 'user' }),
+            this.preload('features', 'globalStore', { url: 'features' }),
 
             globalStore.findAll('principal').then((principals) => {
               const me = principals.filter((p) => p.me === true);
@@ -346,6 +348,7 @@ export default Route.extend(Preload, {
       .then((res) => {
         get(this, 'language').initLanguage(true);
         get(this, 'userTheme').setupTheme();
+        get(this, 'menuPosition').setupMenuPostion();
 
         if (get(this, `prefs.${ C.PREFS.I_HATE_SPINNERS }`)) {
           $('BODY').addClass('i-hate-spinners');

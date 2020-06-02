@@ -97,4 +97,75 @@
         addActionLabel="formNetwork.dnsConfig.options.addActionLabel"
     }}
   </div>
+  <div class="row box mt-20">
+    <div class="col span-4">
+      <label class="acc-label">{{t 'nav.cluster.vlansubnet'}}</label>
+        {{#input-or-display editable=editing value=enableStaticPodLabel}}
+          <div class="radio">
+            <label>{{radio-button selection=staticPod value=false}} {{t 'generic.disable'}}</label>
+          </div>
+          <div class="radio">
+            <label style={{vlansubnetdisabledStyle}}>{{radio-button selection=staticPod disabled=unsupportVlansubnet value=true}} {{t 'generic.enable'}}</label>
+          </div>
+        {{/input-or-display}}
+    </div>
+    <div class="col span-8">
+      {{#if enableStaticPod}}
+        <div class="row">
+          <div class="col span-6">
+            <label class="acc-label">Interface</label>
+            <div>{{netInterface}}</div>
+          </div>
+          <div class="col span-6">
+            <label class="acc-label">{{t "formNetwork.subnet.form.ip.label"}}</label>
+            {{#input-or-display editable=editing value=staticPodAnnotation.ip classesForDisplay="force-wrap"}}
+            {{input
+                class="form-control"
+                maxlength=250
+                value=staticPodForm.ip
+                placeholder=(t "formNetwork.subnet.form.ip.placeholder")
+                change=(action 'updateStaticPod')
+            }}
+            {{/input-or-display}}
+          </div>
+        </div>
+        <div class="row">
+         <div class="col span-6">
+            <label class="acc-label">{{t "formNetwork.subnet.form.mac.label"}}</label>
+            {{#input-or-display editable=editing value=staticPodAnnotation.mac classesForDisplay="force-wrap"}}
+            {{input
+                class="form-control"
+                maxlength=250
+                value=staticPodForm.mac
+                placeholder=(t "formNetwork.subnet.form.mac.placeholder")
+                change=(action 'updateStaticPod')
+            }}
+            {{/input-or-display}}
+          </div>
+          <div class="col span-6">
+            <label class="acc-label">Subnet{{field-required}}</label>
+            {{#input-or-display editable=editing value=staticPodAnnotation.subnet}}
+            {{!-- {{input
+                class="form-control"
+                value=staticPodForm.vlan
+                change=(action 'updateStaticPod')
+            }} --}}
+            {{new-select
+                classNames="form-control"
+                content=vlansubnets
+                value=staticPodForm.subnet
+                prompt=(t "formNetwork.subnet.form.subnet.placeholder")
+                change=(action 'updateStaticPod')
+              }}
+            {{/input-or-display}}
+          </div>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+  {{#if (and enableStaticPod isStopFirstChange)}}
+    {{#banner-message color='bg-success mb-0 mt-10'}}
+      {{t "formNetwork.subnet.msg"}}
+    {{/banner-message}}
+  {{/if}}
 {{/accordion-list-item}}

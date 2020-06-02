@@ -1,0 +1,68 @@
+{{#if isPublic}}
+  <tr class="main-row">
+    <td class="pr-10 pl-10">
+      {{t "shareMemberRow.table.public.name"}}
+    </td>
+    <td class="pr-10 pl-10">
+      {{t "shareMemberRow.table.public.accessType"}}
+    </td>
+    <td class="pt-10">
+      <div class="input-group-btn">
+        <button class="btn bg-primary btn-sm" {{action "remove"}}>
+          <i class="icon icon-minus" />
+        </button>
+      </div>
+    </td>
+  </tr>
+{{else}}
+  <tr class="main-row">
+    <td class="pr-10 pt-10">
+      {{#if noUpdate}}
+        {{#if principal}}
+          {{identity-block principal=principal}}
+        {{else if principalId}}
+          <div class="gh-block">
+            <div class="gh-avatar">
+              <img
+                src="{{principalGravatarSrc}}"
+                width="34"
+                height="34"
+              >
+            </div>
+            <div class="gh-block-content">
+              <div class="clip gh-block-name">
+                {{principalId}}
+              </div>
+            </div>
+          </div>
+        {{else}}
+          {{t "generic.unknown"}}&nbsp;{{t "generic.user"}}
+        {{/if}}
+      {{else}}
+        {{input-identity
+          allowTeams=true
+          action=(action "addAuthorized")
+          onError=(action "gotError")
+        }}
+      {{/if}}
+    </td>
+    <td class="pr-10 pt-10">
+      {{#if editing}}
+        {{searchable-select
+          content=choices
+          localizedLabel=true
+          value=member.accessType
+        }}
+      {{else}}
+        {{member.accessType}}
+      {{/if}}
+    </td>
+    <td class="pt-10">
+      {{#if editing}}
+        <button class="btn bg-primary btn-sm" {{action "remove"}}>
+          <i class="icon icon-minus" />
+        </button>
+      {{/if}}
+    </td>
+  </tr>
+{{/if}}

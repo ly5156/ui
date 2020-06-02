@@ -8,14 +8,13 @@
       {{/if}}
     </h2>
   {{/unless}}
-  <hr/>
+  <hr />
 
-  {{form-name-description
-    model=primaryResource
-    nameDisabled=originalModel
-    namePlaceholder="modalAddCloudKey.name.placeholder"
-    descriptionPlaceholder="modalAddCloudKey.description.placeholder"
-  }}
+  <FormNameDescription
+    @model={{primaryResource}}
+    @namePlaceholder="modalAddCloudKey.name.placeholder"
+    @descriptionPlaceholder="modalAddCloudKey.description.placeholder"
+  />
 
   <div class="row">
     <div class="col span-6">
@@ -28,20 +27,14 @@
           {{singleCloudKeyChoice}}
         </div>
       {{else}}
-        <select
-          class="form-control"
-          onchange={{action "selectConfig" value="target.value"}}
-        >
+        <select class="form-control" onchange={{action "selectConfig" value="target.value"}}>
           {{#if (not-eq cloudCredentialType value)}}
-            <option value="" selected=true >
+            <option value="" selected=true>
               {{t "modalAddCloudKey.typeSelect.prompt"}}
             </option>
           {{/if}}
           {{#each configChoices as |choice|}}
-            <option
-              value="{{choice.name}}"
-              selected={{eq choice.name cloudCredentialType}}
-            >
+            <option value="{{choice.name}}" selected={{eq choice.name cloudCredentialType}}>
               {{choice.displayName}}
             </option>
           {{/each}}
@@ -138,7 +131,7 @@
       <div class="row">
         <div class="col span-6">
           <label class="acc-label" for="digitalocean-accessToken">
-            {{t "modalAddCloudKey.digitalocean.accessToken.label"}}
+            {{t "modalAddCloudKey.digitalocean.accessToken.label"}}{{field-required}}
           </label>
           {{input
             type="password"
@@ -152,15 +145,33 @@
           </p>
         </div>
       </div>
+    {{else if (eq cloudCredentialType "linode")}}
+      <div class="row">
+        <div class="col span-6">
+          <label class="acc-label" for="linode-token">
+            {{t "modalAddCloudKey.linode.token.label"}}{{field-required}}
+          </label>
+          {{input
+            type="password"
+            value=config.token
+            classNames="form-control"
+            placeholder=(t "modalAddCloudKey.linode.token.placeholder")
+            id="linode-token"
+          }}
+          <p class="text-info">
+            {{t "modalAddCloudKey.linode.token.help" htmlSafe=true}}
+          </p>
+        </div>
+      </div>
     {{else if (eq cloudCredentialType "vmware")}}
       <div class="row">
         <div class="col span-6">
           <label class="acc-label">
             {{t "nodeDriver.vmwarevsphere.vcenter.label"}}{{field-required}}
           </label>
-          {{input
-            type="text"
-            class="form-control"
+          {{input-url
+            classNames="form-control"
+            id="server-url"
             value=config.vcenter
             placeholder=(t "nodeDriver.vmwarevsphere.vcenter.placeholder")
           }}
@@ -206,6 +217,7 @@
   </div>
 
 
+  {{top-errors errors=errors}}
   <div class="footer-actions">
     {{save-cancel
       cancel=cancelAdd

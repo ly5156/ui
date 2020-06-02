@@ -1,4 +1,5 @@
 import Resource from '@rancher/ember-api-store/models/resource';
+import { reference } from '@rancher/ember-api-store/utils/denormalize';
 import { get, set, computed, defineProperty } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { ucFirst } from 'shared/utils/util';
@@ -8,9 +9,11 @@ import { isArray } from '@ember/array';
 export default Resource.extend({
   intl:         service(),
   modalService: service('modal'),
+  globalStore:  service(),
 
   type:         'nodeTemplate',
   canClone:     true,
+  creator:      reference('creatorId', 'user', 'globalStore'),
 
   init() {
     this._super(...arguments);
@@ -40,6 +43,14 @@ export default Resource.extend({
       return ucFirst(driver);
     }
   }),
+
+  cloneForNew() {
+    const copy = this._super();
+
+    delete copy.annotations;
+
+    return copy;
+  },
 
   actions: {
     edit() {
@@ -99,7 +110,7 @@ export default Resource.extend({
 
       this.registerDynamicComputedProperty('displayLocation', computedKeys, location.getDisplayProperty);
     } else {
-      set(this, 'displayLocation', 'N/A');
+      set(this, 'displayLocation', get(this, 'config.region') || 'N/A');
     }
   },
 
@@ -112,7 +123,7 @@ export default Resource.extend({
 
       this.registerDynamicComputedProperty('displaySize', computedKeys, size.getDisplayProperty);
     } else {
-      set(this, 'displaySize', 'N/A');
+      set(this, 'displaySize', get(this, 'config.size') || 'N/A');
     }
   },
 

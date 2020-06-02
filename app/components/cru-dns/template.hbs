@@ -20,7 +20,7 @@
         editing=editing
       }}
     </div>
-    <div class="col span-6">
+    <div class="col span-6 pt-5">
       {{form-namespace
         editable=isNew
         namespace=namespace
@@ -101,6 +101,7 @@
             optionValuePath="id"
             optionLabelPath="nameWithType"
             prompt="editDns.prompt.alias"
+            optionGroupPath="namespaceId"
             localizedPrompt=true
             content=dnsRecords
             value=row.value
@@ -118,7 +119,7 @@
            as |c row|
         }}
           {{new-select
-            classNames="form-control"
+            classNames="form-control-static"
             optionValuePath="id"
             optionLabelPath="displayName"
             prompt="editDns.prompt.workload"

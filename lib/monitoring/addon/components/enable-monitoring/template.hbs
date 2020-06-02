@@ -3,20 +3,8 @@
     <h1 class="pull-left">
       {{t (concat "monitoringPage." level ".title")}}
     </h1>
-    {{#if (and enabled canDisableMonitor)}}
-      <div class="pull-right">
-        {{#if confirmDisable}}
-          <button class="btn bg-error" {{action "disable"}}>
-            <i class="icon icon-alert"></i> {{t "monitoringPage.confirmDisable"}}
-          </button>
-        {{else}}
-          <button class="btn bg-error" {{action "promptDisable"}}>
-            <i class="icon icon-umbrella"></i> {{t "monitoringPage.disable"}}
-          </button>
-        {{/if}}
-      </div>
-    {{/if}}
   </section>
+
   {{#if settings.isRancher}}
     <p>
       {{t "monitoringPage.resourceLimitsHelp" htmlSafe=true}}
@@ -80,11 +68,15 @@
           </div>
         </div>
         {{#if (eq level "cluster")}}
-          <div class="col span-6">
+          <div class="col span-3">
             <label class="acc-label">
               {{t "monitoringPage.config.nodeexporter.enable"}}
             </label>
             {{schema/input-boolean value=enableNodeExporter}}
+          </div>
+          <div class="col span-3">
+            <label class="acc-label">{{t "monitoringPage.config.gpuMonitoring.enable"}}</label>
+            {{schema/input-boolean value=enableGpuMonitoring}}
           </div>
         {{/if}}
       </div>
@@ -95,12 +87,6 @@
             {{t "monitoringPage.config.prometheus.enablePersistence.label"}}
           </label>
           {{schema/input-boolean value=enablePrometheusPersistence}}
-        </div>
-        <div class="col span-6">
-          <label class="acc-label">
-            {{t "monitoringPage.config.grafana.enablePersistence.label"}}
-          </label>
-          {{schema/input-boolean value=enableGrafanaPersistence}}
         </div>
       </div>
 
@@ -120,26 +106,6 @@
               {{t "monitoringPage.config.prometheus.storageClass.label"}}
             </label>
             {{schema/input-storageclass value=prometheusStorageClass}}
-          </div>
-        </div>
-      {{/if}}
-
-      {{#if enableGrafanaPersistence}}
-        <div class="row">
-          <div class="col span-6">
-            <label class="acc-label">
-              {{t "monitoringPage.config.grafana.size.label"}}
-            </label>
-            {{schema/input-string
-              value=grafanaPersistenceSize
-              placeholder=(t "monitoringPage.config.grafana.size.placeholder")
-            }}
-          </div>
-          <div class="col span-6">
-            <label class="acc-label">
-              {{t "monitoringPage.config.grafana.storageClass.label"}}
-            </label>
-            {{schema/input-storageclass value=grafanaStorageClass}}
           </div>
         </div>
       {{/if}}
@@ -300,6 +266,43 @@
           }}
         </div>
       </div>
+      <div class="row">
+        <div class="col span-12">
+          {{scheduling-toleration
+            editing=true
+            tolerate=prometheusTolerations
+            title=(t "formScheduling.toleration.workloadTitle" workload="Prometheus")
+          }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col span-6">
+          <label class="acc-label">
+            {{t "monitoringPage.config.grafana.enablePersistence.label"}}
+          </label>
+          {{schema/input-boolean value=enableGrafanaPersistence}}
+        </div>
+      </div>
+      {{#if enableGrafanaPersistence}}
+        <div class="row">
+          <div class="col span-6">
+            <label class="acc-label">
+              {{t "monitoringPage.config.grafana.size.label"}}
+            </label>
+            {{schema/input-string
+              value=grafanaPersistenceSize
+              placeholder=(t "monitoringPage.config.grafana.size.placeholder")
+            }}
+          </div>
+          <div class="col span-6">
+            <label class="acc-label">
+              {{t "monitoringPage.config.grafana.storageClass.label"}}
+            </label>
+            {{schema/input-storageclass value=grafanaStorageClass}}
+          </div>
+        </div>
+      {{/if}}
 
       {{#advanced-section advanced=advanced}}
         {{form-key-value
@@ -346,14 +349,46 @@
   {{/if}}
 
   <div class="text-center">
-    {{save-cancel
+    {{#save-cancel
       saveDisabled=saveDisabled
       cancelDisabled=true
       editing=enabled
       createLabel="monitoringPage.enableActionLabel"
-      save="enable"
+      save=(action "enable")
     }}
+      {{#if (and enabled canDisableMonitor)}}
+        {{#if confirmDisable}}
+          <button class="btn bg-error" {{action "disable"}}>
+            <i class="icon icon-alert"></i> {{t "monitoringPage.confirmDisable"}}
+          </button>
+        {{else}}
+          {{#if (and istioEnabled (eq level "cluster"))}}
+            {{#tooltip-element
+              type="tooltip-basic"
+              model=(t "monitoringPage.errors.disableIstioFirst")
+              tooltipTemplate="tooltip-static"
+              aria-describedby="tooltip-base"
+              inlineBlock=true
+              placement="top"
+            }}
+              <button class="btn bg-error" {{action "promptDisable"}}>
+                {{t "monitoringPage.disable"}}
+              </button>
+            {{/tooltip-element}}
+          {{else}}
+            <button class="btn bg-error" {{action "promptDisable"}}>
+              {{t "monitoringPage.disable"}}
+            </button>
+          {{/if}}
+        {{/if}}
+      {{/if}}
+    {{/save-cancel}}
   </div>
+{{else if (and (eq level "project") scope.currentProject.isSystemProject)}}
+  {{banner-message
+    color="bg-info"
+    message=(t "monitoringPage.systemProject")
+  }}
 {{else}}
   {{banner-message
     color="bg-info"

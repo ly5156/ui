@@ -1,0 +1,9 @@
+<CruCluster
+  @applyClusterTemplate={{not (is-empty clusterTemplateRevision)}}
+  @model={{model}}
+  @provider={{model.provider}}
+  @mode="new"
+  @close={{action "close"}}
+  @clusterDriverError={{action "clusterDriverErrorAndTransition"}}
+  @clusterTemplateRevisionId={{mut clusterTemplateRevision}}
+/>

@@ -25,10 +25,15 @@
             onlyLocal=onlyLocal
             provider="local"
             waiting=localWaiting
+            loginCooldown=loginCooldown
           }}
         {{else}}
           {{#if isGithub}}
             {{login-github action=(action "started")}}
+          {{/if}}
+
+          {{#if isGoogle}}
+            {{login-google action=(action "started")}}
           {{/if}}
 
           {{#if isShibboleth}}
@@ -98,6 +103,10 @@
               provider="keycloak"
             }}
           {{/if}}
+
+          {{#if isCAS}}
+            {{login-cas action="started"}}
+          {{/if}}
         {{/if}}
 
         {{#unless onlyLocal}}
@@ -130,4 +139,8 @@
       {{reload-btn}}
     {{/if}}
   </section>
+</div>
+
+<div class="custom-footer">
+  <FooterSetting />
 </div>

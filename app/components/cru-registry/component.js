@@ -1,26 +1,36 @@
-import { get, set, observer } from '@ember/object';
+import { get, set, observer, computed } from '@ember/object';
 import Component from '@ember/component';
 import ViewNewEdit from 'shared/mixins/view-new-edit';
 import OptionallyNamespaced from 'shared/mixins/optionally-namespaced';
 import layout from './template';
 import  { PRESETS_BY_NAME } from  'ui/models/dockercredential';
-import { inject as service } from '@ember/service'
+import { inject as service } from '@ember/service';
+import { isEmpty } from '@ember/utils';
+import { alias } from '@ember/object/computed';
+const harborAuthKey = 'rancher.cn/registry-harbor-auth'
+const harborAdminAuthKey = 'rancher.cn/registry-harbor-admin-auth'
+
+const TEMP_NAMESPACE_ID = '__TEMP__';
 
 export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
-  globalStore: service(),
+  globalStore:  service(),
+  clusterStore: service(),
+  scopeService: service('scope'),
+  harbor:       service(),
+  access:       service(),
 
   layout,
 
-  model: null,
-
-  titleKey: 'cruRegistry.title',
-
-  scope:     'project',
-  namespace: null,
-  asArray:   null,
-
+  model:          null,
+  titleKey:       'cruRegistry.title',
+  scope:          'project',
+  namespace:      null,
+  asArray:        null,
   projectType:    'dockerCredential',
   namespacedType: 'namespacedDockerCredential',
+
+  harborUsername: alias('harborConfig.harborAccount'),
+  harborServer:   alias('harborConfig.harborServer'),
 
   init() {
     this._super(...arguments);
@@ -47,7 +57,15 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
       })
     }
 
+    const isHarborCred = get(this, 'model.labels') && get(this, 'model.labels')[harborAuthKey] === 'true';
+
+    if (isHarborCred) {
+      asArray.forEach((item) => {
+        item.preset = 'harbor';
+      });
+    }
     set(this, 'asArray', asArray);
+    this.arrayChanged();
   },
 
   arrayChanged: observer('asArray.@each.{preset,address,username,password,auth}', function() {
@@ -63,13 +81,40 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
 
       let val = {};
 
-      ['username', 'password', 'auth'].forEach((k) => {
-        let v = get(obj, k);
+      if (preset === 'harbor' && this.enabledHarborService) {
+        key = get(this, 'harborServer');
+        key = key.indexOf('://') > -1 ? key.substr(key.indexOf('://') + 3) : key;
+        const labels = get(this, 'model.labels') || {};
 
-        if ( v ) {
-          val[k] = v;
+        labels[harborAuthKey] = 'true';
+        if (get(this, 'access.me.hasAdmin')) {
+          labels[harborAdminAuthKey] = 'true';
         }
-      });
+        set(this, 'model.labels', labels);
+      } else {
+        const labels = get(this, 'model.labels');
+
+        if (labels) {
+          const keys = Object.keys(labels);
+
+          if (keys.indexOf(harborAuthKey) > -1) {
+            delete labels[harborAuthKey];
+          }
+          if (keys.indexOf(harborAdminAuthKey) > -1) {
+            delete labels[harborAdminAuthKey]
+          }
+          if (Object.keys(labels).length === 0) {
+            delete get(this, 'model').labels
+          }
+        }
+        ['username', 'password', 'auth'].forEach((k) => {
+          let v = get(obj, k);
+
+          if ( v ) {
+            val[k] = v;
+          }
+        });
+      }
 
       registries[key] = val;
     });
@@ -79,18 +124,30 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
     return this._super(...arguments);
   }),
 
+  enabledHarborService: computed('harborServer', 'access.me.hasAdmin', 'access.me.annotations', function() {
+    if (get(this, 'harborServer')) {
+      if (get(this, 'access.me.hasAdmin')) {
+        return true;
+      }
+      const a = get(this, 'access.me.annotations')
+
+      if (a && a['management.harbor.pandaria.io/synccomplete'] === 'true') {
+        return true;
+      }
+    }
+
+    return false;
+  }),
+
   hostname:  window.location.host,
 
   willSave() {
-    let pr = get(this, 'primaryResource');
+    const { primaryResource: pr } = this;
+    const nsId = this.namespace && this.namespace.id;
 
-    // Namespace is required, but doesn't exist yet... so lie to the validator
-    let nsId = get(pr, 'namespaceId');
+    set(pr, 'namespaceId', nsId ? nsId : TEMP_NAMESPACE_ID);
 
-    set(pr, 'namespaceId', '__TEMP__');
     let ok = this.validate();
-
-    set(pr, 'namespaceId', nsId);
 
     return ok;
   },
@@ -100,7 +157,7 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
 
     const errors = get(this, 'errors') || [];
 
-    if ( get(this, 'scope') !== 'project' ) {
+    if ( get(this, 'scope') === 'namespace' && isEmpty(get(this, 'primaryResource.namespaceId')) ) {
       errors.pushObjects(get(this, 'namespaceErrors') || []);
     }
     set(this, 'errors', errors);
@@ -109,10 +166,19 @@ export default Component.extend(ViewNewEdit, OptionallyNamespaced, {
   },
 
   doSave() {
-    let self = this;
-    let sup = self._super;
+    let self                       = this;
+    let sup                        = self._super;
 
-    return this.namespacePromise().then(() => sup.apply(self, arguments));
+    if (get(this, 'isClone')) {
+      set(this, 'namespace', get(this, 'model.namespace'));
+    }
+    const { primaryResource: { namespaceId } } = this;
+
+    if (isEmpty(namespaceId) || namespaceId === TEMP_NAMESPACE_ID) {
+      return this.namespacePromise().then(() => sup.apply(self, arguments));
+    } else {
+      return sup.apply(self, arguments);
+    }
   },
 
   doneSaving() {

@@ -3,15 +3,16 @@ import { inject as service } from '@ember/service';
 import Route from '@ember/routing/route';
 import C from 'ui/utils/constants';
 import { get, set } from '@ember/object';
+import { all } from 'rsvp';
 
 export default Route.extend({
-  access:   service(),
-  cookies:  service(),
-  github:   service(),
-  language: service('user-language'),
-  modal:    service(),
-  prefs:    service(),
-  settings: service(),
+  access:     service(),
+  cookies:    service(),
+  language:   service('user-language'),
+  modal:      service(),
+  prefs:      service(),
+  settings:   service(),
+  autoLogout: service(),
 
   previousParams: null,
   previousRoute:  null,
@@ -27,37 +28,35 @@ export default Route.extend({
 
     let agent = window.navigator.userAgent.toLowerCase();
 
-    if ( agent.indexOf('msie ') >= 0 || agent.indexOf('trident/') >= 0 ) {
+    // Show the we don't support internet explorer or edge browsers (only edge html based browsers the mobile and chromium based browsers should be okay).
+    if ( agent.indexOf('msie ') >= 0 || agent.indexOf('trident/') >= 0 || agent.indexOf('edge/') >= 0) {
       this.replaceWith('ie');
 
       return;
     }
 
     // Find out if auth is enabled
-    return get(this, 'access').detect();
+    return get(this, 'access').detect().finally(() => {
+      return get(this, 'language').initLanguage();
+    });
   },
+
   model(params, transition) {
     transition.finally(() => {
-      get(this, 'language').initLanguage();
       this.controllerFor('application').setProperties({
         state:             null,
         code:              null,
         error_description: null,
-        redirectTo:        null,
       });
     })
-
-    if ( params.redirectTo ) {
-      let path = params.redirectTo;
-
-      if ( path.substr(0, 1) === '/' ) {
-        get(this, 'session').set(C.SESSION.BACK_TO, path);
-      }
-    }
 
     if (params.isPopup) {
       this.controllerFor('application').set('isPopup', true);
     }
+  },
+
+  afterModel(params, transition) {
+    get(this, 'autoLogout').start(transition);
   },
 
   actions: {
@@ -147,8 +146,22 @@ export default Route.extend({
     logout(transition, errorMsg) {
       let session = get(this, 'session');
       let access = get(this, 'access');
+      const p = []
 
-      access.clearToken().finally(() => {
+      if (errorMsg && errorMsg.logoutUrl && errorMsg.providerName) {
+        const clearThirdToken = get(this, 'access').thirdAuthLogout(errorMsg.logoutUrl);
+
+        errorMsg = null;
+        p.push(clearThirdToken)
+      }
+
+      const clearRancherToken = access.clearToken();
+
+      p.push(clearRancherToken);
+
+      all(p).finally(() => {
+        let url =  `${ window.location.origin }/login`;
+
         get(this, 'tab-session').clear();
         set(this, `session.${ C.SESSION.CONTAINER_ROUTE }`, undefined);
         set(this, `session.${ C.SESSION.ISTIO_ROUTE }`, undefined);
@@ -163,13 +176,11 @@ export default Route.extend({
           get(this, 'modal').toggleModal();
         }
 
-        let params = { queryParams: {} };
-
         if ( errorMsg ) {
-          params.queryParams.errorMsg = errorMsg;
+          url = `${ url }?errorMsg=${ errorMsg }`;
         }
 
-        this.transitionTo('login', params);
+        window.location.replace(url);
       });
     },
 

@@ -26,7 +26,6 @@ export default Component.extend(NewOrEdit, CatalogApp, ChildHook, {
 
   layout,
   namespaceErrors:          null,
-  allTemplates:             null,
   templateResource:         null,
   namespaceResource:        null,
   versionsArray:            null,
@@ -127,7 +126,7 @@ export default Component.extend(NewOrEdit, CatalogApp, ChildHook, {
       if ( get(this, 'istio') ) {
         const projectId = get(this, 'scope.currentProject.id');
 
-        get(this, 'router').transitionTo('authenticated.project.istio.rules', projectId);
+        get(this, 'router').transitionTo('authenticated.project.istio.project-istio.rules', projectId);
       } else if ( this.cancel ) {
         this.cancel();
       }
@@ -321,7 +320,7 @@ export default Component.extend(NewOrEdit, CatalogApp, ChildHook, {
     const errors = get(this, 'errors') || [];
 
     errors.pushObjects(get(this, 'namespaceErrors') || []);
-    errors.pushObjects(get(this, 'selectedTemplateModel').validationErrors() || []);
+    errors.pushObjects(get(this, 'selectedTemplateModel').validationErrors(this.answers) || []);
 
     if (errors.length) {
       set(this, 'errors', errors.uniq());
@@ -426,7 +425,7 @@ export default Component.extend(NewOrEdit, CatalogApp, ChildHook, {
     var projectId = get(this, 'scope.currentProject.id');
 
     if ( get(this, 'istio') ) {
-      return get(this, 'router').transitionTo('authenticated.project.istio.rules', projectId);
+      return get(this, 'router').transitionTo('authenticated.project.istio.project-istio.rules', projectId);
     } else {
       return get(this, 'router').transitionTo('apps-tab.index', projectId);
     }

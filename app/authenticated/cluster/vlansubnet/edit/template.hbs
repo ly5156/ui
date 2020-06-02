@@ -1,0 +1,242 @@
+<section class="header clearfix">
+  <div class="pull-left">
+    <h1>{{t "vlansubnetPage.editMacvlan"}}</h1>
+  </div>
+</section>
+
+<div class="row">
+  <div class="col span-4">
+     <label class="acc-label">{{t "formVlan.name.label"}}{{field-required}}</label>
+      {{input
+        class="form-control"
+        value=form.metadata.name
+        maxlength=60
+        placeholder=(t "formVlan.name.placeholder")
+        disabled=true
+      }}
+  </div>
+  <div class="col span-4">
+    <label class="acc-label">{{t "formVlan.master.label"}}{{field-required}}</label>
+      {{input
+        class="form-control"
+        value=form.spec.master
+        placeholder=(t "formVlan.master.placeholder")
+        disabled=true
+      }}
+  </div>
+  <div class="col span-4">
+      <label class="acc-label">{{t "formVlan.vlan.label"}}</label>
+      {{input
+          class="form-control"
+          value=form.spec.vlan
+          type="number"
+          max="4095"
+          min="2"
+          step="1"
+          placeholder=(t "formVlan.vlan.placeholder")
+          disabled=true
+      }}
+    </div>
+</div>
+<div class="row">
+    <div class="col span-4">
+      <label class="acc-label">{{t "formVlan.cidr.label"}}{{field-required}}</label>
+      {{input
+          class="form-control"
+          value=form.spec.cidr
+          placeholder=(t "formVlan.cidr.placeholder")
+          disabled=true
+      }}
+    </div>
+    <div class="col span-4">
+      <label class="acc-label">{{t "formVlan.mode.label"}}{{field-required}}</label>
+      {{new-select
+        value=form.spec.mode
+        content=modes
+        disabled=true
+      }}
+    </div>
+    <div class="col span-4">
+      <label class="acc-label">{{t "formVlan.gateway.label"}}</label>
+      {{input
+          class="form-control"
+          value=form.spec.gateway
+          placeholder=(t "formVlan.gateway.placeholder")
+          disabled=true
+      }}
+    </div>
+</div>
+<div class="row">
+    <div class="col span-4">
+      <label class="acc-label">{{t "formVlan.project.label"}}</label>
+      {{new-select
+        value=form.metadata.labels.project
+        content=projects
+        disabled=true
+      }}
+    </div>
+    <div class="col span-4">
+      <label class="acc-label">{{t "formVlan.ipReuse.label"}}({{t "formVlan.ipReuse.ipReuseUnit"}})</label>
+      {{input-integer
+          classNames="form-control"
+          value=form.spec.ipDelayReuse
+          min="1"
+          max="3600"
+          step="1"
+          disabled=true
+          placeholder=(t "formVlan.ipReuse.placeholder")
+      }}
+    </div>
+</div>
+<div class="row">
+  <div class="col span-8">
+    <label class="acc-label">{{t "formVlan.ipRange.label"}}</label>
+    {{#if ipRangesExistedMsg}}
+    <div class="text-small text-muted">
+      {{t "formVlan.ipRange.IPRangeExist"}}: {{ipRangesExistedMsg}}
+    </div>
+    {{/if}}
+    {{#if (or form.spec.ranges.length model.vlansubnet.spec.ranges.length)}}
+    <table class="table fixed no-lines small mb-10">
+      <thead>
+        <tr class="hidden-sm">
+          <th class="acc-label">{{t "formVlan.ipRange.start.label"}}{{field-required}}</th>
+          <th width="10"></th>
+          <th class="acc-label">{{t "formVlan.ipRange.end.label"}}{{field-required}}</th>
+          <th width="40">&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each model.vlansubnet.spec.ranges as |range|}}
+          <tr>
+            <td >
+              {{input  placeholder=(t "formVlan.ipRange.start.placeholder") value=range.rangeStart disabled=true}}
+            </td>
+            <td>-</td>
+            <td>
+              {{input  placeholder=(t "formVlan.ipRange.end.placeholder") value=range.rangeEnd disabled=true}}
+            </td>
+            <td>
+              <button class="btn bg-primary btn-sm" disabled>
+                <i class="icon icon-minus"/><span class="sr-only">{{t 'generic.remove'}}</span>
+              </button>
+            </td>
+          </tr>
+        {{/each}}
+        {{#each form.spec.ranges as |range|}}
+          <tr>
+            <td >
+              {{input  placeholder=(t "formVlan.ipRange.start.placeholder") value=range.rangeStart}}
+            </td>
+            <td>-</td>
+            <td>
+              {{input  placeholder=(t "formVlan.ipRange.end.placeholder") value=range.rangeEnd}}
+            </td>
+            <td>
+              <button class="btn bg-primary btn-sm" {{action "removeIPRange" range}}>
+                <i class="icon icon-minus"/><span class="sr-only">{{t 'generic.remove'}}</span>
+              </button>
+            </td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{/if}}
+    <div>
+      <button class="btn bg-link icon-btn p-0" {{action "addIPRange"}}>
+      <span class="darken"><i class="icon icon-plus text-small"/></span>
+      <span>{{t "formVlan.ipRange.btn"}}</span>
+    </button>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col span-8">
+    <label class="acc-label">{{t "formVlan.route.label"}}</label>
+    {{#if form.spec.routes.length}}
+    <table class="table fixed no-lines small mb-10">
+      <thead>
+        <tr class="hidden-sm">
+          <th class="acc-label">{{t "formVlan.route.des.label"}}{{field-required}}</th>
+          <th width="10"></th>
+          <th class="acc-label">{{t "formVlan.route.gw.label"}}</th>
+          <th width="10"></th>
+          <th class="acc-label">{{t "formVlan.route.iface.label"}}</th>
+          <th width="40">&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each form.spec.routes as |route|}}
+          <tr>
+            <td >
+              {{input  placeholder=(t "formVlan.route.des.placeholder") value=route.dst}}
+            </td>
+            <td>&nbsp;</td>
+            <td>
+              {{input  placeholder=(t "formVlan.route.gw.placeholder") value=route.gw}}
+            </td>
+            <td>&nbsp;</td>
+            <td>
+              {{new-select
+                value=route.iface
+                content=ifaceChoice
+              }}
+            </td>
+            <td>
+              <button class="btn bg-primary btn-sm" {{action "removeRoute" route}}>
+                <i class="icon icon-minus"/><span class="sr-only">{{t 'generic.remove'}}</span>
+              </button>
+            </td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{/if}}
+    <div>
+      <button class="btn bg-link icon-btn p-0" {{action "addRoute"}}>
+      <span class="darken"><i class="icon icon-plus text-small"/></span>
+      <span>{{t "formVlan.route.btn"}}</span>
+    </button>
+    </div>
+  </div>
+</div>
+{{#if hasDefaultGateway}}
+<div class="row">
+  <div class="col span-8 row">
+    <label class="acc-label">{{t "formVlan.defaultGateway.label"}}</label>
+    <div class="radio">
+      <label>
+        {{radio-button selection=form.spec.podDefaultGateway.enable value=false}}
+        {{t 'generic.disabled'}}
+      </label>
+    </div>
+    <div class="radio">
+      <label>
+        {{radio-button selection=form.spec.podDefaultGateway.enable value=true}}
+        {{t 'generic.enabled'}}
+      </label>
+    </div>
+    <div class="row">
+      <div class="col span-6">
+        <label class="acc-label">{{t "formVlan.defaultGateway.serviceCidr.label"}}</label>
+        {{input
+          class="form-control"
+          value=form.spec.podDefaultGateway.serviceCidr
+          placeholder=(t "formVlan.defaultGateway.serviceCidr.placeholder")
+          disabled=(not form.spec.podDefaultGateway.enable)
+        }}
+      </div>
+    </div>
+    {{#if (and isCanalMacvlan form.spec.podDefaultGateway.enable)}}
+      <div class="banner bg-info">
+        <div class="banner-icon"><i class="icon icon-info"></i></div>
+        <div class="banner-message">
+            <p>{{t "formVlan.defaultGateway.info"}}</p>
+        </div>
+      </div>
+    {{/if}}
+  </div>
+</div>
+{{/if}}
+{{top-errors errors=errors}}
+{{save-cancel editing=true save=(action "save") cancel=(action "cancel")}}

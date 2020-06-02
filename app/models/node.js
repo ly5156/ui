@@ -1,13 +1,14 @@
-import { computed, get } from '@ember/object';
+import { computed, get, set } from '@ember/object';
 import { or, alias } from '@ember/object/computed';
 import Resource from '@rancher/ember-api-store/models/resource';
 import { download } from 'shared/utils/util';
 import C from 'ui/utils/constants';
 import StateCounts from 'ui/mixins/state-counts';
 import { inject as service } from '@ember/service';
-import { reference } from '@rancher/ember-api-store/utils/denormalize';
+import { hasMany, reference } from '@rancher/ember-api-store/utils/denormalize';
 import ResourceUsage from 'shared/mixins/resource-usage';
 import Grafana from 'shared/mixins/grafana';
+import { next } from '@ember/runloop';
 
 const UNSCHEDULABLE_KEYS = ['node-role.kubernetes.io/etcd', 'node-role.kubernetes.io/controlplane'];
 const UNSCHEDULABLE_EFFECTS = ['NoExecute', 'NoSchedule'];
@@ -23,7 +24,10 @@ var Node = Resource.extend(Grafana, StateCounts, ResourceUsage, {
   clusterStore: service(),
   intl:         service(),
 
-  type: 'node',
+  nodes:        hasMany('clusterId', 'node', 'clusterId'),
+  type:         'node',
+  containerD:   CONTAINERD,
+  isContainerD: false,
 
   grafanaDashboardName: 'Nodes',
   grafanaResourceId:    alias('ipAddress'),
@@ -95,6 +99,15 @@ var Node = Resource.extend(Grafana, StateCounts, ResourceUsage, {
     if ( name ) {
       if ( name.match(/[a-z]/i) ) {
         name = name.replace(/\..*$/, '');
+
+        const nodesWithSamePrefix = (this.nodes || []).filter((node) => (node.nodeName || '').startsWith(`${ name }.`));
+
+        if ( nodesWithSamePrefix.length > 1 ) {
+          name = this.nodeName.slice(this.nodeName.lastIndexOf('.') + 1, this.nodeName.length)
+          if ( name.match(/^\d+$/) ) {
+            name = this.nodeName;
+          }
+        }
       }
 
       return name;
@@ -173,11 +186,19 @@ var Node = Resource.extend(Grafana, StateCounts, ResourceUsage, {
     return 'icon-docker';
   }),
 
-  engineBlurb: computed('info.os.dockerVersion', function() {
+  versionBlurb: computed('info.os.dockerVersion', function() {
     let version = get(this, 'info.os.dockerVersion') || '';
 
     if ( version.startsWith(CONTAINERD) ) {
       version = version.substr(CONTAINERD.length);
+
+      if (!this.isContainerD) {
+        next(() => set(this, 'isContainerD', true));
+      }
+    } else {
+      if (this.isContainerD) {
+        next(() => set(this, 'isContainerD', false));
+      }
     }
 
     const idx = version.indexOf('+');
@@ -196,7 +217,7 @@ var Node = Resource.extend(Grafana, StateCounts, ResourceUsage, {
   }),
 
   //  or they will not be pulled in correctly.
-  displayEndpoints: function() {
+  displayEndpoints: computed('publicEndpoints.@each.{ipAddress,port,serviceId,instanceId}', function() {
     var store = get(this, 'clusterStore');
 
     return (get(this, 'publicEndpoints') || []).map((endpoint) => {
@@ -208,14 +229,15 @@ var Node = Resource.extend(Grafana, StateCounts, ResourceUsage, {
 
       return endpoint;
     });
-  }.property('publicEndpoints.@each.{ipAddress,port,serviceId,instanceId}'),
+  }),
 
   // If you use this you must ensure that services and containers are already in the store
-  requireAnyLabelStrings: function() {
+  requireAnyLabelStrings: computed(`labels.${ C.LABEL.REQUIRE_ANY }`, function() {
     return  ((get(this, 'labels') || {})[C.LABEL.REQUIRE_ANY] || '')
       .split(/\s*,\s*/)
       .filter((x) => x.length > 0 && x !== C.LABEL.SYSTEM_TYPE);
-  }.property(`labels.${ C.LABEL.REQUIRE_ANY }`),
+  }),
+
   actions: {
     activate() {
       return this.doAction('activate');

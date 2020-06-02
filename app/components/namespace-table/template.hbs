@@ -27,7 +27,12 @@
         {{badge-state model=ns}}
       </td>
       <td>
-        {{ns.name}}
+        {{#link-to "authenticated.project.ns.resource-quota" ns.projectId ns.name}}
+          {{ns.name}}
+        {{/link-to}}
+        {{#if ns.autoInjectionEnabled}}
+          <div class="istio istio-autoinjection"></div>
+        {{/if}}
         {{#if ns.description}}
           <p class="text-small text-muted m-0">{{linkify ns.description}}</p>
         {{/if}}
@@ -42,18 +47,6 @@
     <tr class="separator-row">
       <td colspan="{{fullColspan}}"></td>
     </tr>
-    {{#if ns.displayUserLabelStrings.length}}
-      <tr class="sub-row">
-        <td colspan="2"></td>
-        <td colspan="3">
-          {{#each ns.displayUserLabelStrings as |label|}}
-            <span class="tag-xs bg-info">
-              {{label}}
-            </span>
-          {{/each}}
-        </td>
-      </tr>
-    {{/if}}
   {{else if (eq kind "group")}}
     {{#if ns.ref}}
       {{project-group
@@ -61,6 +54,7 @@
         noGroup="namespaceGroup.project"
         fullColspan=sortable.fullColspan
         noNamespace=false
+        internalBulkActions=sortable.internalBulkActions
       }}
     {{else}}
       <tr class="group-row">
@@ -69,18 +63,22 @@
         </td>
       </tr>
     {{/if}}
-  {{else if (eq kind "nomatch")}}
+  {{else if (and (eq kind "nomatch") (eq projectsWithoutNamespace.length 0))}}
     <tr>
-      <td colspan="{{sortable.fullColspan}}" class="text-center text-muted lacsso pt-20 pb-20">{{t "projectsPage.noMatch"}}</td>
+      <td colspan="{{sortable.fullColspan}}" class="text-center text-muted lacsso pt-20 pb-20">
+        {{t "projectsPage.noMatch"}}
+      </td>
     </tr>
   {{else if (eq kind "norows")}}
     {{#unless projectsWithoutNamespace.length}}
       <tr>
-        <td colspan="{{sortable.fullColspan}}" class="text-center text-muted lacsso pt-20 pb-20">{{t "projectsPage.noData"}}</td>
+        <td colspan="{{sortable.fullColspan}}" class="text-center text-muted lacsso pt-20 pb-20">
+          {{t "projectsPage.noData"}}
+        </td>
       </tr>
     {{/unless}}
   {{else if (eq kind "suffix")}}
-    {{#if (and projectsWithoutNamespace.length (not searchText.length))}}
+    {{#if (gt projectsWithoutNamespace.length 0)}}
       <tbody class="fixed grid group">
         {{#each projectsWithoutNamespace as |project|}}
           {{project-group
@@ -90,6 +88,7 @@
             fullColspan=sortable.fullColspan
             noNamespace=true
             projectsWithoutNamespaces=projectsWithoutNamespace
+            internalBulkActions=sortable.internalBulkActions
           }}
         {{/each}}
       </tbody>

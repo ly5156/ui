@@ -43,7 +43,7 @@
   <div class="row">
     <div class="col span-12">
       <div class="acc-label text-capitalize">
-        {{t "notifierPage.slack.defaultRecipient.label"}}{{field-required}}
+        {{t "notifierPage.slack.defaultRecipient.label"}}
       </div>
       {{input
         classNames="form-control"
@@ -53,6 +53,38 @@
       <p class="help-block text-info text-small">
         {{t "notifierPage.slack.defaultRecipient.helpText"}}
       </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-12">
+      <label
+        class="acc-label text-capitalize"
+        for="input-slack-config-proxy-url"
+      >
+        {{t "notifierPage.proxyUrl.label"}}
+      </label>
+      {{input
+        classNames="form-control"
+        id="input-slack-config-proxy-url"
+        value=model.slackConfig.proxyUrl
+        placeholder=(t "notifierPage.proxyUrl.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <label class="acc-label">
+        {{t "notifierPage.sendResolved.label"}}
+      </label>
+      <div class="checkbox">
+        <label>
+          {{input
+            type="checkbox"
+            checked=model.sendResolved
+          }}
+          {{t "generic.enable"}}
+        </label>
+      </div>
     </div>
   </div>
 {{else if (eq currentType "email")}}
@@ -154,6 +186,22 @@
       <p class="help-block text-info text-small">{{t "notifierPage.smtp.defaultRecipient.helpText"}}</p>
     </div>
   </div>
+  <div class="row">
+    <div class="col span-6">
+      <label class="acc-label">
+        {{t "notifierPage.sendResolved.label"}}
+      </label>
+      <div class="checkbox">
+        <label>
+          {{input
+            type="checkbox"
+            checked=model.sendResolved
+          }}
+          {{t "generic.enable"}}
+        </label>
+      </div>
+    </div>
+  </div>
 {{else if (eq currentType "pagerduty")}}
   <div class="row">
     <div class="col span-12 mt-0 mb-0">
@@ -181,6 +229,38 @@
     <p class="help-block text-info text-small">
       {{t "notifierPage.pagerduty.serviceKey.helpText"}}
     </p>
+  </div>
+  <div class="row">
+    <div class="col span-12">
+      <label
+        class="acc-label text-capitalize"
+        for="input-pagerduty-config-proxy-url"
+      >
+        {{t "notifierPage.proxyUrl.label"}}
+      </label>
+      {{input
+        classNames="form-control"
+        id="input-pagerduty-config-proxy-url"
+        value=model.pagerdutyConfig.proxyUrl
+        placeholder=(t "notifierPage.proxyUrl.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <label class="acc-label">
+        {{t "notifierPage.sendResolved.label"}}
+      </label>
+      <div class="checkbox">
+        <label>
+          {{input
+            type="checkbox"
+            checked=model.sendResolved
+          }}
+          {{t "generic.enable"}}
+        </label>
+      </div>
+    </div>
   </div>
 {{else if (eq currentType "wechat")}}
   <div class="row">
@@ -229,6 +309,7 @@
         {{t "notifierPage.wechat.secret.label"}}{{field-required}}
       </div>
       {{input
+        type="password"
         classNames="form-control"
         value=model.wechatConfig.secret
         placeholder=(t "notifierPage.wechat.secretPlaceholder")
@@ -259,6 +340,79 @@
       }}
     </div>
   </div>
+
+  <label class="acc-label text-capitalize pt-20">
+    {{t "notifierPage.wechat.endpoint.label"}}{{field-required}}
+  </label>
+
+  <div class="row">
+    <div class="col span-3">
+      <div class="radio">
+        <label>
+          {{radio-button
+            selection=wechatEndpointMode
+            value="default"
+          }}
+            {{t "notifierPage.wechat.endpoint.default"}}
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          {{radio-button
+            selection=wechatEndpointMode
+            value="custom"
+          }}
+            {{t "notifierPage.wechat.endpoint.custom"}}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  {{#if (eq wechatEndpointMode "custom")}}
+    <div class="row">
+      <div class="col span-12">
+        {{input
+          type="url"
+          value=model.wechatConfig.apiUrl
+          classNames="form-control"
+          placeholder=(t "notifierPage.wechat.endpoint.placeholder")
+        }}
+      </div>
+    </div>
+  {{/if}}
+
+  <div class="row">
+    <div class="col span-12">
+      <label
+        class="acc-label text-capitalize"
+        for="input-notifierpage-config-proxy-url"
+      >
+        {{t "notifierPage.proxyUrl.label"}}
+      </label>
+      {{input
+        classNames="form-control"
+        id="input-notifierpage-config-proxy-url"
+        value=model.wechatConfig.proxyUrl
+        placeholder=(t "notifierPage.proxyUrl.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <label class="acc-label">
+        {{t "notifierPage.sendResolved.label"}}
+      </label>
+      <div class="checkbox">
+        <label>
+          {{input
+            type="checkbox"
+            checked=model.sendResolved
+          }}
+          {{t "generic.enable"}}
+        </label>
+      </div>
+    </div>
+  </div>
 {{else if (eq currentType "webhook")}}
   <div class="row">
     <div class="col span-12 mt-0 mb-0">
@@ -284,6 +438,267 @@
       }}
     </div>
   </div>
+  <div class="row">
+    <div class="col span-12">
+      <label
+        class="acc-label text-capitalize"
+        for="input-webhook-config-proxy-url"
+      >
+        {{t "notifierPage.proxyUrl.label"}}
+      </label>
+      {{input
+        classNames="form-control"
+        id="input-webhook-config-proxy-url"
+        value=model.webhookConfig.proxyUrl
+        placeholder=(t "notifierPage.proxyUrl.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-12">
+      <label
+        class="acc-label text-capitalize"
+        for="input-webhook-config-bearer-token"
+      >
+        {{t "notifierPage.bearerToken.label"}}
+      </label>
+      {{input
+        classNames="form-control"
+        id="input-webhook-config-bearer-token"
+        value=model.webhookConfig.bearer_token
+        placeholder=(t "notifierPage.bearerToken.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <label class="acc-label">
+        {{t "notifierPage.sendResolved.label"}}
+      </label>
+      <div class="checkbox">
+        <label>
+          {{input
+            type="checkbox"
+            checked=model.sendResolved
+          }}
+          {{t "generic.enable"}}
+        </label>
+      </div>
+    </div>
+  </div>
+{{else if (eq currentType "dingtalk")}}
+  <div class="row">
+    <div class="col span-12 mt-0 mb-0">
+      <FormNameDescription
+        @name={{model.name}}
+        @nameRequired={{true}}
+        @nameDisabled={{false}}
+        @description={{model.description}}
+        @bothColClass="col span-6 mt-0"
+        @colClass="col span-12 mt-0"
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-12">
+      <div class="acc-label text-capitalize">
+        {{t "notifierPage.dingtalk.url"}}{{field-required}}
+      </div>
+      {{input
+        classNames="form-control"
+        value=model.dingtalkConfig.url
+        placeholder=(t "notifierPage.dingtalk.urlPlaceholder")
+      }}
+    </div>
+  </div>
+   <div class="row">
+    <div class="col span-12">
+      <div class="acc-label text-capitalize">
+        {{t "notifierPage.dingtalk.secret"}}
+      </div>
+      {{input
+        type="password"
+        classNames="form-control"
+        value=model.dingtalkConfig.secret
+        placeholder=(t "notifierPage.dingtalk.secretPlaceholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-12">
+      <label
+        class="acc-label text-capitalize"
+        for="input-dingtalk-config-proxy-url"
+      >
+        {{t "notifierPage.proxyUrl.label"}}
+      </label>
+      {{input
+        classNames="form-control"
+        id="input-dingtalk-config-proxy-url"
+        value=model.dingtalkConfig.proxyUrl
+        placeholder=(t "notifierPage.proxyUrl.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <label class="acc-label">
+        {{t "notifierPage.sendResolved.label"}}
+      </label>
+      <div class="checkbox">
+        <label>
+          {{input
+            type="checkbox"
+            checked=model.sendResolved
+          }}
+          {{t "generic.enable"}}
+        </label>
+      </div>
+    </div>
+  </div>
+{{else if (eq currentType "msteams")}}
+  <div class="row">
+    <div class="col span-12 mt-0 mb-0">
+      <FormNameDescription
+        @name={{model.name}}
+        @nameRequired={{true}}
+        @nameDisabled={{false}}
+        @description={{model.description}}
+        @bothColClass="col span-6 mt-0"
+        @colClass="col span-12 mt-0"
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-12">
+      <div class="acc-label text-capitalize">
+        {{t "notifierPage.msteams.url"}}{{field-required}}
+      </div>
+      {{input
+        classNames="form-control"
+        value=model.msteamsConfig.url
+        placeholder=(t "notifierPage.msteams.urlPlaceholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-12">
+      <label
+        class="acc-label text-capitalize"
+        for="input-microsoft-config-proxy-url"
+      >
+        {{t "notifierPage.proxyUrl.label"}}
+      </label>
+      {{input
+        classNames="form-control"
+        id="input-msteams-config-proxy-url"
+        value=model.msteamsConfig.proxyUrl
+        placeholder=(t "notifierPage.proxyUrl.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <label class="acc-label">
+        {{t "notifierPage.sendResolved.label"}}
+      </label>
+      <div class="checkbox">
+        <label>
+          {{input
+            type="checkbox"
+            checked=model.sendResolved
+          }}
+          {{t "generic.enable"}}
+        </label>
+      </div>
+    </div>
+  </div>
+{{else if (eq currentType "aliyunsms")}}
+  <div class="row">
+    <div class="col span-12 mt-0 mb-0">
+      <FormNameDescription
+        @name={{model.name}}
+        @nameRequired={{true}}
+        @nameDisabled={{false}}
+        @description={{model.description}}
+        @bothColClass="col span-6 mt-0"
+        @colClass="col span-12 mt-0"
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <div class="acc-label text-capitalize">
+        {{t "notifierPage.aliyunsms.accessKeyID.label"}}{{field-required}}
+      </div>
+      {{input
+        classNames="form-control"
+        value=model.aliyunsmsConfig.accessKeyID
+        placeholder=(t "notifierPage.aliyunsms.accessKeyID.placeholder")
+      }}
+    </div>
+    <div class="col span-6">
+      <div class="acc-label text-capitalize">
+        {{t "notifierPage.aliyunsms.accessKeySecret.label"}}{{field-required}}
+      </div>
+      {{input
+        type="password"
+        classNames="form-control"
+        value=model.aliyunsmsConfig.accessKeySecret
+        placeholder=(t "notifierPage.aliyunsms.accessKeySecret.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <div class="acc-label text-capitalize">
+        {{t "notifierPage.aliyunsms.templateCode.label"}}{{field-required}}
+      </div>
+      {{input
+        classNames="form-control"
+        value=model.aliyunsmsConfig.templateCode
+        placeholder=(t "notifierPage.aliyunsms.templateCode.placeholder")
+      }}
+    </div>
+     <div class="col span-6">
+      <div class="acc-label text-capitalize">
+        {{t "notifierPage.aliyunsms.signName.label"}}{{field-required}}
+      </div>
+      {{input
+        classNames="form-control"
+        value=model.aliyunsmsConfig.signName
+        placeholder=(t "notifierPage.aliyunsms.signName.placeholder")
+      }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <FormValueArray
+        @initialValues={{model.aliyunsmsConfig.to}}
+        @addActionLabel="notifierPage.aliyunsms.to.action"
+        @valueLabel="notifierPage.aliyunsms.to.label"
+        @valuePlaceholder="notifierPage.aliyunsms.to.placeholder"
+        @changed={{action (mut model.aliyunsmsConfig.to)}}
+        @editing={{true}}
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col span-6">
+      <label class="acc-label">
+        {{t "notifierPage.sendResolved.label"}}
+      </label>
+      <div class="checkbox">
+        <label>
+          {{input
+            type="checkbox"
+            checked=model.sendResolved
+          }}
+          {{t "generic.enable"}}
+        </label>
+      </div>
+    </div>
+  </div>
 {{/if}}
 
 {{#if (eq currentType "slack")}}
@@ -298,42 +713,45 @@
   {{t "notifierPage.pagerduty.helpText" htmlSafe=true}}
 {{/if}}
 
-<div class="over-hr mt-40">
-  <span>
-    {{#if testing}}
-      <button
-        style="color: white;"
-        class="btn bg-info btn-disabled"
-        {{action "test"}}
-      >
-        <i class="icon icon-spinner icon-spin"></i>{{t "notifierPage.testAction.testing"}}
-      </button>
-    {{else}}
-      {{#if tested}}
+{{#if isSelectType}}
+  <div class="over-hr mt-40">
+    <span>
+      {{#if testing}}
         <button
-          {{action "test"}}
-          class="btn  btn-disabled {{if testOk "bg-success" "bg-error"}}"
           style="color: white;"
+          class="btn bg-info btn-disabled"
+          {{action "test"}}
         >
-          {{if testOk (t "notifierPage.testAction.testOk") (t "notifierPage.testAction.testFailed")}}
+          <i class="icon icon-spinner icon-spin"></i>{{t "notifierPage.testAction.testing"}}
         </button>
       {{else}}
-        <button
-          {{action "test"}}
-          class="btn bg-info"
-          style="color: white;"
-        >
-          {{t "notifierPage.testAction.test"}}
-        </button>
+        {{#if tested}}
+          <button
+            {{action "test"}}
+            class="btn  btn-disabled {{if testOk "bg-success" "bg-error"}}"
+            style="color: white;"
+          >
+            {{if testOk (t "notifierPage.testAction.testOk") (t "notifierPage.testAction.testFailed")}}
+          </button>
+        {{else}}
+          <button
+            {{action "test"}}
+            class="btn bg-info"
+            style="color: white;"
+          >
+            {{t "notifierPage.testAction.test"}}
+          </button>
+        {{/if}}
       {{/if}}
-    {{/if}}
-  </span>
-</div>
+    </span>
+  </div>
+{{/if}}
 
 <div class="footer-actions">
   {{save-cancel
     createLabel=addBtnLabel
     save=(action "save")
     cancel=(action "cancel")
+    saveDisabled=(not isSelectType)
   }}
 </div>

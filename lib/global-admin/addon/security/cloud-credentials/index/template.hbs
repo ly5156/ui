@@ -30,12 +30,12 @@
      descending=descending
      extraSearchFields=extraSearchFields
      groupByKey="displayType"
-     groupByRef="type"
      headers=headers
      rightActions=true
      searchText=searchText
      showHeader=true
      sortBy=sortBy
+     preSorts=preSorts
      as |sortable kind row dt|
   }}
     {{#if (eq kind "row")}}
@@ -45,6 +45,9 @@
         </td>
         <td data-title="{{t "generic.name"}}:" class="clip">
           {{row.displayName}}
+        </td>
+        <td data-title="{{t "cloudCredentialsPage.numberNodeTemplates"}}:">
+          {{row.numberOfNodeTemplateAssociations}}
         </td>
         <td data-title="{{t "generic.created"}}:" class="text-right pr-20">
           {{date-calendar row.created}}

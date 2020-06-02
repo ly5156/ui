@@ -26,6 +26,7 @@ export default Resource.extend({
   name:              null,
   description:       null,
   isMonitoringReady: false,
+  canEditQoutaKey:   null,
 
   cluster:                     reference('clusterId', 'cluster'),
   // 2.0 bug projectId is wrong in the ptrb should be <cluster-id>:<project-id> instead of just <project-id>
@@ -67,7 +68,10 @@ export default Resource.extend({
     return get(this, 'scope.currentProject.id') === get(this, 'id');
   }),
 
-  canSaveMonitor: computed('actionLinks.{editMonitoring,enableMonitoring}', function() {
+  canSaveMonitor: computed('isSystemProject', 'actionLinks.{editMonitoring,enableMonitoring}', function() {
+    if ( get(this, 'isSystemProject') ) {
+      return false;
+    }
     const action = get(this, 'enableProjectMonitoring') ?  'editMonitoring' : 'enableMonitoring';
 
     return !!this.hasAction(action)
@@ -97,7 +101,7 @@ export default Resource.extend({
     deactivate() {
       return this.doAction('deactivate').then(() => {
         if ( get(this, 'scope.currentProject') === this ) {
-          window.location.href = window.location.href;
+          window.location.href = window.location.href; // eslint-disable-line no-self-assign
         }
       });
     },
@@ -119,7 +123,7 @@ export default Resource.extend({
 
     return promise.then(() => {
       if (get(this, 'active')) {
-        window.location.href = window.location.href;
+        window.location.href = window.location.href; // eslint-disable-line no-self-assign
       }
     }).catch((err) => {
       get(this, 'growl').fromError('Error deleting', err);

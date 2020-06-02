@@ -8,6 +8,10 @@
 </section>
 
 <section class="pl-0 pr-0">
+  <div class="row mb-15">
+    {{search-text searchText=searchText}}
+  </div>
+
   {{#each filteredApps as |group|}}
     <div class="row flex">
       {{#each group as |ns|}}
@@ -17,6 +21,12 @@
       {{/each}}
     </div>
   {{else}}
-    {{empty-table disabled=(rbac-prevents resource="app" scope="project" permission="create") resource="container" newRoute="catalog-tab" newTranslationKey="nav.apps.launch"}}
+    <div class="text-center text-muted">
+      {{#if searchText}}
+        {{t "nav.apps.noMatch"}}
+      {{else}}
+        {{t "nav.apps.noData"}}
+      {{/if}}
+    </div>
   {{/each}}
 </section>

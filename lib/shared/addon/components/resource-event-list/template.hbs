@@ -1,0 +1,65 @@
+{{#accordion-list-item
+     title=(t "resourceEventList.title")
+     detail=(t "resourceEventList.detail" resourceType=resourceType)
+     expandAll=expandAll
+     expand=(action expandFn)
+     expanded=expanded
+     componentName="sortable-table"
+     as | parent |
+}}
+  {{#if (and (or expanded expandAll) (not loading))}}
+    {{#component parent.intent
+        classNames="grid fixed mb-0 sortable-table"
+        bulkActions=false
+        rowActions=false
+        paging=true
+        search=true
+        sortBy=sortBy
+        stickyHeader=false
+        pagingLabel="pagination.event"
+        descending=descending
+        headers=headers
+        body=events
+        as |sortable kind row dt|
+    }}
+      {{#if (eq kind "row")}}
+        <tr class="main-row">
+          {{#if clusterEvents}}
+            <td data-title="{{dt.involvedObject.namespace}}">
+              {{row.involvedObject.namespace}}
+            </td>
+          {{/if}}
+          <td data-title="{{dt.type}}">
+            {{row.type}}
+          </td>
+          <td data-title="{{dt.reason}}">
+            {{row.reason}}
+          </td>
+          {{#if clusterEvents}}
+            <td data-title="{{dt.involvedObject.name}}">
+              {{row.involvedObject.name}}
+            </td>
+          {{/if}}
+          <td data-title="{{dt.message}}">
+            {{row.message}}
+          </td>
+          <td data-title="{{dt.lastTimestamp}}">
+            {{date-from-now row.lastTimestamp}}
+          </td>
+        </tr>
+      {{else if (eq kind "norows")}}
+        <tr>
+          <td colspan="{{sortable.fullColspan}}" class="text-center text-muted pt-20 pb-20">{{t "resourceEventList.noData"}}</td>
+        </tr>
+      {{else if (eq kind "nomatch")}}
+        <tr>
+          <td colspan="{{sortable.fullColspan}}" class="text-center text-muted pt-20 pb-20">{{t "resourceEventList.noMatch"}}</td>
+        </tr>
+      {{/if}}
+    {{/component}}
+  {{else}}
+    <div class="text-center mt-20">
+      <i class="icon icon-spinner icon-spin icon-3x"></i>
+    </div>
+  {{/if}}
+{{/accordion-list-item}}

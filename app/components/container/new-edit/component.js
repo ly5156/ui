@@ -1,14 +1,12 @@
 import Errors from 'ui/utils/errors';
-import { get, set, setProperties, computed } from '@ember/object';
+import { get, set, setProperties } from '@ember/object';
 import { equal } from '@ember/object/computed';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import Component from '@ember/component';
 import NewOrEdit from 'shared/mixins/new-or-edit';
-import { debouncedObserver } from 'ui/utils/debounce';
 import C from 'ui/utils/constants';
 import ChildHook from 'shared/mixins/child-hook';
-import { flattenLabelArrays } from 'shared/mixins/manage-labels';
 import layout from './template';
 
 const WINDOWS_NODE_SELECTOR = 'beta.kubernetes.io/os = windows';
@@ -58,10 +56,12 @@ export default Component.extend(NewOrEdit, ChildHook, {
   annotationErrors: null,
 
   // ----------------------------------
-  userLabels: null,
-
-  advanced:   false,
+  advanced:     false,
   header:        '',
+  showTargetOS: false,
+
+  toggleMacvlan: false,
+
   isSidekick:    equal('scaleMode', 'sidekick'),
   init() {
     window.nec = this;
@@ -73,9 +73,13 @@ export default Component.extend(NewOrEdit, ChildHook, {
 
     const service = get(this, 'service');
 
-    if (!get(this, 'isSidekick') &&
-      service && !get(service, 'scheduling')) {
-      set(service, 'scheduling', { node: {} });
+    const scheduling = get(service, 'scheduling')
+
+    if (!get(this, 'isSidekick') && !get(service, 'scheduling.node')) {
+      set(service, 'scheduling', {
+        ...scheduling,
+        node: {}
+      });
     }
 
     if (!get(this, 'isSidekick')) {
@@ -112,10 +116,6 @@ export default Component.extend(NewOrEdit, ChildHook, {
       }
     }
 
-    if ( !get(this, 'isSidekick') ) {
-      this.labelsChanged();
-    }
-
     if ( get(this, 'showTargetOS') && get(this, `prefs.${ C.PREFS.TARGET_OS }`) ) {
       set(this, 'targetOs', get(this, `prefs.${ C.PREFS.TARGET_OS }`));
     }
@@ -136,10 +136,6 @@ export default Component.extend(NewOrEdit, ChildHook, {
 
     setImage(uuid) {
       set(this, 'launchConfig.image', uuid);
-    },
-
-    setLabels(section, labels) {
-      set(this, `${ section  }Labels`, labels);
     },
 
     setRequestedHostId(hostId) {
@@ -171,19 +167,11 @@ export default Component.extend(NewOrEdit, ChildHook, {
 
       ary.removeAt(idx);
     },
-  },
 
-  // Labels
-  labelsChanged: debouncedObserver(
-    'userLabels.@each.{key,value}',
-    function() {
-      let out = flattenLabelArrays(
-        get(this, 'userLabels'),
-      );
-
-      set(this, 'service.labels', out);
+    handleToggleMacvlan(enabled) {
+      set(this, 'toggleMacvlan', enabled);
     }
-  ),
+  },
 
   updateHeader: function() {
     let args = {};
@@ -213,10 +201,6 @@ export default Component.extend(NewOrEdit, ChildHook, {
       set(this, 'header', get(this, 'intl').t(k, args));
     });
   }.observes('isUpgrade', 'isSidekick', 'isGlobal', 'service.displayName', 'intl.locale').on('init'),
-
-  showTargetOS: computed('scope.currentCluster.isWindows', 'isUpgrade', 'isSidekick', function(){
-    return get(this, 'scope.currentCluster.isWindows') && !get(this, 'isUpgrade') && !get(this, 'isSidekick');
-  }),
 
   // ----------------------------------
   // ----------------------------------

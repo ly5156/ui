@@ -29,12 +29,12 @@
                    aria-haspopup="true"
                    aria-expanded="false"
                 }}
-                  {{maybe-t item.localizedLabel item.label}}
+                  {{t item.localizedLabel default=item.label}}
                   <span class="icon icon-chevron-down"/>
                 {{/link-to-as-attrs}}
               {{else}}
-                <a class="nav-link" role="button" aria-haspopup="true" aria-label={{maybe-t item.localizedLabel item.label}}>
-                  {{maybe-t item.localizedLabel item.label}}
+                <a class="nav-link" role="button" aria-haspopup="true" aria-label={{t item.localizedLabel default=item.label}}>
+                  {{t item.localizedLabel default=item.label}}
                   <span class="icon icon-chevron-down"/>
                 </a>
               {{/if}}
@@ -45,15 +45,16 @@
             {{#each item.submenu as |subitem|}}
               {{#if subitem.route}}
                 {{#if (or (not subitem.resource) (rbac-allows resource=subitem.resource scope=subitem.resourceScope))}}
-                  <li class="{{if (and subitem.disableIfClusterNotReady (not cluster.isReady)) "pointer-events-none"}}">
+                  <li>
                     {{#link-to-as-attrs
                        ourRoute=subitem.route
                        ctx=subitem.ctx
                        qp=subitem.qp
                        activeParent="LI"
+                       currentWhen=subitem.currentWhen
                     }}
                       <span>
-                        {{maybe-t subitem.localizedLabel subitem.label}}
+                        {{t subitem.localizedLabel default=subitem.label}}
                       </span>
                       <i class="{{subitem.icon}}"/>
                     {{/link-to-as-attrs}}
@@ -65,7 +66,7 @@
                 {{! Just a label }}
                 <li class="dropdown-header">
                   <span>
-                    {{maybe-t subitem.localizedLabel subitem.label}}
+                    {{t subitem.localizedLabel default=subitem.label}}
                   </span>
                   <i class="{{subitem.icon}}"/>
                 </li>
@@ -75,7 +76,6 @@
         {{/hover-dropdown}}
 
       {{else if item.route}}
-
         {{#if (or (not item.resource) (rbac-allows resource=item.resource scope=item.resourceScope))}}
           {{! No submenu }}
           <li class="nav-item {{if (and item.disableIfClusterNotReady (not cluster.isReady)) "pointer-events-none"}}">
@@ -87,16 +87,39 @@
                currentWhen=item.currentWhen
                class="nav-link"
             }}
-              {{maybe-t item.localizedLabel item.label}}
+              {{t item.localizedLabel default=item.label}}
             {{/link-to-as-attrs}}
           </li>
         {{/if}}
 
+      {{else if item.url}}
+        <li class="nav-item">
+          {{#if item.iframeEnabled}}
+            {{#if item.customRoute}}
+              {{#link-to-as-attrs
+                ourRoute=item.customRoute
+                activeParent="LI"
+                class="nav-link"
+                ctx=item.ctx
+              }}
+                {{item.label}}
+              {{/link-to-as-attrs}}
+            {{else}}
+              <a href="{{item.url}}">
+                {{item.label}}
+              </a>
+            {{/if}}
+          {{else}}
+            <a href="{{item.url}}" target="_blank">
+              {{item.label}}
+            </a>
+          {{/if}}
+        </li>
       {{else}}
 
         {{! Just a label }}
         <li class="dropdown-header">
-          {{maybe-t item.localizedLabel item.label}}
+          {{t item.localizedLabel default=item.label}}
         </li>
 
       {{/if}}
@@ -159,7 +182,6 @@
           <span>{{t "nav.nodeTemplates.link"}}</span>
         {{/link-to}}
       </li>
-      <li role="separator" class="divider"></li>
       <li>
         {{#link-to "authenticated.prefs"}}
           <span>{{t "nav.userPreferences.link"}}</span>

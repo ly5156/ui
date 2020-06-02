@@ -110,10 +110,14 @@ module.exports = function(defaults) {
   app.import('vendor/ember-shortcuts.js');
   app.import('vendor/aliyun-sdk.js');
   app.import('vendor/cce-sdk.js');
+  app.import('vendor/iframeResizer.min.js');
 
   app.import('vendor/icons/fonts/rancher-icons.svg',   { destDir: 'assets/fonts/' });
   app.import('vendor/icons/fonts/rancher-icons.ttf',   { destDir: 'assets/fonts/' });
   app.import('vendor/icons/fonts/rancher-icons.woff',  { destDir: 'assets/fonts/' });
+  app.import('vendor/cn-icons/fonts/cnrancher-icons.svg',   { destDir: 'assets/fonts/' });
+  app.import('vendor/cn-icons/fonts/cnrancher-icons.ttf',   { destDir: 'assets/fonts/' });
+  app.import('vendor/cn-icons/fonts/cnrancher-icons.woff',  { destDir: 'assets/fonts/' });
   app.import('vendor/json-sanitizer/json-sanitizer.js');
   app.import('vendor/prompt/prompt-v1-latin-300.woff', { destDir: 'assets/fonts/' });
   app.import('vendor/prompt/prompt-v1-latin-300.woff2', { destDir: 'assets/fonts/' });

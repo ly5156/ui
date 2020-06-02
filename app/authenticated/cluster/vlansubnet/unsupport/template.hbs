@@ -1,0 +1,11 @@
+{{#if model.isActive}}
+<section>
+  {{#banner-message color='bg-error m-0'}}
+  {{#if errorMsg}}
+    {{errorMsg}}
+  {{else}}
+    <p> {{t "vlansubnetPage.unsupport"}} </p>
+    {{/if}}
+  {{/banner-message}}
+</section>
+{{/if}}

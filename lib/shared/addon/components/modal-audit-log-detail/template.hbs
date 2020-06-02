@@ -1,0 +1,26 @@
+<div class="modal-audit-log-detail">
+  <section class="header">
+    <h1>{{t "auditLog.detail.title"}}</h1>
+  </section>
+  <div>
+     <h2>{{t "auditLog.detail.request"}}</h2>
+    {{ivy-codemirror
+        value=requestBody
+        options=codeMirrorOptions
+    }}
+  </div>
+<br>
+  <div>
+    <h2>{{t "auditLog.detail.response"}}</h2>
+    {{ivy-codemirror
+        value=responseBody
+        options=codeMirrorOptions
+    }}
+  </div>
+
+<br>
+  <div class="text-center">
+    <button class="btn bg-primary" {{action "cancel"}}>{{t "auditLog.detail.btn.close"}}</button>
+  </div>
+</div>
+

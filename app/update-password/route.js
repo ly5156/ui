@@ -3,10 +3,12 @@ import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import { resolve } from 'rsvp';
 import C from 'ui/utils/constants';
+import { isDevBuild } from 'shared/utils/parse-version';
 
 export default Route.extend({
-  access:       service(),
-  settings: service(),
+  access:     service(),
+  settings:   service(),
+  autoLogout: service(),
 
   model() {
     let promise;
@@ -25,12 +27,12 @@ export default Route.extend({
       const version = get(this, `settings.${ C.SETTING.VERSION_RANCHER }`);
       let optIn;
 
-      if ( version && !['dev', 'master'].includes(version) ) {
+      if ( !version || isDevBuild(version) ) {
+        // For dev builds, default to opt out
+        optIn = (cur === 'in');
+      } else {
         // For releases, default to opt in
         optIn = (cur !== 'out');
-      } else {
-        // For master, default to opt out
-        optIn = (cur === 'in');
       }
 
       return {
@@ -43,10 +45,12 @@ export default Route.extend({
 
   activate() {
     $('BODY').addClass('container-farm'); // eslint-disable-line
+    get(this, 'autoLogout').stop()
   },
 
-  deactivate() {
+  deactivate(params, transition) {
     $('BODY').removeClass('container-farm'); // eslint-disable-line
+    get(this, 'autoLogout').start(transition)
   },
 
 });

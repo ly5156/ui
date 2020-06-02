@@ -1,7 +1,7 @@
 // Forms
 // Placeholder text color
 $label-color                    : $dark-grey !default;
-$input-color-placeholder        : lighten($mid-grey, 5) !default;
+$input-color-placeholder        : lighten($mid-grey, 1) !default;
 $input-bg                       : lighten($light-grey, 5) !default;
 $input-bg-hover                 : $mid-grey !default;
 $input-bg-disabled              : $disabled  !default;
@@ -66,6 +66,11 @@ textarea:required {
   box-shadow: none !important;
 }
 
+// Firefox fix to turn off the red box shadow on invalid fields
+input:invalid {
+  box-shadow: initial;
+}
+
 input[type='text'],
 input[type='password'],
 input[type='number'],
@@ -74,7 +79,8 @@ input[type='email'],
 input[type='search'],
 input[type='tel'],
 input[type='url'],
-textarea {
+textarea,
+select {
     display: block;
     box-sizing: border-box;
     border-width: 1.25px;
@@ -88,20 +94,27 @@ textarea {
     width: 100%;
     color: $input-color;
 
+    // firefox quirk, options were not inheriting there parents color styles
+    option,
+    optgroup {
+      color: $input-color;
+      background: $input-bg;
+    }
+
     &[size] {
       display: inline-block;
       width: auto;
     }
 
     &::placeholder {
-        color: $input-color-placeholder;
+        color: rgba($input-color-placeholder, .8);
     }
 
     &:hover {
         border-color: $input-bg-hover;
-        background: rgba($input-bg-hover, .2);
+        background-color: rgba($input-bg-hover, .2);
         &::placeholder {
-            color: $input-color-placeholder;
+          color: rgba($input-color-placeholder, .35);
         }
     }
     &.disabled, &[disabled], &[disabled]:hover  {
@@ -113,10 +126,11 @@ textarea {
         }
     }
     &:focus {
-        background: rgba($input-border-focus, .2);
+        background-color: rgba($input-border-focus, .2);
         border-color: $input-border-focus;
+        transition: ease-in-out all .25s;
         &::placeholder {
-            color: $input-color-placeholder;
+            color: rgba($input-color-placeholder, .5);
         }
     }
 }
@@ -175,6 +189,38 @@ textarea {
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
+.select-dropdown-list {
+  min-width: calc(39.5% - 47.043px);
+  max-width: calc(84% - 100px);
+  margin-left: calc(-39.5% + 93.043px);
+  li > a {
+    display: inline-block!important;
+    width: 100%;
+    white-space: normal!important;
+    word-wrap:break-word!important;
+    overflow: inherit!important;
+  }
+}
+@media only screen and (max-width: 767px){
+  .select-dropdown-list {
+    min-width: calc(100% - 116px);
+    max-width: calc(100% - 50px);
+    margin-left: calc(-100% + 116px);
+  }
+}
+.small-modal.modal-container {
+  width: 25%;
+  min-width: 250px;
+  margin: 0 auto;
+}
+.custom-input-number{
+  position: relative;
+}
+.custom-input-number__btn{
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
 .input-group {
     position: relative;
     display: table;
@@ -282,7 +328,7 @@ input.input-sm,
     padding: 3px 8px;
     font-size: 0.87em;
 
-    &:not(textarea) {
+    &:not(textarea), &.new-select select {
       max-height: 32px;
     }
 }

@@ -35,15 +35,19 @@ var Pod = Resource.extend(Grafana, DisplayImage, {
     return !!get(this, 'links.update') && !!get(this, 'links.yaml');
   }),
 
-  availableActions: computed('combinedState', function() {
-    let isRunning = get(this, 'combinedState') === 'running';
+  canShell: computed('containers', function() {
+    return !!get(this, 'containers').findBy('canShell', true);
+  }),
+
+  availableActions: computed('canShell', function() {
+    const canShell = get(this, 'canShell');
 
     var choices = [
       {
         label:     'action.execute',
         icon:      'icon icon-terminal',
         action:    'shell',
-        enabled:   isRunning,
+        enabled:   canShell,
         altAction: 'popoutShell'
       },
       {
@@ -52,6 +56,13 @@ var Pod = Resource.extend(Grafana, DisplayImage, {
         action:    'logs',
         enabled:   true,
         altAction: 'popoutLogs'
+      },
+      {
+        label:     'action.downloadFile',
+        icon:      'icon icon-download',
+        action:    'popoutDownload',
+        enabled:   canShell && get(this, 'actionLinks.download'),
+        altAction: 'popoutDownload'
       },
     ];
 
@@ -112,6 +123,40 @@ var Pod = Resource.extend(Grafana, DisplayImage, {
   displayIp: function() {
     return get(this, 'status.podIp') || null;
   }.property('status.podIp'),
+
+  displayMacvlanIp: computed('macvlanIpWithoutType', function() {
+    const labels = get(this, 'labels');
+    const type = labels && labels['macvlan.panda.io/macvlanIpType'];
+    let macvlanIpWithoutType = get(this, 'macvlanIpWithoutType');
+
+    if (!macvlanIpWithoutType){
+      return ''
+    }
+
+    return `${ macvlanIpWithoutType }${ type ? ` (${ type })` : '' }`;
+  }),
+  macvlanIpWithoutType: computed('annotations.[]', function() {
+    const a = get(this, 'annotations');
+    const networkStatusStr = a && a['k8s.v1.cni.cncf.io/networks-status'];
+
+    if (!networkStatusStr) {
+      return '';
+    }
+    let networkStatus;
+
+    try {
+      networkStatus = JSON.parse(networkStatusStr);
+    } catch (err) {
+      return '';
+    }
+    if (networkStatus) {
+      const macvlan = networkStatus.find((n) => n.interface === 'eth1');
+
+      return `${ (macvlan && macvlan.ips && macvlan.ips[0]) || '' }`;
+    }
+
+    return '';
+  }),
 
   dislayContainerMessage: computed('containers.@each.showTransitioningMessage', function() {
     return !!get(this, 'containers').findBy('showTransitioningMessage', true);
@@ -187,6 +232,9 @@ var Pod = Resource.extend(Grafana, DisplayImage, {
       later(() => {
         window.open(`//${ window.location.host }${ route }?podId=${ podId }&isPopup=true`, '_blank', 'toolbars=0,width=900,height=700,left=200,top=200');
       });
+    },
+    popoutDownload() {
+      get(this, 'modalService').toggleModal('modal-download-file', { originalModel: this });
     },
   },
 

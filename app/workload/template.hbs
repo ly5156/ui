@@ -100,7 +100,7 @@
         <div class="btn-group btn-group-xs p-0 ml-10">
           <button
             class="btn btn-xs bg-primary"
-            {{action "scaleDown" target=service}}
+            {{action "podDown"}}
             disabled={{not service.canScaleDown}}
           >
             <i class="icon icon-minus icon-fw"/>
@@ -108,7 +108,7 @@
           <button
             style="margin-left: -1px;"
             class="btn btn-xs bg-primary"
-            {{action "scaleUp" target=service}}
+            {{action "podUp"}}
             disabled={{not service.canScaleUp}}
           >
             <i class="icon icon-plus icon-fw"/>
@@ -303,7 +303,7 @@
     }}
   {{/if}}
 
-  {{#if scope.currentCluster.enableClusterMonitoring}}
+  {{#if (or (and scope.currentProject.isSystemProject scope.currentCluster.enableClusterMonitoring) scope.currentProject.enableProjectMonitoring)}}
     {{container/form-custom-metrics
       classNames="accordion-wrapper"
       workload=service
@@ -314,3 +314,10 @@
   {{/if}}
 
 {{/accordion-list}}
+
+{{#custom-modal-adjust-pod
+  modalVisible=showAddPodModal
+  models=service
+  podChangeNum=podChangeNum
+  saved=(action "refreshScale" target=service)
+}}{{/custom-modal-adjust-pod }}

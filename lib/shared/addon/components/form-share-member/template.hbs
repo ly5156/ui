@@ -1,0 +1,72 @@
+{{#if editing}}
+  <div class="row">
+    <div class="col">
+      <button class="btn bg-link icon-btn p-0" {{action "addMember"}}>
+        <span class="darken">
+          <i class="icon icon-plus text-small"/>
+        </span>
+        <span>
+          {{t "formShareMember.add"}}
+        </span>
+      </button>
+    </div>
+  </div>
+{{/if}}
+
+<div class="row">
+  <SortableTable
+    @class="grid sortable-table"
+    @body={{membersRows}}
+    @searchText={{searchText}}
+    @descending={{descending}}
+    @sortBy={{sortBy}}
+    @bulkActions={{false}}
+    @pagingLabel="pagination.cluster"
+    @headers={{membersHeaders}}
+    @stickyHeader={{false}}
+    @search={{false}}
+    as |sortable kind member dt|
+  >
+    {{#if (eq kind "row")}}
+      {{#unless member.pendingDelete}}
+        <ShareMemberRow
+          @member={{member}}
+          @editing={{editing}}
+          @clusterResource={{resource}}
+          @users={{users}}
+          @remove={{removeMember}}
+        />
+      {{/unless}}
+    {{else if (eq kind "nomatch")}}
+      <tr>
+        <td colspan="{{sortable.fullColspan}}" class="no-match">
+          {{t "formShareMember.table.noMatch"}}
+        </td>
+      </tr>
+    {{else if (eq kind "norows")}}
+      <tr>
+        <td colspan="{{sortable.fullColspan}}" class="no-data">
+          {{t "formShareMember.table.noData"}}
+        </td>
+      </tr>
+    {{/if}}
+  </SortableTable>
+
+  <hr/>
+
+  {{#if editing}}
+    <div class="col span-6">
+      <div class="radio">
+        <label>
+          {{input
+            type="checkbox"
+            classNames="form-control"
+            checked=addPublicMember
+            change=(action "checkboxToggled")
+          }}
+          {{t "formShareMember.public"}}
+        </label>
+      </div>
+    </div>
+  {{/if}}
+</div>

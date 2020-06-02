@@ -1,0 +1,392 @@
+imageRepoSection:
+  common:
+    reset: Reset
+  action:
+    changePwd: "Change Password"
+    edit: Edit
+    editAccount: "Edit Account"
+  projectsPage:
+    addProject: "New Project"
+    removeProject: "Remove Project"
+    projectPublic: "Public"
+    porjectPrivate: "Pricate"
+    projectRoles:
+      admin: Project Admin
+      master: Master
+      developer: Developer
+      guest: Guest
+    table:
+      noData: No Data
+      noMatch: No Data Match
+  adminConfigPage:
+    saveHarborConfig: "SAVE"
+    removeHarborConfig: "REMOVE Harbor Config"
+    testEmailServer: "Test mail server"
+    gcSchedule: "Clean up"
+    methodNotSupported: "Rancher({rancherAuthMode}) does not support harbor server with {auth} authorization, does not support sync with harbor user."
+  userConfigPage:
+    syncAccount: "Synchronous Account"
+    reSyncAccount: "Resynchronize Account"
+    methodNotSupported: "Rancher({rancherAuthMode}) does not support harbor server with {auth} authorization."
+  labelPage:
+    table:
+      noMatch: 没有Label匹配当前搜索
+      noData: "No Data"
+  tagPage:
+    copyDigest: Copy Summary
+    copy: COPY
+    addLabel: Add Label
+    table:
+      noMatch: 没有TAG匹配当前搜索
+      noData: "No Data"
+    action:
+      copyDigest: Copy Summary
+      addLabel: Add Tag
+      retag: Copy Image
+quotasCn:
+  quotas: Quotas
+  remain: Assignable
+  editProjectModal: Edit project quotas
+  editNamespaceModal: Edit namespace quotas
+  headers:
+    namespace: Namespace
+    used: Allocated
+    percent: Percent
+  common:
+    limit: Limit
+    reserved: Reserved
+    use: Used
+    total: Total
+    usage: Usage
+    avaliable: Avaliable
+  project:
+    title: Project Quotas
+  namespace:
+    title: Namespace Quotas
+  notice: No quotas configured, Add quotas by setting the project quota item.
+
+harborConfig:
+  title: "Harbor Configuration"
+  sync:
+    title: "Harbor Account synchronous"
+    subtitle: "Synchronizes the current user information to Harbor"
+  setting:
+    title: "Harbor Account Settings"
+    subTitle: "Set the mailbox and access password"
+  wait: "Please wait for the administrator to configure the mirror library."
+  info: "Please configure your Harbor account before visiting this page."
+  log: "Logs"
+  image: "Image Management"
+  newProject: "New Project"
+  access:
+    title: "Harbor Access Configuration"
+    subtitle: "Set up the Harbor visiting address and account."
+  form:
+    address:
+      label: Address
+      placeholder: "Access the URL of the Harbor."
+    email:
+      label: Email
+      placeholder: Email
+    username:
+      label: Username
+      placeholder: "The username of access the Harbor."
+    pw:
+      label: Password
+      placeholder: "The password to access the Harbor."
+    newPw:
+      label: "New"
+      placeholder: "New Harbor password"
+    confirmPw:
+      label: "Confirm"
+      placeholder: "Confirm your website password"
+    image:
+      all: "All Projects"
+      public: "Public Projects"
+      private: "Private Projects"
+    search:
+      placeholder: Search
+      username: Username
+      store: Store
+      tag: Tag
+      operation: Operation
+    projectName:
+      label: "Project Name"
+    accessLevel:
+      label: "Access Level"
+      checkPublic: Public
+      info: 'When the project is set to public, anyone with read access to the image under this item can pull the image under this item without "docker login".'
+    creator:
+      all: All
+      admin: Admin
+    addMember:
+      title: Add Member
+      username:
+        label: Username
+        placeholder: username
+      role:
+        label: Role
+  validate:
+    notAdmin: "Configure Harbor with the user of the administrator role"
+    addressError: "Access address error"
+    unableAccess: "Unable to access Harbor services"
+    harborInfoError: "Harbor Website address、 username or password incorrect"
+    harborNeedUpdate: "Please save harbor config again for better use Rancher integration with harbor server."
+    numAndReq: "Token expiration time must be filled, and is a number"
+    formatError: "Passwords should be between 8 and 20 in length and contain at least one uppercase character, one lowercase character, and one number"
+    confirmError: "The new password and the confirmation password must be the same"
+    urlReq: "Address cannot be empty"
+    urlFormatError: "URL address format error，e.g. http(s)://example.com"
+    usernameReq: "Username cannot be empty"
+    pwReq: "Password cannot be empty"
+    emailHostReq: "Please enter the mail server address"
+    emailFromReq: "Please enter the email source"
+    emailPortFormatError: "Please enter the correct port number"
+    updateEmailServerOk: "The updated mail server configuration was successful"
+    updateEmailServerError: "Failed to update mail server configuration, error"
+    validateEmailServerError: "Verify that the mail server failed, error"
+    updateSystemOk: "System Settings were updated successfully"
+    updateSystemError: "Failed to update system Settings, error"
+    emailPortReq: "Please enter the mail server port"
+    errorAndResetHarbor: "The original account or password is wrong, the password cannot be changed, please reconfigure the Harbor account."
+    validateEmailServerOk: "Verify that the mail server was successful"
+    accountUnavailable: "Harbor Account unavailable"
+    emailReq: "Please enter your email address"
+    emailUrlError: "Please use the correct email address，e.g. name@example.com"
+    projectNameReq: "Please enter the project name"
+    projectNameFormatError: 'The project name consists of a lowercase character number and "._-", and has at least two characters beginning with a letter or number'
+    projectNameExist: "The project name already exists"
+    pwdError: Password incorrect
+  table:
+    projectName: "Project name"
+    level: "Access Level"
+    role: Role
+    count: Number of image store
+    username: Username
+    imagename: Image Name
+    tag: Tag
+    operation: Operation
+    timestamp: Timestamp
+    entityName: Name
+    entityType: "Member Type"
+    roleItem:
+      admin: Manager
+      developer: Developer
+      visitor: Visitors
+      user: User
+      master: Master
+      limitedGuest: Limited Guest
+    storeStatus:
+      public: Public
+      private: Private
+      message: "When the project is set to public, anyone with read access to the image under this item can pull the image under this item without docker login."
+    name: Name
+    tagCount: Tag Count
+    downCount: Down Count
+    pushImg:
+      btn: PUSH
+      title: Push Image
+      markedImg: Mark the image in the project
+      pushImgToProject: Push the image to the current project
+    otherOperation:
+      title: Others
+      setRole: Set Role
+      removeMembers: Remove
+    addUser: Add User
+    imageTag: Image Tag
+    size: Size
+    pullCommand: Pull Command
+    author: Author
+    dockerVersion: Docker Version
+    label: Label
+  btn:
+    createProject: "NEW"
+  advanced:
+    titleLeft: "Other advanced options are configured in the "
+    titleRight: "."
+    label:
+      title: Labels
+      subtitle: "Label Management"
+      create: "NEW LABEL"
+      name: Label
+      describe: Description
+      createTime: "Creation Time"
+      nodata: "No Data"
+  formTag:
+    titleAdd: "New Tag"
+    titleEdit: "Edit Tag"
+    name:
+      label: "Tag Name"
+      nameReq: '"Tag Name" cannot be empty'
+      nameExist: '"Tag Name" already existed '
+    color:
+      label: Color
+    description: "Tag Description"
+    btn:
+      add: "New Tag"
+  tab:
+    summary: "Summary"
+    store: "Image Store"
+    member: "Member"
+    copy: "Copy"
+    tag: "Tag"
+    log: "Log"
+    accessLevel: "Access Level"
+  summary:
+    projectImageRepo: "Project repositories"
+    projectMember: "Project members"
+    projectQuota: "Project quotas"
+    count: "Artifact count"
+    storage: "Storage used"
+    infinity: "unlimited"
+
+vlansubnetPage:
+  unsupport: "The current cluster does not support flat networks."
+  createMacvlan: "Create MacvlanSubnet"
+  editMacvlan: "Edit MacvlanSubnet"
+  noData: "No Data"
+  noMatch: "There is no matching data."
+  deleteVlanAboutPodsTotal: "There are {total} Pods in use"
+  deleteVlanAboutPodsTotalThan: "More than {total} Pods are in use"
+  deleteVlanAboutVlans: '"{vlan}" and {others} others'
+  macvlanIpCount: Total IP number：{total}
+formVlan:
+  name:
+    label: Name
+    placeholder: "e.g. testvlan"
+    nameReq: '"name" cannot be empty'
+    nameFormatError: '"name" consists of alphanumeric and ._-, not more than 62 characters in length and beginning with a letter or number"'
+  master:
+    label: Master
+    placeholder: "e.g. eth0"
+    masterReq: '"master" cannot be empty'
+  vlan:
+    label: VLAN
+    placeholder: "Values between 2 and 4095."
+    vlanRangeError: '"VLAN" should be between 2 and 4095'
+  cidr:
+    label: CIDR
+    placeholder: "e.g. 192.168.2.0/24"
+    cidrReq: '"CIDR" cannot be empty'
+    cidrFormatError: '"CIDR" format error'
+  mode:
+    label: MODE
+  gateway:
+    label: GATEWAY
+    placeholder: "e.g. 192.168.1.1"
+    gatewayFormatError: '"Gateway" format error'
+  project:
+    label: Project
+  ipReuse:
+    label: Ip Delay Reuse
+    ipReuseUnit: minute
+    placeholder: "Values between 1 and 3600."
+    ipReuseFormatError: '"Ip Delay Reuse" format error'
+  ipRange:
+    label: "IP Range"
+    btn: "Add IP Range"
+    IPFormatError: '"IP Ranges" There are records with incorrect IP address format'
+    IPInCidrError: '"IP Ranges" There are records of IP addresses that are not in the subnet scope'
+    IPRangeError: 'The starting address {min} cannot be greater than the ending address {max}'
+    IPRangeExist: '"IP Ranges" already existed '
+    IPRangeExistWithOthers: "The current IP address range conflicts with an existing IP address range."
+    formInfoExist: '"master":{master}, "vlan":{vlan}, "cidr":{cidr} already exists'
+    start:
+      label: "Range Start"
+      placeholder: "e.g. 192.168.56.10"
+    end:
+      label: "Range End"
+      placeholder: "e.g. 192.168.56.20"
+  route:
+    label: "Custom Route"
+    btn: "Add Custom Route"
+    routeDstReq: '"Custom Route": "Destination" cannot be empty'
+    routeDstFormatError: '"Custom Route": "Destination" format error'
+    routeGwFormatError: '"Custom Route": "Gateway" format error'
+    routeGwInCidrError: '"Custom Route": "Gateway" There are records of IP addresses that are not in the subnet scope'
+    des:
+      label: Destination
+      placeholder: "e.g. 192.168.0.0/16"
+    gw:
+      label: Gateway
+      placeholder: "e.g. 192.168.1.1"
+    iface:
+      label: Iface
+      eth1: eth1
+      eth0: eth0
+  defaultGateway:
+    label: "The eth1 as the container's default gateway"
+    info: canal-macvlan default gateway setting eth1 requires manual editing of macvlan subnet YAML. Some routing information in subnet needs to be set according to the host network environment.
+    serviceCidr:
+      label: ServiceCidr
+      placeholder: "e.g. 10.43.0.0/16"
+      serviceCidrReq: '"ServiceCidr" cannot be empty'
+      serviceCidrFormatError: '"ServiceCidr" format error'
+auditLog:
+  title: "Audit Log"
+  serverSetError: 'Please check if the "auditlog-server-url" service configuration is correct'
+  unknownError: 'unknown error'
+  form:
+    name:
+      label: "Resource Name/ID"
+      placeholder: "Resource Name/ID"
+    type:
+      label: "All Types"
+      placeholder: "All Types"
+    operation:
+      all: "All Operations"
+      create: Create
+      update: Update
+      delete: Delete
+    time:
+      all: "All Created"
+      day5: "The last 5 days"
+      day10: "The last 10 days"
+      day15: "The last 15 days"
+    operator:
+      placeholder: operator
+  table:
+    user: Operator
+    operation: Operation
+    result: "Operating Result"
+    time: "Change Time"
+    type: "Resource Type"
+    name: "Resource Name/ID"
+    detail: Detail
+    noData: "No Data"
+    noMatch: "No matching data is available"
+  btn:
+    clearAll: "CLEAR"
+    search: Search
+    detail: Detail
+  detail:
+    title: "Audit Log - Request details"
+    request: "Request Object"
+    response: "Response Object"
+    btn:
+      close: Close
+  status:
+    200: success
+    201: created
+    202: accepted
+    203: non-authoritative
+    204: success
+    205: reset content
+    206: partial content
+    300: multiple choice
+    301: moved permanently
+    302: moved temporaily
+    400: bad request
+    401: unauthorized
+    403: forbid
+    404: not found
+    405: method disable
+    406: not accept
+    407: proxy authentication
+    408: timed out
+    500: server error
+    501: not yet implemented
+    502: bad gateway
+    503: service unavailable
+    504: gateway time out
+    505: HTTP version not supported
