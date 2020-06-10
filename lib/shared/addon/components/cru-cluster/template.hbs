@@ -86,6 +86,22 @@
       initialLabels=model.cluster.labels
       model=model.cluster
     }}
+
+    {{#if (eq driverInfo.name "import")}}
+      {{#accordion-list-item
+              title=(t "cruPrivateRegistry.title.label")
+              detail=(t "cruPrivateRegistry.title.detail")
+              expandOnInit=(or (or (eq mode "edit" true false) forceExpandOnInit) applyClusterTemplate)
+              expandAll=al.expandAll
+              expand=(action expandFn)
+      }}
+        {{input
+                type="text"
+                value=model.cluster.systemDefaultRegistry
+                classNames="form-control"
+        }}
+      {{/accordion-list-item}}
+    {{/if}}
   {{/accordion-list}}
 {{/if}}
 
