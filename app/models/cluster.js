@@ -150,8 +150,6 @@ export default Resource.extend(Grafana, ResourceUsage, {
       return 'googlegke';
     case 'tencentEngineConfig':
       return 'tencenttke';
-    case 'huaweiEngineConfig':
-      return 'huaweicce';
     case 'rancherKubernetesEngineConfig':
       if ( !pools.length ) {
         return 'custom';
@@ -182,8 +180,6 @@ export default Resource.extend(Grafana, ResourceUsage, {
       return intl.t('clusterNew.googlegke.shortLabel');
     case 'tencentEngineConfig':
       return intl.t('clusterNew.tencenttke.shortLabel');
-    case 'huaweiEngineConfig':
-      return intl.t('clusterNew.huaweicce.shortLabel');
     case 'rancherKubernetesEngineConfig':
       if ( !!pools ) {
         if ( firstPool ) {
