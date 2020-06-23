@@ -36,24 +36,60 @@
       {{/if}}
 
       {{#if (eq pageScope "cluster")}}
-        <div class="row">
+        <label class="row flex-align-center hand">
           {{input
             type="checkbox"
-            classNames="form-control"
+            classNames="form-control mr-5"
             checked=model.includeSystemComponent
           }}
           {{t "loggingPage.additional.includeSystemComponent.label"}}
-        </div>
+        </label>
       {{/if}}
 
-      <div class="row">
+      <label class="row flex-align-center hand">
         {{input
           type="checkbox"
-          classNames="form-control"
+          classNames="form-control mr-5"
           checked=loggingModel.enableJSONParsing
         }}
         {{t "loggingPage.additional.jsonParsing.label"}}
-      </div>
+      </label>
+
+      {{#if (and (not-eq targetType "syslog") (not-eq customType "syslog"))}}
+        <label class="row flex-align-center hand">
+          {{input
+            type="checkbox"
+            classNames="form-control mr-5"
+            checked=model.enableMultiLineFilter
+          }}
+          {{t "loggingPage.additional.enableMultiLineFilter.label"}}
+        </label>
+
+        {{#if model.enableMultiLineFilter}}
+          <div classNames="row">
+            <div classNames="col">
+              <label class="acc-label">
+                {{t "loggingPage.additional.multiLineStartRegexp.label"}}
+                </label>
+                {{input
+                  value=model.multiLineStartRegexp
+                  class="form-control"
+                }}
+            </div>
+          </div>
+          <div classNames="row">
+            <div classNames="col">
+              <label class="acc-label">
+                {{t "loggingPage.additional.multiLineEndRegexp.label"}}
+                </label>
+                {{input
+                  value=model.multiLineEndRegexp
+                  class="form-control"
+                }}
+            </div>
+          </div>
+        {{/if}}
+      {{/if}}
 
     </section>
   </div>
